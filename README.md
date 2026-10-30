@@ -15,6 +15,7 @@
 
 - ตั้งกระทู้ (topic) ได้
 - เขียนความเห็น (comment) ได้
+- สมัครสมาชิก / login ด้วยรหัสผ่าน + 2FA (TOTP) — รหัสผ่านเก็บเป็น PBKDF2-HMAC-SHA256 ([เหตุผล](docs/architecture/decisions/ADR-auth-password-2fa.md))
 
 ส่วนเสริม (ถ้ามีเวลา): comment ย่อยใน comment, tag ให้กระทู้, แยกห้อง (room)
 

@@ -144,7 +144,7 @@
 <!-- omit in toc -->
 ### Scopes
 
-ใช้ชื่อ layer/ส่วนของระบบ: `ui` (Presentation), `api` (Domain), `data` (Data Access / EF), `db` (migration/schema), `docs`, `ci`
+ใช้ชื่อ layer/ส่วนของระบบ: `ui` (Presentation), `api` (Domain), `data` (Data Access / EF), `db` (migration/schema), `auth` (login, 2FA, password hashing), `docs`, `ci`
 
 <!-- omit in toc -->
 ### Examples
@@ -200,7 +200,7 @@ add topic api and fix ui    # สองเรื่องใน commit เดี
 
 ## Secrets
 
-- **ห้าม commit secret** — connection string จริง, password ของฐานข้อมูล, API key
+- **ห้าม commit secret** — connection string จริง, password ของฐานข้อมูล, JWT signing key, Data Protection key, API key
 - เก็บ connection string ตอน dev ด้วย `dotnet user-secrets` หรือ environment variable
 - `appsettings.json` ที่ commit ได้มีแค่ค่าตัวอย่าง (เช่น `Host=localhost;Database=webboard;Username=postgres`) ไม่มี password
 - ถ้าเผลอ commit secret ไปแล้ว: เปลี่ยน password นั้นทันที แล้วแจ้งทีม — การลบใน commit ถัดไปไม่พอ เพราะยังอยู่ใน history

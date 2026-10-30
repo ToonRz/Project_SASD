@@ -15,6 +15,10 @@
 | API docs | **OpenAPI** (`Microsoft.AspNetCore.OpenApi`) + Swagger UI | เปิดเฉพาะ Development |
 | Validation | DataAnnotations (`[Required]`, `[MaxLength]`) | ตอบ `400` เป็น Problem Details อัตโนมัติ |
 | Errors | `AddProblemDetails()` | RFC 9457 |
+| Auth — password hash | **PBKDF2-HMAC-SHA256** ผ่าน `Rfc2898DeriveBytes.Pbkdf2` (BCL) | 600,000 รอบ, salt 16 bytes, hash 32 bytes, เทียบด้วย `CryptographicOperations.FixedTimeEquals` — ดู [ADR](architecture/decisions/ADR-auth-password-2fa.md) |
+| Auth — 2FA | **TOTP** (RFC 6238) ผ่าน **Otp.NET** | SHA-1, 6 หลัก, 30 วินาที, ยอมคลาด ±1 ช่วง |
+| Auth — tokens | **JWT Bearer** (`Microsoft.AspNetCore.Authentication.JwtBearer`) | HS256; access 60 นาที, MFA 5 นาที; signing key อยู่ใน user-secrets |
+| Secret at rest | **ASP.NET Core Data Protection** | เข้ารหัส shared key ของ 2FA ก่อนลง DB |
 
 ## 2. Data Access Layer (`src/Webboard.DataAccess/`)
 
@@ -41,7 +45,8 @@
 | --- | --- | --- |
 | Framework | TBD | |
 | HTTP client | TBD | |
-| Dev server / CORS | TBD | ถ้า UI รันคนละ port กับ API ต้องตั้ง CORS ที่ `Program.cs` |
+| Dev server / CORS | TBD | ถ้า UI รันคนละ port กับ API ต้องตั้ง CORS ที่ `Program.cs` (อนุญาต header `Authorization`) |
+| QR code | TBD | แปลง `otpauthUri` จาก `/api/auth/2fa/setup` เป็น QR ให้แอป Authenticator สแกน |
 
 ## 5. Dev / Test Tooling
 

@@ -28,8 +28,42 @@ _Avoid_: Category, Label (Category ชวนให้เข้าใจว่า
 _Avoid_: Board, Category, Forum, Group
 
 **Author** (ผู้เขียน):
-ชื่อที่แสดงว่าใครเขียน **Topic** หรือ **Comment** ใน MVP เป็นแค่ display name ที่ผู้ใช้กรอก ยังไม่ผูกกับบัญชีผู้ใช้
-_Avoid_: User, Member (ใช้เมื่อมีระบบบัญชีแล้วเท่านั้น)
+**Member** ที่เขียน **Topic** หรือ **Comment** นั้น — มาจาก access token เสมอ ไม่ใช่ชื่อที่พิมพ์มาใน request
+_Avoid_: Poster, Owner
+
+### Accounts
+
+**Member** (สมาชิก):
+ผู้ใช้ที่มีบัญชี (`Username`, `DisplayName`, รหัสผ่าน, 2FA) ในโค้ดเป็น class `User` บนตาราง `app_user` (`user` เป็นคำสงวนของ PostgreSQL)
+_Avoid_: Account, Customer
+
+**Reader** (ผู้อ่าน):
+ผู้ใช้ที่ไม่ได้ login — อ่านได้ เขียนไม่ได้
+_Avoid_: Guest, Anonymous user
+
+**Username** / **DisplayName**:
+`Username` ใช้ login (ตัวเล็ก, ไม่ซ้ำ, เปลี่ยนไม่ได้) ส่วน `DisplayName` คือชื่อที่แสดงบนกระทู้และความเห็น
+_Avoid_: Login name, Nickname
+
+**Password Hash**:
+ผลของ PBKDF2-HMAC-SHA256 ที่เก็บแทนรหัสผ่าน ถอดกลับเป็นรหัสผ่านไม่ได้
+_Avoid_: Encrypted password (ไม่ได้เข้ารหัส — เป็น hash)
+
+**Two-Factor (2FA)** / **TOTP**:
+ขั้นที่สองของ login: รหัส 6 หลักที่แอป Authenticator สร้างใหม่ทุก 30 วินาทีจาก **Shared Key**
+_Avoid_: OTP (ชวนนึกถึง OTP ทาง SMS ซึ่งระบบนี้ไม่มี)
+
+**Shared Key**:
+Secret ของ TOTP ที่ระบบกับแอป Authenticator ถือร่วมกัน ได้มาตอนตั้ง 2FA (สแกน QR) เก็บในฐานข้อมูลแบบเข้ารหัส
+_Avoid_: Seed, 2FA password
+
+**MFA Token**:
+Token อายุ 5 นาทีที่ได้หลังรหัสผ่านถูก ใช้ได้กับขั้น 2FA เท่านั้น
+_Avoid_: Temp token, Pre-auth token
+
+**Access Token**:
+JWT อายุ 60 นาทีที่ได้หลังผ่าน 2FA ส่งใน header `Authorization: Bearer` เพื่อเรียก endpoint ที่ต้อง login
+_Avoid_: Session, Cookie
 
 ## Flagged ambiguities
 
@@ -40,3 +74,7 @@ _Avoid_: User, Member (ใช้เมื่อมีระบบบัญชี
 **"Tag" vs "Room"**:
 ทั้งคู่ใช้จัดกลุ่มกระทู้
 **Resolved:** **Room** = ที่อยู่ของ Topic (หนึ่งต่อหนึ่ง, บังคับเลือกเมื่อเปิดใช้ฟีเจอร์ Room), **Tag** = คำอธิบายเพิ่มเติม (หลายต่อหลาย, ไม่บังคับ)
+
+**"encrypt รหัสผ่านเป็น SHA-256"**:
+SHA-256 เป็น hash ไม่ใช่การเข้ารหัส และ SHA-256 ครั้งเดียวไม่พอสำหรับรหัสผ่าน
+**Resolved:** เก็บเป็น **Password Hash** แบบ PBKDF2-HMAC-SHA256 (มี salt, 600,000 รอบ) — ดู ADR-auth-password-2fa

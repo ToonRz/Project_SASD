@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: UI pane on the left (what the user sees); Domain + Data Access stacked on the right (what happens behind it). One column on phones. */
+/* Layout: UI pane + the user's authenticator app on the left; Domain + Data Access stacked on the right. One column on phones. */
 :root {
   --bg: #F2F4F7;
   --surface: #FFFFFF;
@@ -23,6 +23,7 @@
   --warn: #B54708;
   --err: #C42B2B;
   --flash: #FFF3C4;
+  --qr-bg: #FFFFFF;
   --font-display: "Bai Jamjuree", "IBM Plex Sans Thai", system-ui, sans-serif;
   --font-body: "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, "IBM Plex Sans Thai", monospace;
@@ -54,12 +55,13 @@ body {
 h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
 button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .55; }
 :focus-visible { outline: 2px solid var(--dom); outline-offset: 2px; }
 
 /* header */
 .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
 .top h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
-.top p { margin: 2px 0 0; color: var(--muted); max-width: 62ch; }
+.top p { margin: 2px 0 0; color: var(--muted); max-width: 66ch; }
 .reset { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; font-size: 13px; }
 .reset:hover { border-color: var(--muted); }
 
@@ -76,15 +78,17 @@ button { cursor: pointer; }
 
 /* grid */
 .grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-.side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 @media (max-width: 920px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 
 .layer { --c: var(--pres); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
 .layer.dom { --c: var(--dom); }
 .layer.data { --c: var(--data); }
+.layer.phone { --c: var(--muted); border-style: dashed; }
 .layer-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--c) 8%, var(--surface)); }
 .layer-num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--c); color: var(--on-accent); font: 600 12px/1 var(--font-mono); }
 .layer-head h2 { font-size: 16px; font-weight: 600; color: var(--c); }
+.layer.phone .layer-head h2 { color: var(--ink); }
 .layer-head .tech { color: var(--muted); font-size: 13px; margin-left: auto; }
 .layer-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 
@@ -96,12 +100,18 @@ pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); bord
 .dots { display: flex; gap: 5px; }
 .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
 .url { flex: 1; min-width: 0; background: var(--code-bg); border-radius: 5px; padding: 3px 10px; font: 12.5px var(--font-mono); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.site { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.brand { font: 600 18px var(--font-display); color: var(--pres); background: none; border: 0; padding: 0; }
+.site .acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13.5px; }
+.site .me { color: var(--muted); }
+.site .me b { color: var(--ink); font-weight: 600; }
 .board { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
 .board-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .board-title h3 { font-size: 20px; font-weight: 600; }
 .btn { border: 0; border-radius: 6px; padding: 7px 14px; background: var(--pres); color: var(--on-accent); font-weight: 500; font-size: 14px; }
-.btn:hover { filter: brightness(1.08); }
+.btn:hover:not(:disabled) { filter: brightness(1.08); }
 .btn.ghost { background: transparent; color: var(--pres); border: 1px solid color-mix(in srgb, var(--pres) 45%, var(--line)); }
+.btn.sm { padding: 3px 10px; font-size: 13px; }
 .link { background: none; border: 0; padding: 0; color: var(--pres); font-weight: 500; text-align: left; }
 .link:hover { text-decoration: underline; }
 
@@ -114,15 +124,25 @@ pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); bord
 .count { flex: none; font: 500 12px var(--font-mono); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
 
 form.card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: color-mix(in srgb, var(--pres) 4%, var(--surface)); }
+form.narrow { max-width: 440px; }
 .field { display: flex; flex-direction: column; gap: 3px; }
 .field label { font-size: 13px; font-weight: 500; }
 .field input, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; background: var(--surface); }
 .field textarea { min-height: 72px; resize: vertical; }
 .field.bad input, .field.bad textarea { border-color: var(--err); }
+.field input.code { font: 500 20px var(--font-mono); letter-spacing: .3em; max-width: 12ch; }
 .err { color: var(--err); font-size: 12.5px; }
+.form-err { margin: 0; font-size: 13.5px; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.row .field { flex: 1 1 160px; }
 .hint { font-size: 12.5px; color: var(--muted); }
+.notice { border: 1px solid color-mix(in srgb, var(--pres) 40%, var(--line)); background: color-mix(in srgb, var(--pres) 7%, var(--surface)); border-radius: 6px; padding: 8px 12px; font-size: 14px; }
+.gate { border: 1px dashed var(--line); border-radius: 8px; padding: 10px 14px; font-size: 14px; color: var(--muted); }
+.steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.qr { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.qr-box { background: var(--qr-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--line); line-height: 0; }
+.qr-box svg { width: 150px; height: 150px; }
+.qr-info { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.key { font: 500 14px var(--font-mono); letter-spacing: .05em; word-break: break-all; }
 
 .topic-full h3 { font-size: 22px; font-weight: 600; }
 .topic-full .body { margin: 8px 0 0; white-space: pre-wrap; }
@@ -133,7 +153,18 @@ form.card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; di
 .comment .text { white-space: pre-wrap; }
 .kids { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding-left: 14px; }
 .kids.flat { padding-left: 0; }
-.empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+.empty { color: var(--muted); font-size: 14px; padding: 8px 0; margin: 0; }
+
+/* --- authenticator app --- */
+.otp-list { list-style: none; margin: 0; padding: 0; }
+.otp-list li { display: flex; align-items: center; gap: 12px; padding: 7px 0; }
+.otp-list li + li { border-top: 1px solid var(--line); }
+.otp-label { flex: 1; min-width: 0; font-size: 13px; }
+.otp-label small { display: block; color: var(--muted); font-size: 11.5px; }
+.otp-code { font: 500 20px var(--font-mono); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.timer { display: flex; align-items: center; gap: 10px; font: 12px var(--font-mono); color: var(--muted); }
+.timer .bar { flex: 1; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.timer .bar i { display: block; height: 100%; background: var(--pres); transition: width 1s linear; }
 
 /* --- Domain --- */
 .handler { font: 13px var(--font-mono); display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
@@ -146,7 +177,7 @@ form.card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; di
 @media (max-width: 560px) { .two { grid-template-columns: minmax(0, 1fr); } }
 .tests { display: flex; flex-wrap: wrap; gap: 6px; }
 .test { border: 1px dashed color-mix(in srgb, var(--dom) 55%, var(--line)); background: transparent; color: var(--dom); border-radius: 6px; padding: 4px 10px; font-size: 13px; }
-.test:hover { background: color-mix(in srgb, var(--dom) 8%, transparent); }
+.test:hover:not(:disabled) { background: color-mix(in srgb, var(--dom) 8%, transparent); }
 .log { list-style: none; margin: 0; padding: 0; font: 12.5px var(--font-mono); border: 1px solid var(--line); border-radius: 6px; max-height: 180px; overflow: auto; }
 .log li button { width: 100%; display: flex; gap: 8px; align-items: center; background: none; border: 0; padding: 5px 10px; text-align: left; }
 .log li + li { border-top: 1px solid var(--line); }
@@ -154,29 +185,32 @@ form.card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; di
 .log li.cur button { background: color-mix(in srgb, var(--dom) 10%, transparent); }
 .log .p { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .log .tag { color: var(--muted); font-size: 11px; }
-.stopnote { border: 1px solid color-mix(in srgb, var(--err) 40%, var(--line)); background: color-mix(in srgb, var(--err) 7%, var(--surface)); border-radius: 6px; padding: 8px 12px; font-size: 13.5px; }
+.stopnote, .note { border-radius: 6px; padding: 8px 12px; font-size: 13.5px; }
+.stopnote { border: 1px solid color-mix(in srgb, var(--err) 40%, var(--line)); background: color-mix(in srgb, var(--err) 7%, var(--surface)); }
+.note { border: 1px solid color-mix(in srgb, var(--dom) 35%, var(--line)); background: color-mix(in srgb, var(--dom) 6%, var(--surface)); }
 
 /* --- Data --- */
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 .tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 4px 10px; font: 500 13px var(--font-mono); color: var(--muted); margin-bottom: -1px; }
 .tab[aria-selected="true"] { color: var(--data); border-bottom-color: var(--data); }
 .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 6px 6px; max-height: 260px; }
 table { border-collapse: collapse; width: 100%; font: 12.5px var(--font-mono); font-variant-numeric: tabular-nums; }
 th, td { text-align: left; padding: 5px 10px; white-space: nowrap; border-bottom: 1px solid var(--line); }
 th { color: var(--muted); font-weight: 500; background: var(--code-bg); position: sticky; top: 0; }
-td.trunc { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+td.trunc { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
 td.null { color: var(--muted); font-style: italic; }
 tr.flash td { background: var(--flash); }
-.nosql { color: var(--muted); font-size: 13.5px; }
+.nosql { color: var(--muted); font-size: 13.5px; margin: 0; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
 <div class="wrap">
   <header class="top">
     <div>
       <h1>Webboard · 3-Layer Mock</h1>
-      <p>ลองตั้งกระทู้ เปิดอ่าน หรือคอมเมนต์ในหน้าเว็บทางซ้าย แล้วดูว่า Domain Layer รับ request อะไร และ Data Access Layer ยิง SQL อะไรลง PostgreSQL ข้อมูลทั้งหมดอยู่ในหน่วยความจำของหน้านี้</p>
+      <p>สมัครหรือ login (บัญชีตัวอย่าง <b>ton</b> / <b>webboard123</b>) ผ่าน 2FA แล้วตั้งกระทู้หรือคอมเมนต์ทางซ้าย จากนั้นดูว่า Domain Layer รับ request อะไร และ Data Access Layer ยิง SQL อะไรลง PostgreSQL การ hash รหัสผ่าน, TOTP และ JWT คำนวณจริงในเบราว์เซอร์ ส่วนข้อมูลอยู่ในหน่วยความจำของหน้านี้</p>
     </div>
     <button class="reset" id="reset" type="button">รีเซ็ตข้อมูลตัวอย่าง</button>
   </header>
@@ -191,16 +225,27 @@ tr.flash td { background: var(--flash); }
   </div>
 
   <div class="grid">
-    <section class="layer pres" aria-labelledby="h-pres">
-      <div class="layer-head">
-        <span class="layer-num">1</span><h2 id="h-pres">Presentation Layer</h2>
-        <span class="tech">เทคโนโลยียังไม่กำหนด · คุยผ่าน REST API เท่านั้น</span>
-      </div>
-      <div class="browser-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url" id="url">webboard.local/</span></div>
-      <div class="board" id="view"></div>
-    </section>
+    <div class="col">
+      <section class="layer pres" aria-labelledby="h-pres">
+        <div class="layer-head">
+          <span class="layer-num">1</span><h2 id="h-pres">Presentation Layer</h2>
+          <span class="tech">เทคโนโลยียังไม่กำหนด · คุยผ่าน REST API เท่านั้น</span>
+        </div>
+        <div class="browser-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url" id="url">webboard.local/</span></div>
+        <div class="site" id="site"></div>
+        <div class="board" id="view"></div>
+      </section>
 
-    <div class="side">
+      <section class="layer phone" aria-labelledby="h-phone">
+        <div class="layer-head">
+          <h2 id="h-phone">แอป Authenticator</h2>
+          <span class="tech">จำลองมือถือของผู้ใช้ · อยู่นอกระบบ</span>
+        </div>
+        <div class="layer-body" id="phone"></div>
+      </section>
+    </div>
+
+    <div class="col">
       <section class="layer dom" aria-labelledby="h-dom">
         <div class="layer-head">
           <span class="layer-num">2</span><h2 id="h-dom">Domain Layer</h2>
@@ -241,139 +286,417 @@ function setKids(el, ...kids) {
   el.replaceChildren(...kids.flat().filter(k => k != null && k !== false));
 }
 
-// ---------- "PostgreSQL": in-memory tables ----------
-let db;
-function minsAgo(m) { return new Date(Date.now() - m * 60000).toISOString(); }
-function seed() {
-  db = { topic: [], comment: [], seq: { topic: 0, comment: 0 } };
-  const t1 = insert('topic', { title: 'ใช้ EF Core กับ PostgreSQL แล้ว DateTime ฟ้อง Kind=Local แก้ยังไง', body: 'ตอน SaveChanges() ลงคอลัมน์ timestamptz แล้ว Npgsql โยน exception ว่า Kind=Local ไม่รองรับ ต้องแก้ตรงไหนครับ', author_name: 'ต้น', created_at: minsAgo(185), room_id: null });
-  const t2 = insert('topic', { title: 'สรุป Layered Architecture ก่อนสอบกลางภาค', body: 'Presentation → Domain → Data Access → Database\nlayer บนเรียก layer ล่างได้ทางเดียว ใครมีจุดที่ต้องเพิ่มคอมเมนต์ได้เลย', author_name: 'แพรว', created_at: minsAgo(62), room_id: null });
-  insert('topic', { title: 'แนะนำร้านข้าวมันไก่แถวคณะหน่อย', body: 'เบื่อร้านเดิมแล้ว ขอร้านที่เดินไปได้', author_name: 'ปอนด์', created_at: minsAgo(9), room_id: null });
-  const c1 = insert('comment', { topic_id: t1.id, parent_comment_id: null, body: 'ใช้ DateTime.UtcNow แทน DateTime.Now ครับ Npgsql 6 ขึ้นไปบังคับให้ค่าที่ลง timestamptz เป็น UTC', author_name: 'มายด์', created_at: minsAgo(170) });
-  insert('comment', { topic_id: t1.id, parent_comment_id: c1.id, body: 'ได้แล้วครับ ขอบคุณมาก', author_name: 'ต้น', created_at: minsAgo(160) });
-  insert('comment', { topic_id: t2.id, parent_comment_id: null, body: 'อย่าลืมว่า Controller ไม่ควรแตะ DbContext ตรง ให้ผ่าน Service', author_name: 'บีม', created_at: minsAgo(40) });
+// ---------- crypto: the same algorithms the server uses, via WebCrypto ----------
+const enc = new TextEncoder();
+const b64 = bytes => btoa(String.fromCharCode(...bytes));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64url = bytes => b64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64url = s => unb64(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
+const randBytes = n => crypto.getRandomValues(new Uint8Array(n));
+
+// Password hash: PBKDF2-HMAC-SHA256, 600,000 iterations, 16-byte salt (ADR-auth-password-2fa)
+const PBKDF2_ITER = 600000;
+async function pbkdf2(password, salt, iterations) {
+  const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+  return new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, key, 256));
 }
+async function hashPassword(password) {
+  const salt = randBytes(16);
+  return `PBKDF2-SHA256$${PBKDF2_ITER}$${b64(salt)}$${b64(await pbkdf2(password, salt, PBKDF2_ITER))}`;
+}
+async function verifyPassword(password, stored) {
+  const [, iter, salt, hash] = stored.split('$');
+  const got = await pbkdf2(password, unb64(salt), +iter);
+  const want = unb64(hash);
+  let diff = 0;
+  for (let i = 0; i < want.length; i++) diff |= got[i] ^ want[i]; // fixed-time compare
+  return diff === 0;
+}
+const DUMMY_HASH = `PBKDF2-SHA256$${PBKDF2_ITER}$${b64(new Uint8Array(16))}$${b64(new Uint8Array(32))}`;
+
+// TOTP (RFC 6238): HMAC-SHA1, 6 digits, 30-second steps
+const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+function b32encode(bytes) {
+  let bits = 0, val = 0, out = '';
+  for (const b of bytes) {
+    val = ((val << 8) | b) & 0xffff; bits += 8;
+    while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; }
+  }
+  if (bits > 0) out += B32[(val << (5 - bits)) & 31];
+  return out;
+}
+function b32decode(s) {
+  let bits = 0, val = 0; const out = [];
+  for (const c of s.replace(/[=\s]/g, '')) {
+    val = ((val << 5) | B32.indexOf(c)) & 0xffff; bits += 5;
+    if (bits >= 8) { out.push((val >>> (bits - 8)) & 255); bits -= 8; }
+  }
+  return new Uint8Array(out);
+}
+const nowStep = () => Math.floor(Date.now() / 30000);
+async function totp(secret, step) {
+  const key = await crypto.subtle.importKey('raw', b32decode(secret), { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+  const msg = new ArrayBuffer(8);
+  new DataView(msg).setUint32(4, step);
+  const mac = new Uint8Array(await crypto.subtle.sign('HMAC', key, msg));
+  const off = mac[19] & 15;
+  const bin = ((mac[off] & 127) << 24) | (mac[off + 1] << 16) | (mac[off + 2] << 8) | mac[off + 3];
+  return String(bin % 1e6).padStart(6, '0');
+}
+
+// JWT HS256 — the key stands in for "Jwt:SigningKey" from user-secrets
+let jwtKey;
+async function signJwt(payload) {
+  const head = b64url(enc.encode(JSON.stringify({ alg: 'HS256', typ: 'JWT' })));
+  const body = b64url(enc.encode(JSON.stringify(payload)));
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', jwtKey, enc.encode(`${head}.${body}`)));
+  return `${head}.${body}.${b64url(sig)}`;
+}
+async function readJwt(token) {
+  const [head, body, sig] = (token || '').split('.');
+  if (!sig) return null;
+  if (!await crypto.subtle.verify('HMAC', jwtKey, unb64url(sig), enc.encode(`${head}.${body}`))) return null;
+  const payload = JSON.parse(new TextDecoder().decode(unb64url(body)));
+  return payload.exp * 1000 > Date.now() ? payload : null;
+}
+
+// Data Protection: only the server's key ring can turn the stored value back into the shared key
+let keyRing;
+function protect(secret) { const p = 'CfDJ8' + b64url(randBytes(48)); keyRing.set(p, secret); return p; }
+const unprotect = p => keyRing.get(p);
+
+// ---------- "PostgreSQL": in-memory tables ----------
+const SEED_USERS = [
+  { username: 'ton', display: 'ต้น', secret: 'D6FOZ3ACB77CYI2RLCF7GTW35HS7H4TI', hash: 'PBKDF2-SHA256$600000$j+w8VambHSP/bJAWmvr1lg==$1NquiVJl/yyH9YHkyKBvGCzquLd8YWIOv2NoD3w+Ayk=' },
+  { username: 'mind', display: 'มายด์', secret: 'ZE5LUIXIGLNJCKNWZDDSGUSI5INR2CYD', hash: 'PBKDF2-SHA256$600000$wzSCMWHF2yg5SRgQ80RAbQ==$/B5u6mKulRNf237uWfKsfumBpxnF3k0j7YnoxJDNvKk=' },
+  { username: 'praew', display: 'แพรว', secret: '3WRBX3KABJDYXAX4QCMLDFM5UCN2A6XX', hash: 'PBKDF2-SHA256$600000$Iutw0iV+QEYX5JbSc/RpHg==$611CBkeaUS01t1BLDdwWU/n+REtY6VqUlSF1ilb5jcM=' },
+  { username: 'pond', display: 'ปอนด์', secret: 'WB7FDF3IXB4PE7C42I35IZR67Z2WCJP6', hash: 'PBKDF2-SHA256$600000$zHJWtmExZrM3GySI8knNZQ==$I+uMsAAI9pR5JJu7VIZiFe6eUkF5oBrKz5kXKj/Q5z0=' },
+  { username: 'beam', display: 'บีม', secret: 'R24U6OZIAYO4N7ZGX5LYPE67RC2ZX5G5', hash: 'PBKDF2-SHA256$600000$EPajv7S1QUD6KMXl6d2s4A==$XoL5rGh+cXrWrdSKb/xNu+Fm93amxm3gR6Ni5TPGMOM=' }
+];
+let db, authenticator;
+function minsAgo(m) { return new Date(Date.now() - m * 60000).toISOString(); }
 function insert(table, row) {
   const r = { id: ++db.seq[table], ...row };
   db[table].push(r);
   return r;
 }
+function seed() {
+  db = { app_user: [], topic: [], comment: [], seq: { app_user: 0, topic: 0, comment: 0 } };
+  keyRing = new Map();
+  authenticator = [];
+  SEED_USERS.forEach((u, i) => {
+    insert('app_user', { username: u.username, display_name: u.display, password_hash: u.hash, two_factor_enabled: true, totp_secret_protected: protect(u.secret), totp_last_step: null, failed_login_count: 0, lockout_until: null, created_at: minsAgo(60 * 24 * (10 - i)) });
+    authenticator.push({ username: u.username, secret: u.secret, code: '' });
+  });
+  const t1 = insert('topic', { user_id: 1, title: 'ใช้ EF Core กับ PostgreSQL แล้ว DateTime ฟ้อง Kind=Local แก้ยังไง', body: 'ตอน SaveChanges() ลงคอลัมน์ timestamptz แล้ว Npgsql โยน exception ว่า Kind=Local ไม่รองรับ ต้องแก้ตรงไหนครับ', created_at: minsAgo(185), room_id: null });
+  const t2 = insert('topic', { user_id: 3, title: 'สรุป Layered Architecture ก่อนสอบกลางภาค', body: 'Presentation → Domain → Data Access → Database\nlayer บนเรียก layer ล่างได้ทางเดียว ใครมีจุดที่ต้องเพิ่มคอมเมนต์ได้เลย', created_at: minsAgo(62), room_id: null });
+  insert('topic', { user_id: 4, title: 'แนะนำร้านข้าวมันไก่แถวคณะหน่อย', body: 'เบื่อร้านเดิมแล้ว ขอร้านที่เดินไปได้', created_at: minsAgo(9), room_id: null });
+  const c1 = insert('comment', { topic_id: t1.id, user_id: 2, parent_comment_id: null, body: 'ใช้ DateTime.UtcNow แทน DateTime.Now ครับ Npgsql 6 ขึ้นไปบังคับให้ค่าที่ลง timestamptz เป็น UTC', created_at: minsAgo(170) });
+  insert('comment', { topic_id: t1.id, user_id: 1, parent_comment_id: c1.id, body: 'ได้แล้วครับ ขอบคุณมาก', created_at: minsAgo(160) });
+  insert('comment', { topic_id: t2.id, user_id: 5, parent_comment_id: null, body: 'อย่าลืมว่า Controller ไม่ควรแตะ DbContext ตรง ให้ผ่าน Service', created_at: minsAgo(40) });
+}
+const userById = id => db.app_user.find(u => u.id === id);
+const nameOf = id => userById(id)?.display_name ?? '?';
 
 // ---------- Domain Layer: the REST API ----------
-const PROBLEM_400 = 'https://tools.ietf.org/html/rfc9110#section-15.5.1';
-const PROBLEM_404 = 'https://tools.ietf.org/html/rfc9110#section-15.5.5';
-function traceId() { return '00-' + Math.random().toString(16).slice(2, 18).padEnd(16, '0') + '-01'; }
+const PROBLEM = {
+  400: ['https://tools.ietf.org/html/rfc9110#section-15.5.1', 'Bad Request'],
+  401: ['https://tools.ietf.org/html/rfc9110#section-15.5.2', 'Unauthorized'],
+  404: ['https://tools.ietf.org/html/rfc9110#section-15.5.5', 'Not Found'],
+  409: ['https://tools.ietf.org/html/rfc9110#section-15.5.10', 'Conflict'],
+  429: ['https://tools.ietf.org/html/rfc6585#section-4', 'Too Many Requests']
+};
+function traceId() { return '00-' + b64url(randBytes(12)).toLowerCase().replace(/[^a-z0-9]/g, '0').slice(0, 16) + '-01'; }
+function problem(status, detail, extra = {}) {
+  const [type, title] = PROBLEM[status];
+  return { status, statusText: title, body: { type, title, status, detail, traceId: traceId() }, ...extra };
+}
+function badRequest(errors) {
+  return { status: 400, statusText: 'Bad Request', body: { type: PROBLEM[400][0], title: 'One or more validation errors occurred.', status: 400, errors, traceId: traceId() } };
+}
+// [Authorize] failing: JwtBearer answers 401 with an empty body before the controller runs
+const NOT_AUTHENTICATED = { status: 401, statusText: 'Unauthorized', headers: { 'WWW-Authenticate': 'Bearer' }, body: null, stoppedAt: 'api' };
 
-function topicSummary(t) {
-  return { id: t.id, title: t.title, authorName: t.author_name, createdAt: t.created_at, commentCount: db.comment.filter(c => c.topic_id === t.id).length };
-}
-function commentDto(c) {
-  return { id: c.id, topicId: c.topic_id, parentCommentId: c.parent_comment_id, authorName: c.author_name, body: c.body, createdAt: c.created_at };
-}
 function validate(body, rules) {
   const errors = {};
-  for (const [field, prop, max] of rules) {
-    const v = (body[prop] ?? '').trim();
-    if (!v) (errors[field] ||= []).push(`The ${field} field is required.`);
-    else if (max && v.length > max) (errors[field] ||= []).push(`The field ${field} must be a string or array type with a maximum length of '${max}'.`);
+  for (const [field, prop, min, max, pattern, patternMsg] of rules) {
+    const v = String(body[prop] ?? '').trim();
+    const add = msg => (errors[field] ||= []).push(msg);
+    if (!v) add(`The ${field} field is required.`);
+    else if (min && max && (v.length < min || v.length > max)) add(`The field ${field} must be a string with a minimum length of ${min} and a maximum length of ${max}.`);
+    else if (max && v.length > max) add(`The field ${field} must be a string or array type with a maximum length of '${max}'.`);
+    else if (pattern && !pattern.test(v)) add(patternMsg);
   }
   return Object.keys(errors).length ? errors : null;
 }
-function badRequest(errors) {
-  return { status: 400, statusText: 'Bad Request', body: { type: PROBLEM_400, title: 'One or more validation errors occurred.', status: 400, errors, traceId: traceId() } };
-}
-function notFound(detail) {
-  return { status: 404, statusText: 'Not Found', body: { type: PROBLEM_404, title: 'Not Found', status: 404, detail, traceId: traceId() } };
-}
 function sqlLog(ms, params, text) {
-  const p = Object.entries(params).map(([k, v]) => `${k}=${v === null ? 'NULL' : typeof v === 'number' ? v : `'${v}'`}`).join(', ');
+  const p = Object.entries(params).map(([k, v]) => `${k}=${v === null ? 'NULL' : typeof v === 'number' || typeof v === 'boolean' ? v : `'${v}'`}`).join(', ');
   return `-- Executed DbCommand (${ms}ms) [Parameters=[${p}]]\n${text}`;
 }
+async function bearer(headers, purpose) {
+  const p = await readJwt((headers.Authorization || '').replace(/^Bearer /, ''));
+  return p && p.purpose === purpose && userById(+p.sub) ? p : null;
+}
+const LOCK_MINUTES = 15, MAX_FAILURES = 5;
+const isLocked = u => u.lockout_until && new Date(u.lockout_until) > new Date();
+// returns true when this failure locked the account
+function registerFailure(u) {
+  u.failed_login_count++;
+  if (u.failed_login_count < MAX_FAILURES) return false;
+  u.failed_login_count = 0;
+  u.lockout_until = new Date(Date.now() + LOCK_MINUTES * 60000).toISOString();
+  return true;
+}
+const updateUserSql = u => sqlLog(2, { '@p0': u.failed_login_count, '@p1': u.lockout_until, '@p2': u.totp_last_step, '@p3': u.two_factor_enabled, '@id': u.id },
+  `UPDATE app_user SET failed_login_count = @p0, lockout_until = @p1, totp_last_step = @p2, two_factor_enabled = @p3
+WHERE id = @id;`);
+const lockedProblem = (u, extra) => problem(429, `Too many failed attempts. Try again in ${LOCK_MINUTES} minutes.`,
+  { headers: { 'Retry-After': String(Math.ceil((new Date(u.lockout_until) - Date.now()) / 1000)) }, ...extra });
 
-function handle(method, path, body) {
+async function handle(method, path, body, headers) {
   let m;
+
+  // ----- auth -----
+  if (method === 'POST' && path === '/api/auth/register') {
+    const base = { handler: ['AuthController.Register(RegisterRequest)', 'AuthService.RegisterAsync(request)'], fr: 'FR-AUTH-001', table: 'app_user' };
+    const errors = validate(body, [
+      ['Username', 'username', 0, 0, /^[A-Za-z0-9_]{3,30}$/, 'Username must be 3–30 characters: a-z, 0-9 or _.'],
+      ['DisplayName', 'displayName', 0, 50],
+      ['Password', 'password', 8, 128]]);
+    if (errors) return { ...base, ...badRequest(errors), stoppedAt: 'api' };
+    const username = body.username.trim().toLowerCase();
+    const sql = [sqlLog(1, { '@username': username }, `SELECT EXISTS (
+    SELECT 1 FROM app_user AS a WHERE a.username = @username)`)];
+    let ef = `var username = request.Username.Trim().ToLowerInvariant();
+if (await _db.Users.AnyAsync(u => u.Username == username))
+    return Conflict();`;
+    if (db.app_user.some(u => u.username === username)) return { ...base, ...problem(409, `Username '${username}' is already taken.`), ef, sql };
+    const t0 = performance.now();
+    const hash = await hashPassword(body.password);
+    const ms = Math.round(performance.now() - t0);
+    const row = insert('app_user', { username, display_name: body.displayName.trim(), password_hash: hash, two_factor_enabled: false, totp_secret_protected: null, totp_last_step: null, failed_login_count: 0, lockout_until: null, created_at: new Date().toISOString() });
+    ef += `
+
+var user = new User {
+    Username = username,
+    DisplayName = request.DisplayName,
+    PasswordHash = _hasher.Hash(request.Password),   // PBKDF2-HMAC-SHA256, 600,000 rounds
+    CreatedAt = DateTime.UtcNow
+};
+_db.Users.Add(user);
+await _db.SaveChangesAsync();
+return Created($"/api/users/{user.Id}", UserDto.From(user));`;
+    sql.push(sqlLog(3, { '@p0': row.created_at, '@p1': row.display_name, '@p2': row.password_hash, '@p3': false, '@p4': username },
+      `INSERT INTO app_user (created_at, display_name, password_hash, two_factor_enabled, username)
+VALUES (@p0, @p1, @p2, @p3, @p4)
+RETURNING id;`));
+    return { ...base, status: 201, statusText: 'Created', headers: { Location: `/api/users/${row.id}` }, body: { id: row.id, username, displayName: row.display_name, twoFactorEnabled: false }, highlight: row.id, ef, sql,
+      note: `Hash รหัสผ่านด้วย PBKDF2-HMAC-SHA256 600,000 รอบ ใช้เวลา ${ms} ms — ตั้งใจให้ช้า เพื่อให้การเดารหัสจากฐานข้อมูลที่หลุดไปช้าตาม` };
+  }
+
+  if (method === 'POST' && path === '/api/auth/login') {
+    const base = { handler: ['AuthController.Login(LoginRequest)', 'AuthService.LoginAsync(request)'], fr: 'FR-AUTH-003', table: 'app_user' };
+    const errors = validate(body, [['Username', 'username'], ['Password', 'password']]);
+    if (errors) return { ...base, ...badRequest(errors), stoppedAt: 'api' };
+    const username = body.username.trim().toLowerCase();
+    const user = db.app_user.find(u => u.username === username);
+    const sql = [sqlLog(1, { '@username': username }, `SELECT a.id, a.display_name, a.failed_login_count, a.lockout_until, a.password_hash,
+       a.totp_last_step, a.totp_secret_protected, a.two_factor_enabled, a.username
+FROM app_user AS a
+WHERE a.username = @username
+LIMIT 2`)];
+    let ef = `var user = await _db.Users.SingleOrDefaultAsync(u => u.Username == username);
+if (user?.LockoutUntil > DateTime.UtcNow) return TooManyRequests();
+
+// an unknown username still pays the PBKDF2 cost, so response time doesn't reveal it
+var ok = _hasher.Verify(request.Password, user?.PasswordHash ?? PasswordHasher.DummyHash);
+if (user is null) return Unauthorized();`;
+    if (user && isLocked(user)) return { ...base, ...lockedProblem(user), fr: 'FR-AUTH-006', ef, sql };
+    const t0 = performance.now();
+    const ok = await verifyPassword(body.password, user ? user.password_hash : DUMMY_HASH);
+    const note = `ตรวจรหัสผ่านด้วย PBKDF2-HMAC-SHA256 600,000 รอบ ใช้เวลา ${Math.round(performance.now() - t0)} ms`;
+    if (!user) return { ...base, ...problem(401, 'Invalid username or password.'), ef, sql, note: note + ' — ทำแม้ไม่มี username นี้ เวลาตอบจึงเท่ากัน' };
+    ef += `
+if (!ok)
+{
+    user.RegisterFailure();               // 5 in a row → LockoutUntil = now + 15 min
+    await _db.SaveChangesAsync();
+    return user.IsLockedOut ? TooManyRequests() : Unauthorized();
+}
+user.FailedLoginCount = 0;
+await _db.SaveChangesAsync();
+return Ok(new LoginResponse(_tokens.CreateMfaToken(user), TwoFactorSetupRequired: !user.TwoFactorEnabled));`;
+    if (!ok) {
+      const locked = registerFailure(user);
+      sql.push(updateUserSql(user));
+      const extra = { ef, sql, note, highlight: user.id };
+      return locked ? { ...base, ...lockedProblem(user, extra), fr: 'FR-AUTH-006' } : { ...base, ...problem(401, 'Invalid username or password.'), ...extra };
+    }
+    user.failed_login_count = 0;
+    sql.push(updateUserSql(user));
+    const mfaToken = await signJwt({ sub: String(user.id), purpose: 'mfa', exp: Math.floor(Date.now() / 1000) + 300 });
+    return { ...base, status: 200, statusText: 'OK', body: { mfaToken, twoFactorSetupRequired: !user.two_factor_enabled }, ef, sql, note, highlight: user.id };
+  }
+
+  if (method === 'POST' && path === '/api/auth/2fa/setup') {
+    const base = { handler: ['AuthController.SetupTwoFactor()', 'AuthService.BeginTwoFactorSetupAsync(userId)'], fr: 'FR-AUTH-004', table: 'app_user' };
+    const p = await bearer(headers, 'mfa');
+    if (!p) return { ...base, ...NOT_AUTHENTICATED };
+    const user = userById(+p.sub);
+    const sql = [sqlLog(1, { '@id': user.id }, `SELECT a.* FROM app_user AS a WHERE a.id = @id LIMIT 1`)];
+    let ef = `var user = await _db.Users.FindAsync(User.GetUserId());   // from the MFA token
+if (user.TwoFactorEnabled) return Conflict();`;
+    if (user.two_factor_enabled) return { ...base, ...problem(409, 'Two-factor authentication is already enabled.'), ef, sql };
+    const secret = b32encode(randBytes(20));
+    user.totp_secret_protected = protect(secret);
+    ef += `
+
+var sharedKey = KeyGeneration.GenerateRandomKey(20);          // Otp.NET
+user.TotpSecretProtected = _protector.Protect(Base32Encoding.ToString(sharedKey));
+await _db.SaveChangesAsync();
+return Ok(new TwoFactorSetupResponse(sharedKey, OtpAuthUri(user, sharedKey)));`;
+    sql.push(sqlLog(2, { '@p0': user.totp_secret_protected, '@id': user.id }, `UPDATE app_user SET totp_secret_protected = @p0
+WHERE id = @id;`));
+    const uri = `otpauth://totp/Webboard:${user.username}?secret=${secret}&issuer=Webboard&algorithm=SHA1&digits=6&period=30`;
+    return { ...base, status: 200, statusText: 'OK', body: { sharedKey: secret.match(/.{1,4}/g).join(' '), otpauthUri: uri }, ef, sql, highlight: user.id,
+      note: 'Shared key ถูกเข้ารหัสด้วย Data Protection ก่อนลง DB — ต่างจากรหัสผ่านที่ hash เพราะระบบต้องอ่าน key กลับมาคำนวณรหัสทุกครั้ง' };
+  }
+
+  if (method === 'POST' && path === '/api/auth/2fa/verify') {
+    const base = { handler: ['AuthController.VerifyTwoFactor(VerifyRequest)', 'AuthService.VerifyTwoFactorAsync(userId, code)'], fr: 'FR-AUTH-005', table: 'app_user' };
+    const p = await bearer(headers, 'mfa');
+    if (!p) return { ...base, ...NOT_AUTHENTICATED };
+    const errors = validate(body, [['Code', 'code', 0, 0, /^\d{6}$/, 'Code must be 6 digits.']]);
+    if (errors) return { ...base, ...badRequest(errors), stoppedAt: 'api' };
+    const user = userById(+p.sub);
+    const sql = [sqlLog(1, { '@id': user.id }, `SELECT a.* FROM app_user AS a WHERE a.id = @id LIMIT 1`)];
+    const ef = `var user = await _db.Users.FindAsync(User.GetUserId());   // from the MFA token
+if (user.LockoutUntil > DateTime.UtcNow) return TooManyRequests();
+
+var secret = _protector.Unprotect(user.TotpSecretProtected);
+var step = _totp.Match(secret, request.Code, window: 1);         // ±30 seconds
+if (step is null || step <= user.TotpLastStep)                   // a used code can't be replayed
+{
+    user.RegisterFailure();
+    await _db.SaveChangesAsync();
+    return user.IsLockedOut ? TooManyRequests() : Unauthorized();
+}
+user.TotpLastStep = step;
+user.TwoFactorEnabled = true;
+user.FailedLoginCount = 0;
+await _db.SaveChangesAsync();
+return Ok(new AuthResponse(_tokens.CreateAccessToken(user), ExpiresIn: 3600, UserDto.From(user)));`;
+    if (isLocked(user)) return { ...base, ...lockedProblem(user), fr: 'FR-AUTH-006', ef, sql };
+    const secret = unprotect(user.totp_secret_protected);
+    if (!secret) return { ...base, ...problem(400, 'Set up two-factor authentication first.'), ef, sql };
+    const s = nowStep();
+    let matched = null;
+    for (const step of [s - 1, s, s + 1]) if (await totp(secret, step) === body.code) matched = step;
+    if (matched === null || matched <= (user.totp_last_step ?? -1)) {
+      const locked = registerFailure(user);
+      sql.push(updateUserSql(user));
+      const reused = matched !== null;
+      const extra = { ef, sql, highlight: user.id, note: reused ? 'รหัสนี้ถูกใช้ไปแล้วในช่วง 30 วินาทีนี้ จึงปฏิเสธ (กัน replay)' : null };
+      return locked ? { ...base, ...lockedProblem(user, extra), fr: 'FR-AUTH-006' } : { ...base, ...problem(401, 'Invalid code.'), ...extra };
+    }
+    user.totp_last_step = matched;
+    user.two_factor_enabled = true;
+    user.failed_login_count = 0;
+    sql.push(updateUserSql(user));
+    const accessToken = await signJwt({ sub: String(user.id), name: user.display_name, purpose: 'access', exp: Math.floor(Date.now() / 1000) + 3600 });
+    return { ...base, status: 200, statusText: 'OK', body: { accessToken, expiresIn: 3600, user: { id: user.id, username: user.username, displayName: user.display_name } }, ef, sql, highlight: user.id };
+  }
+
+  // ----- topics & comments -----
   if (method === 'GET' && path === '/api/topics') {
-    const list = [...db.topic].sort((a, b) => b.created_at.localeCompare(a.created_at)).map(topicSummary);
+    const list = [...db.topic].sort((a, b) => b.created_at.localeCompare(a.created_at)).map(t => ({
+      id: t.id, title: t.title, authorName: nameOf(t.user_id), createdAt: t.created_at, commentCount: db.comment.filter(c => c.topic_id === t.id).length }));
     return {
       status: 200, statusText: 'OK', body: list,
-      handler: ['TopicsController.GetAll()', 'TopicService.ListAsync()'], fr: 'FR-TOPIC-002',
+      handler: ['TopicsController.GetAll()', 'TopicService.ListAsync()'], fr: 'FR-TOPIC-002', table: 'topic',
       ef: `return await _db.Topics
     .OrderByDescending(t => t.CreatedAt)
     .Select(t => new TopicSummaryDto(
-        t.Id, t.Title, t.AuthorName, t.CreatedAt,
+        t.Id, t.Title, t.Author.DisplayName, t.CreatedAt,
         t.Comments.Count()))
     .ToListAsync();`,
-      sql: [sqlLog(2, {}, `SELECT t.id, t.title, t.author_name, t.created_at, (
+      sql: [sqlLog(2, {}, `SELECT t.id, t.title, a.display_name, t.created_at, (
     SELECT count(*)::int
     FROM comment AS c
     WHERE t.id = c.topic_id) AS comment_count
 FROM topic AS t
-ORDER BY t.created_at DESC`)],
-      table: 'topic'
+INNER JOIN app_user AS a ON t.user_id = a.id
+ORDER BY t.created_at DESC`)]
     };
   }
+
   if (method === 'GET' && (m = path.match(/^\/api\/topics\/(\d+)$/))) {
     const id = +m[1];
     const t = db.topic.find(x => x.id === id);
     const res = {
-      handler: ['TopicsController.GetById(id)', 'TopicService.GetAsync(id)'], fr: 'FR-TOPIC-003',
+      handler: ['TopicsController.GetById(id)', 'TopicService.GetAsync(id)'], fr: 'FR-TOPIC-003', table: 'comment',
       ef: `var topic = await _db.Topics
-    .Include(t => t.Comments.OrderBy(c => c.CreatedAt))
+    .Include(t => t.Author)
+    .Include(t => t.Comments.OrderBy(c => c.CreatedAt)).ThenInclude(c => c.Author)
     .FirstOrDefaultAsync(t => t.Id == id);
 if (topic is null) return NotFound();
 return TopicDetailDto.From(topic);`,
-      sql: [sqlLog(3, { '@id': id }, `SELECT t.id, t.author_name, t.body, t.created_at, t.title,
-       c.id, c.author_name, c.body, c.created_at, c.parent_comment_id, c.topic_id
+      sql: [sqlLog(3, { '@id': id }, `SELECT t.id, t.body, t.created_at, t.title, a.display_name,
+       c.id, c.body, c.created_at, c.parent_comment_id, c.topic_id, ca.display_name
 FROM (
     SELECT t0.* FROM topic AS t0 WHERE t0.id = @id LIMIT 1
 ) AS t
+INNER JOIN app_user AS a ON t.user_id = a.id
 LEFT JOIN comment AS c ON t.id = c.topic_id
-ORDER BY t.id, c.created_at`)],
-      table: 'comment'
+LEFT JOIN app_user AS ca ON c.user_id = ca.id
+ORDER BY t.id, c.created_at`)]
     };
-    if (!t) return { ...res, ...notFound(`Topic ${id} was not found.`) };
+    if (!t) return { ...res, ...problem(404, `Topic ${id} was not found.`) };
     const comments = db.comment.filter(c => c.topic_id === id).sort((a, b) => a.created_at.localeCompare(b.created_at)).map(commentDto);
-    return { ...res, status: 200, statusText: 'OK', body: { id: t.id, title: t.title, body: t.body, authorName: t.author_name, createdAt: t.created_at, comments } };
+    return { ...res, status: 200, statusText: 'OK', body: { id: t.id, title: t.title, body: t.body, authorName: nameOf(t.user_id), createdAt: t.created_at, comments } };
   }
+
   if (method === 'POST' && path === '/api/topics') {
-    const base = {
-      handler: ['TopicsController.Create(CreateTopicRequest)', 'TopicService.CreateAsync(request)'], fr: 'FR-TOPIC-001',
-      table: 'topic'
-    };
-    const errors = validate(body, [['Title', 'title', 200], ['Body', 'body', 0], ['AuthorName', 'authorName', 50]]);
+    const base = { handler: ['TopicsController.Create(CreateTopicRequest)', 'TopicService.CreateAsync(userId, request)'], fr: 'FR-TOPIC-001', table: 'topic' };
+    const p = await bearer(headers, 'access');
+    if (!p) return { ...base, ...NOT_AUTHENTICATED, fr: 'FR-AUTH-007' };
+    const errors = validate(body, [['Title', 'title', 0, 200], ['Body', 'body']]);
     if (errors) return { ...base, ...badRequest(errors), stoppedAt: 'api', fr: 'FR-TOPIC-004' };
-    const row = insert('topic', { title: body.title.trim(), body: body.body.trim(), author_name: body.authorName.trim(), created_at: new Date().toISOString(), room_id: null });
+    const row = insert('topic', { user_id: +p.sub, title: body.title.trim(), body: body.body.trim(), created_at: new Date().toISOString(), room_id: null });
     return {
       ...base, status: 201, statusText: 'Created', headers: { Location: `/api/topics/${row.id}` },
-      body: topicSummary(row), highlight: row.id,
+      body: { id: row.id, title: row.title, authorName: nameOf(row.user_id), createdAt: row.created_at, commentCount: 0 }, highlight: row.id,
       ef: `var topic = new Topic {
+    UserId = User.GetUserId(),        // "sub" claim of the access token, never from the body
     Title = request.Title,
     Body = request.Body,
-    AuthorName = request.AuthorName,
     CreatedAt = DateTime.UtcNow
 };
 _db.Topics.Add(topic);
 await _db.SaveChangesAsync();
 return CreatedAtAction(nameof(GetById), new { id = topic.Id }, TopicSummaryDto.From(topic));`,
-      sql: [sqlLog(4, { '@p0': row.author_name, '@p1': row.body, '@p2': row.created_at, '@p3': row.title }, `INSERT INTO topic (author_name, body, created_at, title)
+      sql: [sqlLog(4, { '@p0': row.body, '@p1': row.created_at, '@p2': row.title, '@p3': row.user_id }, `INSERT INTO topic (body, created_at, title, user_id)
 VALUES (@p0, @p1, @p2, @p3)
 RETURNING id;`)]
     };
   }
+
   if (method === 'POST' && (m = path.match(/^\/api\/topics\/(\d+)\/comments$/))) {
     const topicId = +m[1];
     const parentId = body.parentCommentId ?? null;
     const base = {
-      handler: ['CommentsController.Create(topicId, CreateCommentRequest)', 'CommentService.CreateAsync(topicId, request)'],
+      handler: ['CommentsController.Create(topicId, CreateCommentRequest)', 'CommentService.CreateAsync(userId, topicId, request)'],
       fr: parentId ? 'FR-REPLY-001' : 'FR-COMMENT-001', table: 'comment'
     };
-    const errors = validate(body, [['Body', 'body', 0], ['AuthorName', 'authorName', 50]]);
+    const p = await bearer(headers, 'access');
+    if (!p) return { ...base, ...NOT_AUTHENTICATED, fr: 'FR-AUTH-007' };
+    const errors = validate(body, [['Body', 'body']]);
     if (errors) return { ...base, ...badRequest(errors), stoppedAt: 'api' };
     const sql = [sqlLog(1, { '@topicId': topicId }, `SELECT EXISTS (
     SELECT 1 FROM topic AS t WHERE t.id = @topicId)`)];
     let ef = `if (!await _db.Topics.AnyAsync(t => t.Id == topicId))
     return NotFound();`;
-    if (!db.topic.some(t => t.id === topicId)) return { ...base, ...notFound(`Topic ${topicId} was not found.`), fr: 'FR-COMMENT-003', ef, sql };
+    if (!db.topic.some(t => t.id === topicId)) return { ...base, ...problem(404, `Topic ${topicId} was not found.`), fr: 'FR-COMMENT-003', ef, sql };
     if (parentId != null) {
       ef += `
 
@@ -383,7 +706,7 @@ if (request.ParentCommentId is int parentId)
     if (parent is null || parent.TopicId != topicId)
         return ValidationProblem("Reply must be in the same topic as its parent.");
 }`;
-      sql.push(sqlLog(1, { '@parentId': parentId }, `SELECT c.id, c.author_name, c.body, c.created_at, c.parent_comment_id, c.topic_id
+      sql.push(sqlLog(1, { '@parentId': parentId }, `SELECT c.id, c.body, c.created_at, c.parent_comment_id, c.topic_id, c.user_id
 FROM comment AS c
 WHERE c.id = @parentId
 LIMIT 1`));
@@ -392,34 +715,40 @@ LIMIT 1`));
         return { ...base, ...badRequest({ ParentCommentId: ['Reply must be in the same topic as its parent.'] }), fr: 'FR-REPLY-002', ef, sql };
       }
     }
-    const row = insert('comment', { topic_id: topicId, parent_comment_id: parentId, body: body.body.trim(), author_name: body.authorName.trim(), created_at: new Date().toISOString() });
+    const row = insert('comment', { topic_id: topicId, user_id: +p.sub, parent_comment_id: parentId, body: body.body.trim(), created_at: new Date().toISOString() });
     ef += `
 
 var comment = new Comment {
     TopicId = topicId,
+    UserId = User.GetUserId(),        // "sub" claim of the access token
     ParentCommentId = request.ParentCommentId,
     Body = request.Body,
-    AuthorName = request.AuthorName,
     CreatedAt = DateTime.UtcNow
 };
 _db.Comments.Add(comment);
 await _db.SaveChangesAsync();
 return Created($"/api/topics/{topicId}/comments/{comment.Id}", CommentDto.From(comment));`;
-    sql.push(sqlLog(3, { '@p0': row.author_name, '@p1': row.body, '@p2': row.created_at, '@p3': row.parent_comment_id, '@p4': row.topic_id }, `INSERT INTO comment (author_name, body, created_at, parent_comment_id, topic_id)
+    sql.push(sqlLog(3, { '@p0': row.body, '@p1': row.created_at, '@p2': row.parent_comment_id, '@p3': row.topic_id, '@p4': row.user_id },
+      `INSERT INTO comment (body, created_at, parent_comment_id, topic_id, user_id)
 VALUES (@p0, @p1, @p2, @p3, @p4)
 RETURNING id;`));
     return { ...base, status: 201, statusText: 'Created', headers: { Location: `/api/topics/${topicId}/comments/${row.id}` }, body: commentDto(row), highlight: row.id, ef, sql };
   }
   return { status: 404, statusText: 'Not Found', body: null, handler: ['(no route)'], stoppedAt: 'api' };
 }
+function commentDto(c) {
+  return { id: c.id, topicId: c.topic_id, parentCommentId: c.parent_comment_id, authorName: nameOf(c.user_id), body: c.body, createdAt: c.created_at };
+}
 
 // ---------- request log + "HTTP" ----------
 const log = [];
 let focusIdx = -1;
-function api(method, path, body, opts = {}) {
-  const res = handle(method, path, body ? structuredClone(body) : undefined);
-  log.unshift({ method, path, reqBody: body, res, refresh: !!opts.refresh, at: new Date() });
-  if (log.length > 30) log.pop();
+let tab = 'topic';
+async function api(method, path, body, opts = {}) {
+  const headers = opts.token ? { Authorization: `Bearer ${opts.token}` } : {};
+  const res = await handle(method, path, body ? structuredClone(body) : undefined, headers);
+  log.unshift({ method, path, reqBody: body, headers, res, refresh: !!opts.refresh });
+  if (log.length > 40) log.pop();
   if (opts.refresh) { if (focusIdx >= 0) focusIdx++; }
   else { focusIdx = 0; if (res.table) tab = res.table; }
   renderDomain(); renderData(); renderFlow();
@@ -428,7 +757,12 @@ function api(method, path, body, opts = {}) {
 
 // ---------- Presentation Layer ----------
 let route = { page: 'list' };
+let returnTo = { page: 'list' };
 let replyTo = null;
+let session = null;   // { accessToken, user } — kept in memory only, never in the URL or storage
+let pending = null;   // { mfaToken, setupRequired, username, setup }
+let showNewForm = false;
+let lastTopic = null;
 const view = document.getElementById('view');
 const urlEl = document.getElementById('url');
 
@@ -442,81 +776,112 @@ function timeAgo(iso) {
 function field(id, label, name, opts = {}) {
   const input = opts.multiline
     ? h('textarea', { id, name, placeholder: opts.placeholder || '' })
-    : h('input', { id, name, type: 'text', placeholder: opts.placeholder || '', autocomplete: 'off' });
+    : h('input', { id, name, type: opts.type || 'text', placeholder: opts.placeholder || '', autocomplete: opts.autocomplete || 'off', inputmode: opts.inputmode, maxlength: opts.maxlength, class: opts.cls });
+  if (opts.value) input.value = opts.value;
   return h('div', { class: 'field', 'data-field': opts.key }, h('label', { for: id }, label), input, h('span', { class: 'err' }));
 }
 function readForm(form) {
   return Object.fromEntries([...form.querySelectorAll('input, textarea')].map(el => [el.name, el.value]));
 }
-function showErrors(form, errors) {
+function showErrors(form, errors, formMsg) {
   form.querySelectorAll('.field').forEach(f => {
     const msg = errors?.[f.dataset.field];
     f.classList.toggle('bad', !!msg);
     f.querySelector('.err').textContent = msg ? msg.join(' ') : '';
   });
+  const fe = form.querySelector('.form-err');
+  if (fe) fe.textContent = formMsg || '';
+}
+// disable the submit button while the request (and its PBKDF2 work) runs
+async function submitting(form, busyLabel, fn) {
+  const btn = form.querySelector('button[type="submit"]');
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = busyLabel;
+  try { await fn(); } finally { if (btn.isConnected) { btn.disabled = false; btn.textContent = label; } }
+}
+function sessionExpired() {
+  session = null;
+  renderSite();
+  goLogin({ notice: 'Session หมดอายุ — เข้าสู่ระบบอีกครั้ง' });
 }
 
-function goList(opts) {
+function renderSite() {
+  setKids(document.getElementById('site'),
+    h('button', { class: 'brand', type: 'button', onclick: () => goList() }, 'Webboard'),
+    h('div', { class: 'acts' },
+      session
+        ? [h('span', { class: 'me' }, 'สวัสดี ', h('b', {}, session.user.displayName), ` (@${session.user.username})`),
+           h('button', { class: 'btn ghost sm', type: 'button', onclick: () => { session = null; renderSite(); route.page === 'topic' ? goTopic(route.id) : goList(); renderDomain(); } }, 'ออกจากระบบ')]
+        : [h('button', { class: 'btn ghost sm', type: 'button', onclick: () => goLogin() }, 'เข้าสู่ระบบ'),
+           h('button', { class: 'btn sm', type: 'button', onclick: () => goRegister() }, 'สมัครสมาชิก')]));
+}
+function loginGate(text) {
+  return h('div', { class: 'gate' }, h('button', { class: 'link', type: 'button', onclick: () => { returnTo = route; goLogin(); } }, 'เข้าสู่ระบบ'), ` ${text}`);
+}
+
+async function goList(opts) {
   route = { page: 'list' }; replyTo = null;
   urlEl.textContent = 'webboard.local/';
-  const res = api('GET', '/api/topics', null, opts);
+  const res = await api('GET', '/api/topics', null, opts);
   renderList(res.body);
 }
-function goTopic(id, opts) {
+async function goTopic(id, opts) {
   route = { page: 'topic', id };
   urlEl.textContent = `webboard.local/topics/${id}`;
-  const res = api('GET', `/api/topics/${id}`, null, opts);
+  const res = await api('GET', `/api/topics/${id}`, null, opts);
   if (res.status !== 200) { setKids(view, h('p', { class: 'empty' }, 'ไม่พบกระทู้นี้')); return; }
   renderTopic(res.body);
 }
 
-let showNewForm = false;
 function renderList(topics) {
   const form = h('form', { class: 'card', id: 'new-topic', novalidate: true, onsubmit: e => {
       e.preventDefault();
-      const v = readForm(e.target);
-      const res = api('POST', '/api/topics', { title: v.title, body: v.body, authorName: v.authorName });
-      if (res.status === 201) { showNewForm = false; goTopic(res.body.id, { refresh: true }); }
-      else showErrors(e.target, res.body.errors);
+      const f = e.target, v = readForm(f);
+      submitting(f, 'กำลังส่ง…', async () => {
+        const res = await api('POST', '/api/topics', { title: v.title, body: v.body }, { token: session?.accessToken });
+        if (res.status === 201) { showNewForm = false; await goTopic(res.body.id, { refresh: true }); }
+        else if (res.status === 401) sessionExpired();
+        else showErrors(f, res.body.errors);
+      });
     } },
     field('nt-title', 'หัวข้อกระทู้', 'title', { key: 'Title', placeholder: 'ไม่เกิน 200 ตัวอักษร' }),
     field('nt-body', 'เนื้อหา', 'body', { key: 'Body', multiline: true }),
     h('div', { class: 'row' },
-      field('nt-author', 'ชื่อที่แสดง', 'authorName', { key: 'AuthorName', placeholder: 'ไม่เกิน 50 ตัวอักษร' }),
-      h('button', { class: 'btn', type: 'submit', style: 'align-self:end' }, 'ตั้งกระทู้')),
-    h('span', { class: 'hint' }, 'ลองกดตั้งกระทู้โดยเว้นช่องว่างไว้ เพื่อดู 400 จาก Domain Layer'));
-  setKids(view, 
+      h('button', { class: 'btn', type: 'submit' }, 'ตั้งกระทู้'),
+      h('span', { class: 'hint' }, `ผู้เขียน: ${session?.user.displayName ?? ''} (มาจาก access token) · ลองส่งแบบเว้นว่างเพื่อดู 400`)));
+  setKids(view,
     h('div', { class: 'board-title' },
       h('h3', {}, 'กระทู้ทั้งหมด'),
-      h('button', { class: 'btn' + (showNewForm ? ' ghost' : ''), type: 'button', onclick: () => { showNewForm = !showNewForm; renderList(topics); } }, showNewForm ? 'ยกเลิก' : '+ ตั้งกระทู้ใหม่')),
-    showNewForm ? form : null,
+      session ? h('button', { class: 'btn' + (showNewForm ? ' ghost' : ''), type: 'button', onclick: () => { showNewForm = !showNewForm; renderList(topics); } }, showNewForm ? 'ยกเลิก' : '+ ตั้งกระทู้ใหม่') : null),
+    session ? (showNewForm ? form : null) : loginGate('เพื่อตั้งกระทู้ใหม่'),
     topics.length
       ? h('ul', { class: 'topics' }, topics.map(t => h('li', {},
           h('div', { class: 'main' },
             h('button', { class: 'link', type: 'button', onclick: () => goTopic(t.id) }, t.title),
             h('div', { class: 'meta' }, `${t.authorName} · ${timeAgo(t.createdAt)}`)),
           h('span', { class: 'count' }, `${t.commentCount} ความเห็น`))))
-      : h('p', { class: 'empty' }, 'ยังไม่มีกระทู้ — กด "ตั้งกระทู้ใหม่" เพื่อเริ่ม'));
+      : h('p', { class: 'empty' }, 'ยังไม่มีกระทู้'));
 }
 
 function commentForm(topicId, parentId) {
   const key = parentId ? `r${parentId}` : 'c';
   return h('form', { class: 'card', novalidate: true, onsubmit: e => {
       e.preventDefault();
-      const v = readForm(e.target);
-      const res = api('POST', `/api/topics/${topicId}/comments`, { body: v.body, authorName: v.authorName, parentCommentId: parentId });
-      if (res.status === 201) { replyTo = null; goTopic(topicId, { refresh: true }); }
-      else showErrors(e.target, res.body.errors);
+      const f = e.target, v = readForm(f);
+      submitting(f, 'กำลังส่ง…', async () => {
+        const res = await api('POST', `/api/topics/${topicId}/comments`, { body: v.body, parentCommentId: parentId }, { token: session?.accessToken });
+        if (res.status === 201) { replyTo = null; await goTopic(topicId, { refresh: true }); }
+        else if (res.status === 401) sessionExpired();
+        else showErrors(f, res.body.errors);
+      });
     } },
     field(`${key}-body`, parentId ? `ตอบความเห็น #${parentId}` : 'แสดงความเห็น', 'body', { key: 'Body', multiline: true }),
     h('div', { class: 'row' },
-      field(`${key}-author`, 'ชื่อที่แสดง', 'authorName', { key: 'AuthorName' }),
-      h('button', { class: 'btn', type: 'submit', style: 'align-self:end' }, parentId ? 'ส่งคำตอบ' : 'ส่งความเห็น'),
-      parentId ? h('button', { class: 'btn ghost', type: 'button', style: 'align-self:end', onclick: () => { replyTo = null; rerenderTopic(); } }, 'ยกเลิก') : null));
+      h('button', { class: 'btn', type: 'submit' }, parentId ? 'ส่งคำตอบ' : 'ส่งความเห็น'),
+      parentId ? h('button', { class: 'btn ghost', type: 'button', onclick: () => { replyTo = null; renderTopic(lastTopic); } }, 'ยกเลิก') : null,
+      h('span', { class: 'hint' }, `ในนาม ${session?.user.displayName ?? ''}`)));
 }
 
-let lastTopic = null;
-function rerenderTopic() { if (lastTopic) renderTopic(lastTopic); }
 function renderTopic(t) {
   lastTopic = t;
   const byParent = new Map();
@@ -529,49 +894,217 @@ function renderTopic(t) {
     h('div', { class: 'comment' + (depth ? ' reply' : '') },
       h('div', {}, h('span', { class: 'who' }, c.authorName), h('span', { class: 'meta' }, ` · #${c.id} · ${timeAgo(c.createdAt)}`)),
       h('div', { class: 'text' }, c.body),
-      h('div', {}, h('button', { class: 'link', type: 'button', style: 'font-size:13px', onclick: () => { replyTo = c.id; rerenderTopic(); } }, 'ตอบ')),
-      replyTo === c.id ? commentForm(t.id, c.id) : null,
+      session ? h('div', {}, h('button', { class: 'link', type: 'button', style: 'font-size:13px', onclick: () => { replyTo = c.id; renderTopic(lastTopic); } }, 'ตอบ')) : null,
+      session && replyTo === c.id ? commentForm(t.id, c.id) : null,
       byParent.has(c.id) ? h('div', { class: 'kids' + (depth >= 2 ? ' flat' : '') }, renderThread(c.id, depth + 1)) : null));
 
-  setKids(view, 
+  setKids(view,
     h('div', {}, h('button', { class: 'link', type: 'button', onclick: () => goList() }, '← กระทู้ทั้งหมด')),
     h('article', { class: 'topic-full' },
       h('h3', {}, t.title),
       h('div', { class: 'meta' }, `${t.authorName} · ${timeAgo(t.createdAt)} · กระทู้ #${t.id}`),
       h('p', { class: 'body' }, t.body)),
     h('div', { class: 'board-title' }, h('h3', { style: 'font-size:16px' }, `${t.comments.length} ความเห็น`)),
-    t.comments.length ? h('div', { class: 'comments' }, renderThread(0, 0)) : h('p', { class: 'empty' }, 'ยังไม่มีความเห็น เป็นคนแรกเลย'),
-    commentForm(t.id, null));
+    t.comments.length ? h('div', { class: 'comments' }, renderThread(0, 0)) : h('p', { class: 'empty' }, 'ยังไม่มีความเห็น'),
+    session ? commentForm(t.id, null) : loginGate('เพื่อแสดงความเห็น'));
+}
+
+// --- register / login / 2FA screens ---
+function goRegister() {
+  route = { page: 'register' };
+  urlEl.textContent = 'webboard.local/register';
+  const form = h('form', { class: 'card narrow', novalidate: true, onsubmit: e => {
+      e.preventDefault();
+      const f = e.target, v = readForm(f);
+      submitting(f, 'กำลังสมัคร…', async () => {
+        const res = await api('POST', '/api/auth/register', { username: v.username, displayName: v.displayName, password: v.password });
+        if (res.status === 201) goLogin({ username: res.body.username, notice: 'สมัครสำเร็จ — เข้าสู่ระบบแล้วตั้งค่า 2FA ต่อ' });
+        else if (res.status === 409) showErrors(f, { Username: ['ชื่อผู้ใช้นี้ถูกใช้แล้ว'] });
+        else showErrors(f, res.body.errors);
+      });
+    } },
+    field('rg-user', 'ชื่อผู้ใช้ (ใช้ login)', 'username', { key: 'Username', placeholder: '3–30 ตัว: a-z 0-9 _', autocomplete: 'username' }),
+    field('rg-name', 'ชื่อที่แสดง', 'displayName', { key: 'DisplayName', placeholder: 'ไม่เกิน 50 ตัวอักษร' }),
+    field('rg-pass', 'รหัสผ่าน', 'password', { key: 'Password', type: 'password', placeholder: 'อย่างน้อย 8 ตัว', autocomplete: 'new-password' }),
+    h('div', { class: 'row' }, h('button', { class: 'btn', type: 'submit' }, 'สมัครสมาชิก'),
+      h('button', { class: 'link', type: 'button', onclick: () => goLogin() }, 'มีบัญชีแล้ว? เข้าสู่ระบบ')));
+  setKids(view, h('h3', { style: 'font-size:20px' }, 'สมัครสมาชิก'), form);
+}
+
+function goLogin(opts = {}) {
+  route = { page: 'login' };
+  urlEl.textContent = 'webboard.local/login';
+  const form = h('form', { class: 'card narrow', novalidate: true, onsubmit: e => {
+      e.preventDefault();
+      const f = e.target, v = readForm(f);
+      submitting(f, 'กำลังตรวจรหัสผ่าน…', async () => {
+        const res = await api('POST', '/api/auth/login', { username: v.username, password: v.password });
+        if (res.status === 200) {
+          pending = { mfaToken: res.body.mfaToken, setupRequired: res.body.twoFactorSetupRequired, username: v.username.trim().toLowerCase() };
+          await goTwoFactor();
+        } else if (res.status === 400) showErrors(f, res.body.errors);
+        else if (res.status === 429) showErrors(f, null, 'ผิดติดกัน 5 ครั้ง บัญชีถูกล็อก 15 นาที');
+        else showErrors(f, null, 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+      });
+    } },
+    field('lg-user', 'ชื่อผู้ใช้', 'username', { key: 'Username', autocomplete: 'username', value: opts.username }),
+    field('lg-pass', 'รหัสผ่าน', 'password', { key: 'Password', type: 'password', autocomplete: 'current-password' }),
+    h('p', { class: 'err form-err', role: 'alert' }),
+    h('div', { class: 'row' }, h('button', { class: 'btn', type: 'submit' }, 'ถัดไป'),
+      h('button', { class: 'link', type: 'button', onclick: () => goRegister() }, 'ยังไม่มีบัญชี? สมัครสมาชิก')),
+    h('span', { class: 'hint' }, 'บัญชีตัวอย่าง: ton, mind, praew, pond, beam — รหัสผ่าน webboard123'));
+  setKids(view,
+    h('h3', { style: 'font-size:20px' }, 'เข้าสู่ระบบ'),
+    h('p', { class: 'meta', style: 'margin:0' }, 'ขั้นที่ 1 จาก 2: รหัสผ่าน'),
+    opts.notice ? h('div', { class: 'notice' }, opts.notice) : null,
+    form);
+}
+
+async function goTwoFactor() {
+  route = { page: '2fa' };
+  urlEl.textContent = 'webboard.local/login/2fa';
+  if (pending.setupRequired && !pending.setup) {
+    const res = await api('POST', '/api/auth/2fa/setup', null, { token: pending.mfaToken });
+    if (res.status !== 200) { pending = null; goLogin({ notice: 'ขั้นตอนหมดเวลา — เข้าสู่ระบบใหม่' }); return; }
+    pending.setup = res.body;
+  }
+  const form = h('form', { class: 'card narrow', novalidate: true, onsubmit: e => {
+      e.preventDefault();
+      const f = e.target, v = readForm(f);
+      submitting(f, 'กำลังตรวจ…', async () => {
+        const res = await api('POST', '/api/auth/2fa/verify', { code: v.code.trim() }, { token: pending.mfaToken });
+        if (res.status === 200) {
+          session = { accessToken: res.body.accessToken, user: res.body.user };
+          pending = null;
+          renderSite();
+          const back = returnTo; returnTo = { page: 'list' };
+          back.page === 'topic' ? await goTopic(back.id, { refresh: true }) : await goList({ refresh: true });
+        } else if (res.status === 400) showErrors(f, res.body.errors);
+        else if (res.status === 429) showErrors(f, null, 'ผิดติดกัน 5 ครั้ง บัญชีถูกล็อก 15 นาที');
+        else if (res.body === null) { pending = null; goLogin({ notice: 'ขั้นตอนหมดเวลา (MFA token อายุ 5 นาที) — เข้าสู่ระบบใหม่' }); }
+        else showErrors(f, null, 'รหัสไม่ถูกต้อง หรือถูกใช้ไปแล้ว — รอรหัสถัดไปในแอปแล้วลองใหม่');
+      });
+    } },
+    field('tf-code', 'รหัส 6 หลักจากแอป Authenticator', 'code', { key: 'Code', inputmode: 'numeric', maxlength: '6', autocomplete: 'one-time-code', cls: 'code', placeholder: '000000' }),
+    h('p', { class: 'err form-err', role: 'alert' }),
+    h('div', { class: 'row' }, h('button', { class: 'btn', type: 'submit' }, pending.setup ? 'ยืนยันและเปิดใช้ 2FA' : 'เข้าสู่ระบบ'),
+      h('button', { class: 'link', type: 'button', onclick: () => { pending = null; goLogin(); } }, 'ยกเลิก')));
+
+  let setupBlock = null;
+  if (pending.setup) {
+    const { sharedKey, otpauthUri } = pending.setup;
+    const qrBox = h('div', { class: 'qr-box', role: 'img', 'aria-label': 'QR code สำหรับแอป Authenticator' });
+    if (window.qrcode) {
+      const qr = qrcode(0, 'M'); qr.addData(otpauthUri); qr.make();
+      qrBox.innerHTML = qr.createSvgTag(4, 2); // library output, built from a URI the API returned
+    } else qrBox.append(h('span', { class: 'hint', style: 'line-height:1.4' }, 'โหลดตัวสร้าง QR ไม่ได้ — ใช้ key ด้านขวาแทน'));
+    const added = authenticator.some(a => a.username === pending.username && a.secret === sharedKey.replace(/ /g, ''));
+    setupBlock = h('div', { class: 'card', style: 'gap:12px' },
+      h('ol', { class: 'steps' },
+        h('li', {}, 'สแกน QR ด้วยแอป Authenticator (ใช้มือถือจริงได้ หรือกดปุ่มด้านล่างเพื่อเพิ่มในแอปจำลอง)'),
+        h('li', {}, 'ใส่รหัส 6 หลักที่แอปแสดง เพื่อยืนยันและเปิดใช้ 2FA')),
+      h('div', { class: 'qr' }, qrBox,
+        h('div', { class: 'qr-info' },
+          h('span', { class: 'label', style: 'margin:0' }, 'หรือพิมพ์ key นี้ในแอป'),
+          h('span', { class: 'key' }, sharedKey),
+          h('button', { class: 'btn ghost sm', type: 'button', disabled: added, style: 'align-self:start', onclick: () => {
+              authenticator.push({ username: pending.username, secret: sharedKey.replace(/ /g, ''), code: '' });
+              refreshCodes(); goTwoFactor();
+            } }, added ? 'เพิ่มในแอปจำลองแล้ว' : 'เพิ่มในแอป Authenticator จำลอง'))));
+  }
+  setKids(view,
+    h('h3', { style: 'font-size:20px' }, pending.setup ? 'ตั้งค่า 2FA' : 'ยืนยันตัวตน 2 ขั้น'),
+    h('p', { class: 'meta', style: 'margin:0' }, `ขั้นที่ 2 จาก 2 · @${pending.username}` + (pending.setup ? ' · บัญชีนี้ยังไม่มี 2FA ต้องตั้งก่อนเข้าใช้' : '')),
+    setupBlock,
+    form);
+  document.getElementById('tf-code')?.focus({ preventScroll: true });
+}
+
+// ---------- the user's authenticator app (outside the system) ----------
+const phoneEl = document.getElementById('phone');
+let phoneStep = -1;
+async function refreshCodes() {
+  const s = nowStep();
+  for (const a of authenticator) a.code = await totp(a.secret, s);
+  renderPhone();
+}
+function renderPhone() {
+  const left = 30 - Math.floor(Date.now() / 1000) % 30;
+  setKids(phoneEl,
+    h('p', { class: 'hint', style: 'margin:0' }, 'แอปคำนวณรหัสเองจาก shared key + เวลาปัจจุบัน ไม่ได้คุยกับเซิร์ฟเวอร์ — ระบบคำนวณแบบเดียวกันแล้วเทียบผล'),
+    h('div', { class: 'timer' }, h('span', { class: 'bar' }, h('i', { id: 'bar', style: `width:${left / 30 * 100}%` })), h('span', { id: 'left' }, `${left} วิ`)),
+    h('ul', { class: 'otp-list' }, authenticator.map(a => h('li', {},
+      h('span', { class: 'otp-label' }, `Webboard (${a.username})`, h('small', {}, `key ${a.secret.slice(0, 4)}…`)),
+      h('span', { class: 'otp-code' }, a.code ? `${a.code.slice(0, 3)} ${a.code.slice(3)}` : '--- ---'),
+      h('button', { class: 'btn ghost sm', type: 'button', onclick: () => {
+          const el = document.getElementById('tf-code');
+          if (el) { el.value = a.code; el.focus(); }
+        } }, 'ใส่รหัสนี้')))));
+}
+function tickPhone() {
+  const s = nowStep();
+  if (s !== phoneStep) { phoneStep = s; refreshCodes(); return; }
+  const left = 30 - Math.floor(Date.now() / 1000) % 30;
+  const bar = document.getElementById('bar');
+  if (bar) bar.style.width = `${left / 30 * 100}%`;
+  const l = document.getElementById('left');
+  if (l) l.textContent = `${left} วิ`;
 }
 
 // ---------- Domain panel ----------
 const domainEl = document.getElementById('domain');
-function pillClass(s) { return s < 300 ? 's2' : s === 404 ? 's404' : 's4'; }
+const pillClass = s => s < 300 ? 's2' : s === 404 || s === 401 ? 's404' : 's4';
+const shortTok = t => t.length > 36 ? `${t.slice(0, 36)}…` : t;
+// NFR-006: never show passwords or 2FA codes; tokens shortened for readability
+function forDisplay(obj) {
+  if (!obj) return obj;
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === 'password' || k === 'code') out[k] = '•'.repeat(k === 'code' ? 6 : 8);
+    else if (k.endsWith('Token') && typeof v === 'string') out[k] = shortTok(v);
+    else if (v && typeof v === 'object' && !Array.isArray(v)) out[k] = forDisplay(v);
+    else out[k] = v;
+  }
+  return out;
+}
 function renderDomain() {
   const e = log[focusIdx];
-  if (!e) { setKids(domainEl, ); return; }
-  const r = e.res;
-  const reqText = `${e.method} ${e.path} HTTP/1.1\nAccept: application/json` + (e.reqBody ? `\nContent-Type: application/json\n\n${JSON.stringify(e.reqBody, null, 2)}` : '');
-  const resHeaders = [`HTTP/1.1 ${r.status} ${r.statusText}`, `Content-Type: application/${r.status >= 400 ? 'problem+json' : 'json'}; charset=utf-8`]
-    .concat(Object.entries(r.headers || {}).map(([k, v]) => `${k}: ${v}`)).join('\n');
-  const resText = resHeaders + (r.body != null ? `\n\n${JSON.stringify(r.body, null, 2)}` : '');
-
+  const r = e?.res;
+  const loggedIn = !!session;
   const tests = h('div', { class: 'tests' },
-    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/topics', { title: '', body: '', authorName: '' }) }, 'POST กระทู้ว่าง → 400'),
-    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/topics', { title: 'ก'.repeat(210), body: 'ทดสอบหัวข้อยาว', authorName: 'ทดสอบ' }) }, 'หัวข้อยาว 210 ตัว → 400'),
-    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/topics/999/comments', { body: 'สวัสดี', authorName: 'ทดสอบ' }) }, 'คอมเมนต์ topic 999 → 404'),
-    h('button', { class: 'test', type: 'button', onclick: () => {
+    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/topics', { title: 'ไม่มี token', body: 'ทดสอบ' }) }, 'ตั้งกระทู้โดยไม่มี token → 401'),
+    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/auth/login', { username: 'pond', password: 'wrong-pass' }) }, 'login pond รหัสผิด → 401 (ครั้งที่ 5 → 429)'),
+    h('button', { class: 'test', type: 'button', disabled: !loggedIn, title: loggedIn ? null : 'ต้อง login ก่อน', onclick: () => api('POST', '/api/topics', { title: '', body: '' }, { token: session.accessToken }) }, 'ตั้งกระทู้ว่าง → 400'),
+    h('button', { class: 'test', type: 'button', disabled: !loggedIn, title: loggedIn ? null : 'ต้อง login ก่อน', onclick: () => api('POST', '/api/topics/999/comments', { body: 'สวัสดี' }, { token: session.accessToken }) }, 'คอมเมนต์ topic 999 → 404'),
+    h('button', { class: 'test', type: 'button', disabled: !loggedIn, title: loggedIn ? null : 'ต้อง login ก่อน', onclick: () => {
         const c = db.comment[0]; const other = db.topic.find(t => c && t.id !== c.topic_id);
-        if (c && other) api('POST', `/api/topics/${other.id}/comments`, { body: 'ตอบข้ามกระทู้', authorName: 'ทดสอบ', parentCommentId: c.id });
-      } }, 'Reply ข้ามกระทู้ → 400'));
+        if (c && other) api('POST', `/api/topics/${other.id}/comments`, { body: 'ตอบข้ามกระทู้', parentCommentId: c.id }, { token: session.accessToken });
+      } }, 'Reply ข้ามกระทู้ → 400'),
+    loggedIn ? null : h('span', { class: 'hint', style: 'align-self:center' }, 'ปุ่มที่จางต้อง login ก่อน'));
+  if (!r) { setKids(domainEl, h('div', {}, h('div', { class: 'label' }, 'ลองยิงกรณีผิดพลาด'), tests)); return; }
 
-  setKids(domainEl, 
+  const reqHeaders = Object.entries(e.headers).map(([k, v]) => `\n${k}: ${k === 'Authorization' ? 'Bearer ' + shortTok(v.slice(7)) : v}`).join('');
+  const reqText = `${e.method} ${e.path} HTTP/1.1\nAccept: application/json${reqHeaders}` + (e.reqBody ? `\nContent-Type: application/json\n\n${JSON.stringify(forDisplay(e.reqBody), null, 2)}` : '');
+  const resHeaders = [`HTTP/1.1 ${r.status} ${r.statusText}`]
+    .concat(r.body != null ? [`Content-Type: application/${r.status >= 400 ? 'problem+json' : 'json'}; charset=utf-8`] : [])
+    .concat(Object.entries(r.headers || {}).map(([k, v]) => `${k}: ${v}`)).join('\n');
+  const resText = resHeaders + (r.body != null ? `\n\n${JSON.stringify(Array.isArray(r.body) ? r.body : forDisplay(r.body), null, 2)}` : '');
+  const masked = e.reqBody && ('password' in e.reqBody || 'code' in e.reqBody);
+  const authStop = r.stoppedAt === 'api' && r.status === 401;
+
+  setKids(domainEl,
     h('div', {},
       h('div', { class: 'label' }, 'ผู้รับผิดชอบ request นี้'),
-      h('div', { class: 'handler' }, h('b', {}, r.handler[0]), r.handler[1] ? h('span', { class: 'arrow' }, '→') : null, r.handler[1] ? h('b', {}, r.handler[1]) : null, r.fr ? h('span', { class: 'meta' }, `(${r.fr})`) : null)),
-    r.stoppedAt === 'api' ? h('div', { class: 'stopnote' }, 'Validation ไม่ผ่านที่ Domain Layer จึงตอบ 400 กลับทันที ไม่มีการเรียก DbContext และไม่มี SQL ถึงฐานข้อมูล') : null,
+      h('div', { class: 'handler' },
+        authStop ? [h('b', {}, 'JwtBearer ([Authorize])'), h('span', { class: 'arrow' }, '✕'), h('span', { class: 'meta' }, r.handler[0])] :
+        [h('b', {}, r.handler[0]), r.handler[1] ? h('span', { class: 'arrow' }, '→') : null, r.handler[1] ? h('b', {}, r.handler[1]) : null],
+        r.fr ? h('span', { class: 'meta' }, `(${r.fr})`) : null)),
+    authStop ? h('div', { class: 'stopnote' }, 'ไม่มี token ที่ใช้ได้กับ endpoint นี้ ASP.NET ตอบ 401 ก่อนถึง Controller — ไม่ตรวจ body และไม่แตะฐานข้อมูล') : null,
+    r.stoppedAt === 'api' && r.status === 400 ? h('div', { class: 'stopnote' }, 'Validation ไม่ผ่านที่ Domain Layer จึงตอบ 400 กลับทันที ไม่มีการเรียก DbContext และไม่มี SQL ถึงฐานข้อมูล') : null,
+    r.note ? h('div', { class: 'note' }, r.note) : null,
     h('div', { class: 'two' },
-      h('div', { style: 'min-width:0' }, h('div', { class: 'label' }, 'Request (จาก Presentation)'), h('pre', {}, reqText)),
+      h('div', { style: 'min-width:0' }, h('div', { class: 'label' }, 'Request (จาก Presentation)'), h('pre', {}, reqText),
+        masked ? h('div', { class: 'hint', style: 'margin-top:4px' }, 'รหัสผ่าน/รหัส 2FA ถูกซ่อนบนจอนี้ — ระบบจริงห้าม log ค่าเหล่านี้ (NFR-006)') : null),
       h('div', { style: 'min-width:0' },
         h('div', { class: 'reqline' }, h('span', { class: 'label', style: 'margin:0' }, 'Response'), h('span', { class: 'pill ' + pillClass(r.status) }, `${r.status} ${r.statusText}`)),
         h('pre', {}, resText))),
@@ -583,39 +1116,41 @@ function renderDomain() {
           h('span', { class: 'pill ' + pillClass(x.res.status) }, x.res.status),
           h('span', { class: 'method' }, x.method),
           h('span', { class: 'p' }, x.path),
+          x.headers.Authorization ? h('span', { class: 'tag' }, 'token') : null,
           x.refresh ? h('span', { class: 'tag' }, 'refresh') : null))))));
 }
 
 // ---------- Data Access panel ----------
 const dataEl = document.getElementById('data');
-let tab = 'topic';
+const COLS = {
+  app_user: ['id', 'username', 'display_name', 'password_hash', 'two_factor_enabled', 'totp_secret_protected', 'totp_last_step', 'failed_login_count', 'lockout_until', 'created_at'],
+  topic: ['id', 'user_id', 'title', 'body', 'created_at', 'room_id'],
+  comment: ['id', 'topic_id', 'user_id', 'parent_comment_id', 'body', 'created_at']
+};
+const TRUNC = new Set(['title', 'body', 'password_hash', 'totp_secret_protected']);
 function renderData() {
-  const e = log[focusIdx];
-  const r = e?.res;
+  const r = log[focusIdx]?.res;
   const hl = r && r.highlight && r.table === tab ? r.highlight : null;
-  const cols = tab === 'topic'
-    ? ['id', 'title', 'body', 'author_name', 'created_at', 'room_id']
-    : ['id', 'topic_id', 'parent_comment_id', 'author_name', 'body', 'created_at'];
-  const rows = db[tab];
   const cell = (row, c) => {
     const v = row[c];
-    if (v === null) return h('td', { class: 'null' }, 'NULL');
-    if (c === 'created_at') return h('td', {}, v.replace('T', ' ').slice(0, 19) + 'Z');
-    return h('td', { class: (c === 'title' || c === 'body') ? 'trunc' : '', title: typeof v === 'string' ? v : null }, v);
+    if (v === null || v === undefined) return h('td', { class: 'null' }, 'NULL');
+    if (c === 'created_at' || c === 'lockout_until') return h('td', {}, v.replace('T', ' ').slice(0, 19) + 'Z');
+    return h('td', { class: TRUNC.has(c) ? 'trunc' : '', title: typeof v === 'string' ? v : null }, v);
   };
-  setKids(dataEl, 
+  setKids(dataEl,
     r?.ef
       ? h('div', {}, h('div', { class: 'label' }, 'EF Core (ใน Service)'), h('pre', {}, r.ef))
-      : h('p', { class: 'nosql' }, 'Request นี้ไม่ถึง Data Access Layer'),
+      : h('p', { class: 'nosql' }, r ? 'Request นี้ไม่ถึง Data Access Layer' : 'ยังไม่มี request'),
     r?.sql ? h('div', {}, h('div', { class: 'label' }, 'SQL ที่ EF Core สร้างส่งไป PostgreSQL'), h('pre', {}, r.sql.join('\n\n'))) : null,
     h('div', {},
       h('div', { class: 'label' }, 'ตารางใน PostgreSQL (ปัจจุบัน)'),
       h('div', { class: 'tabs', role: 'tablist' },
-        ['topic', 'comment'].map(t => h('button', { class: 'tab', role: 'tab', type: 'button', 'aria-selected': String(t === tab), onclick: () => { tab = t; renderData(); } }, `${t} (${db[t].length})`))),
+        Object.keys(COLS).map(t => h('button', { class: 'tab', role: 'tab', type: 'button', 'aria-selected': String(t === tab), onclick: () => { tab = t; renderData(); } }, `${t} (${db[t].length})`))),
       h('div', { class: 'tablewrap' },
         h('table', {},
-          h('thead', {}, h('tr', {}, cols.map(c => h('th', {}, c)))),
-          h('tbody', {}, rows.map(row => h('tr', { class: row.id === hl ? 'flash' : '' }, cols.map(c => cell(row, c)))))))));
+          h('thead', {}, h('tr', {}, COLS[tab].map(c => h('th', {}, c)))),
+          h('tbody', {}, db[tab].map(row => h('tr', { class: row.id === hl ? 'flash' : '' }, COLS[tab].map(c => cell(row, c)))))))),
+    tab === 'app_user' ? h('p', { class: 'hint', style: 'margin:0' }, 'ไม่มีคอลัมน์ไหนเก็บรหัสผ่านหรือ shared key แบบอ่านได้: password_hash ถอดกลับไม่ได้ ส่วน totp_secret_protected ถอดได้เฉพาะเซิร์ฟเวอร์ที่มี key ring') : null);
 }
 
 // ---------- flow strip ----------
@@ -628,11 +1163,22 @@ function renderFlow() {
     n.classList.toggle('on', i <= last);
     n.classList.toggle('stop', r?.stoppedAt === 'api' && n.dataset.n === 'api');
   });
-  document.getElementById('flowNote').textContent = r ? (r.stoppedAt === 'api' ? 'หยุดที่ Domain (validation)' : `${r.status} ${r.statusText}`) : '';
+  document.getElementById('flowNote').textContent = !r ? '' :
+    r.stoppedAt === 'api' ? (r.status === 401 ? 'หยุดที่ Domain (ไม่มี token)' : 'หยุดที่ Domain (validation)') : `${r.status} ${r.statusText}`;
 }
 
-document.getElementById('reset').addEventListener('click', () => { log.length = 0; focusIdx = -1; showNewForm = false; seed(); goList(); });
+async function start() {
+  log.length = 0; focusIdx = -1; showNewForm = false; session = null; pending = null; replyTo = null; returnTo = { page: 'list' };
+  seed();
+  renderSite();
+  await refreshCodes();
+  await goList();
+}
+document.getElementById('reset').addEventListener('click', start);
 
-seed();
-goList();
+(async () => {
+  jwtKey = await crypto.subtle.importKey('raw', randBytes(32), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+  await start();
+  setInterval(tickPhone, 1000);
+})();
 </script>
