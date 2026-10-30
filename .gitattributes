@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.sh text eol=lf
+# Visual Studio expects CRLF in solution files
+*.sln text eol=crlf
