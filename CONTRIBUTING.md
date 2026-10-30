@@ -21,6 +21,9 @@
 - [docs/SPECREQUIREMENT.md](docs/SPECREQUIREMENT.md) — งานที่ทำต้องอ้างถึง `FR-...` ข้อใดข้อหนึ่ง ถ้าไม่มีข้อที่ตรง ให้เพิ่ม requirement ก่อน
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — โดยเฉพาะ §3 กฎการพึ่งพาระหว่าง layer
 - [CONTEXT.md](CONTEXT.md) — ใช้ศัพท์ให้ตรง (Topic ไม่ใช่ Post, Comment ไม่ใช่ Reply ฯลฯ)
+- [task-plans/to-do/README.md](task-plans/to-do/README.md) — ทุกงานมีไฟล์ TASK ก่อนเปิด PR; หยิบงานจาก board แล้วใส่ชื่อตัวเองในคอลัมน์ `Owner`
+
+สมาชิกใหม่: เพิ่มชื่อตัวเองใน [CONTRIBUTORS.md](CONTRIBUTORS.md) ใน PR แรก
 
 ## รายงาน Bug / เสนอ Feature
 
@@ -181,13 +184,14 @@ add topic api and fix ui    # สองเรื่องใน commit เดี
 
 - หัวข้อ PR ใช้รูปแบบเดียวกับ commit subject (กลายเป็น commit ตอน squash)
 - ใน description ระบุ:
-  - `FR-...` ที่ PR นี้ทำ
+  - TASK ID (เช่น `TASK-MVP-04`) และ `FR-...` ที่ PR นี้ทำ
   - วิธีทดสอบ (คำสั่ง, request ตัวอย่าง, ภาพหน้าจอถ้าเป็น UI)
 - Checklist ก่อนขอ review:
   - [ ] `dotnet build` ผ่าน ไม่มี warning
   - [ ] `dotnet test` ผ่าน
   - [ ] ถ้าแก้ Entity → มี migration ใหม่ที่สร้างด้วย `dotnet ef migrations add` และรัน `database update` ผ่าน
   - [ ] ถ้าเปลี่ยน API/โครงสร้าง/requirement → อัปเดต `docs/` ใน PR เดียวกัน
+  - [ ] อัปเดตสถานะ task ใน `tasks.md` และเพิ่ม receipt (คำสั่ง + output จริง)
   - [ ] ไม่มี secret ใน diff
 
 ## Code Style

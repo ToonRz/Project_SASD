@@ -32,5 +32,8 @@
 | เทคโนโลยีและเวอร์ชันที่ใช้ | [docs/TECHSTACK.md](docs/TECHSTACK.md) |
 | ศัพท์ของโดเมน (Topic, Comment, Room …) | [CONTEXT.md](CONTEXT.md) |
 | Branch / commit / PR | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| สมาชิกทีม | [CONTRIBUTORS.md](CONTRIBUTORS.md) |
+| งานที่ยังเปิดอยู่ / ลำดับงาน / ใครทำ | [task-plans/to-do/](task-plans/to-do/README.md) |
+| Design spec ต่อฟีเจอร์ | [task-plans/spec/](task-plans/spec/) |
 | เหตุผลของการตัดสินใจเชิงสถาปัตยกรรม | [docs/architecture/decisions/](docs/architecture/decisions/) |
 | Mock แบบคลิกได้ ดูว่า request วิ่งผ่าน 3 layer อย่างไร | [docs/mockups/webboard-layers.html](docs/mockups/webboard-layers.html) (เปิดในเบราว์เซอร์ได้เลย) |

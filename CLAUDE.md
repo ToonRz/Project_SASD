@@ -18,6 +18,9 @@ Three layers, technology fixed by the assignment: Presentation (free choice, not
 | Domain terms (Topic, Comment, Reply, Tag, Room, Author, Member, MFA/Access token) | `CONTEXT.md` |
 | Branching / commits / PR / secrets | `CONTRIBUTING.md` |
 | Why the layers are split this way | `docs/architecture/decisions/` |
+| Feature design (decisions, contracts, acceptance) | `task-plans/spec/spec-*.md` |
+| Open work, order, owners | `task-plans/to-do/` — conventions in its `README.md`; single tasks in `backlog/`, spec breakdowns in `<feature>-to-do/tasks.md` |
+| Team members | `CONTRIBUTORS.md` |
 
 ## Critical rules
 
