@@ -3,6 +3,7 @@
 เอกสารนี้อธิบายว่าระบบแบ่งเป็นส่วนไหน แต่ละส่วนรับผิดชอบอะไร และข้อมูลไหลผ่านอย่างไร
 อ่านคู่กับ [SPECREQUIREMENT.md](SPECREQUIREMENT.md) (ต้องทำอะไร) และ [TECHSTACK.md](TECHSTACK.md) (ใช้อะไรทำ)
 เหตุผลที่เลือกโครงสร้างนี้อยู่ใน [ADR-layered-architecture.md](architecture/decisions/ADR-layered-architecture.md)
+ดูตัวอย่างการทำงานแบบคลิกได้ที่ [mockups/webboard-layers.html](mockups/webboard-layers.html) — ข้อมูลอยู่ในหน่วยความจำของหน้าเว็บ ไม่ได้ต่อ API หรือฐานข้อมูลจริง
 
 ## Contents
 

@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Webboard Layer Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: UI pane on the left (what the user sees); Domain + Data Access stacked on the right (what happens behind it). One column on phones. */
+:root {
+  --bg: #F2F4F7;
+  --surface: #FFFFFF;
+  --ink: #17202B;
+  --muted: #5A6575;
+  --line: #DADFE7;
+  --code-bg: #EEF1F5;
+  --pres: #0B7A64;
+  --dom: #5A3CC2;
+  --data: #2C6590;
+  --on-accent: #FFFFFF;
+  --ok: #1A7F37;
+  --warn: #B54708;
+  --err: #C42B2B;
+  --flash: #FFF3C4;
+  --font-display: "Bai Jamjuree", "IBM Plex Sans Thai", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, "IBM Plex Sans Thai", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F141B; --surface: #161D27; --ink: #E5E9EF; --muted: #96A1B1; --line: #273243;
+    --code-bg: #0C1117; --pres: #3EC6A6; --dom: #A08BF2; --data: #72AADB; --on-accent: #0D1218;
+    --ok: #4CC36E; --warn: #F0A050; --err: #F07070; --flash: #3A3418;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F141B; --surface: #161D27; --ink: #E5E9EF; --muted: #96A1B1; --line: #273243;
+  --code-bg: #0C1117; --pres: #3EC6A6; --dom: #A08BF2; --data: #72AADB; --on-accent: #0D1218;
+  --ok: #4CC36E; --warn: #F0A050; --err: #F07070; --flash: #3A3418;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.6 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--dom); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
+.top h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+.top p { margin: 2px 0 0; color: var(--muted); max-width: 62ch; }
+.reset { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; font-size: 13px; }
+.reset:hover { border-color: var(--muted); }
+
+/* flow strip */
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
+.node { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); transition: background .2s, color .2s, border-color .2s; }
+.node.on { color: var(--on-accent); border-color: transparent; }
+.node.on[data-n="ui"] { background: var(--pres); }
+.node.on[data-n="http"], .node.on[data-n="api"] { background: var(--dom); }
+.node.on[data-n="ef"], .node.on[data-n="pg"] { background: var(--data); }
+.node.stop { outline: 2px solid var(--err); outline-offset: 1px; }
+.arrow { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+.flow-note { color: var(--muted); font-size: 13px; }
+
+/* grid */
+.grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+@media (max-width: 920px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.layer { --c: var(--pres); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
+.layer.dom { --c: var(--dom); }
+.layer.data { --c: var(--data); }
+.layer-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--c) 8%, var(--surface)); }
+.layer-num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--c); color: var(--on-accent); font: 600 12px/1 var(--font-mono); }
+.layer-head h2 { font-size: 16px; font-weight: 600; color: var(--c); }
+.layer-head .tech { color: var(--muted); font-size: 13px; margin-left: auto; }
+.layer-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; font: 12.5px/1.55 var(--font-mono); white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow: auto; }
+
+/* --- Presentation: mock browser + forum --- */
+.browser-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.url { flex: 1; min-width: 0; background: var(--code-bg); border-radius: 5px; padding: 3px 10px; font: 12.5px var(--font-mono); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.board-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.board-title h3 { font-size: 20px; font-weight: 600; }
+.btn { border: 0; border-radius: 6px; padding: 7px 14px; background: var(--pres); color: var(--on-accent); font-weight: 500; font-size: 14px; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--pres); border: 1px solid color-mix(in srgb, var(--pres) 45%, var(--line)); }
+.link { background: none; border: 0; padding: 0; color: var(--pres); font-weight: 500; text-align: left; }
+.link:hover { text-decoration: underline; }
+
+.topics { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 8px; }
+.topics li { display: flex; gap: 12px; align-items: start; padding: 12px 14px; }
+.topics li + li { border-top: 1px solid var(--line); }
+.topics .main { flex: 1; min-width: 0; }
+.topics .link { font-size: 16px; }
+.meta { color: var(--muted); font-size: 13px; }
+.count { flex: none; font: 500 12px var(--font-mono); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+
+form.card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: color-mix(in srgb, var(--pres) 4%, var(--surface)); }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field label { font-size: 13px; font-weight: 500; }
+.field input, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; background: var(--surface); }
+.field textarea { min-height: 72px; resize: vertical; }
+.field.bad input, .field.bad textarea { border-color: var(--err); }
+.err { color: var(--err); font-size: 12.5px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.row .field { flex: 1 1 160px; }
+.hint { font-size: 12.5px; color: var(--muted); }
+
+.topic-full h3 { font-size: 22px; font-weight: 600; }
+.topic-full .body { margin: 8px 0 0; white-space: pre-wrap; }
+.comments { display: flex; flex-direction: column; gap: 10px; }
+.comment { border-left: 3px solid var(--line); padding: 4px 0 4px 12px; display: flex; flex-direction: column; gap: 4px; }
+.comment.reply { border-left-color: color-mix(in srgb, var(--pres) 50%, var(--line)); }
+.comment .who { font-weight: 600; font-size: 14px; }
+.comment .text { white-space: pre-wrap; }
+.kids { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding-left: 14px; }
+.kids.flat { padding-left: 0; }
+.empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+
+/* --- Domain --- */
+.handler { font: 13px var(--font-mono); display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.handler b { color: var(--dom); font-weight: 500; }
+.reqline { font: 500 13px var(--font-mono); margin-bottom: 4px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.method { color: var(--dom); }
+.pill { font: 600 11.5px var(--font-mono); border-radius: 4px; padding: 1px 7px; color: var(--on-accent); }
+.pill.s2 { background: var(--ok); } .pill.s4 { background: var(--warn); } .pill.s404 { background: var(--err); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+@media (max-width: 560px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.tests { display: flex; flex-wrap: wrap; gap: 6px; }
+.test { border: 1px dashed color-mix(in srgb, var(--dom) 55%, var(--line)); background: transparent; color: var(--dom); border-radius: 6px; padding: 4px 10px; font-size: 13px; }
+.test:hover { background: color-mix(in srgb, var(--dom) 8%, transparent); }
+.log { list-style: none; margin: 0; padding: 0; font: 12.5px var(--font-mono); border: 1px solid var(--line); border-radius: 6px; max-height: 180px; overflow: auto; }
+.log li button { width: 100%; display: flex; gap: 8px; align-items: center; background: none; border: 0; padding: 5px 10px; text-align: left; }
+.log li + li { border-top: 1px solid var(--line); }
+.log li button:hover { background: var(--code-bg); }
+.log li.cur button { background: color-mix(in srgb, var(--dom) 10%, transparent); }
+.log .p { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log .tag { color: var(--muted); font-size: 11px; }
+.stopnote { border: 1px solid color-mix(in srgb, var(--err) 40%, var(--line)); background: color-mix(in srgb, var(--err) 7%, var(--surface)); border-radius: 6px; padding: 8px 12px; font-size: 13.5px; }
+
+/* --- Data --- */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 4px 10px; font: 500 13px var(--font-mono); color: var(--muted); margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--data); border-bottom-color: var(--data); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 6px 6px; max-height: 260px; }
+table { border-collapse: collapse; width: 100%; font: 12.5px var(--font-mono); font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 5px 10px; white-space: nowrap; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 500; background: var(--code-bg); position: sticky; top: 0; }
+td.trunc { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+td.null { color: var(--muted); font-style: italic; }
+tr.flash td { background: var(--flash); }
+.nosql { color: var(--muted); font-size: 13.5px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Webboard · 3-Layer Mock</h1>
+      <p>ลองตั้งกระทู้ เปิดอ่าน หรือคอมเมนต์ในหน้าเว็บทางซ้าย แล้วดูว่า Domain Layer รับ request อะไร และ Data Access Layer ยิง SQL อะไรลง PostgreSQL ข้อมูลทั้งหมดอยู่ในหน่วยความจำของหน้านี้</p>
+    </div>
+    <button class="reset" id="reset" type="button">รีเซ็ตข้อมูลตัวอย่าง</button>
+  </header>
+
+  <div class="flow" aria-label="เส้นทางของ request ล่าสุด">
+    <span class="node" data-n="ui">Presentation</span><span class="arrow">→</span>
+    <span class="node" data-n="http">HTTP + JSON</span><span class="arrow">→</span>
+    <span class="node" data-n="api">ASP.NET Controller / Service</span><span class="arrow">→</span>
+    <span class="node" data-n="ef">EF Core DbContext</span><span class="arrow">→</span>
+    <span class="node" data-n="pg">PostgreSQL</span>
+    <span class="flow-note" id="flowNote"></span>
+  </div>
+
+  <div class="grid">
+    <section class="layer pres" aria-labelledby="h-pres">
+      <div class="layer-head">
+        <span class="layer-num">1</span><h2 id="h-pres">Presentation Layer</h2>
+        <span class="tech">เทคโนโลยียังไม่กำหนด · คุยผ่าน REST API เท่านั้น</span>
+      </div>
+      <div class="browser-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url" id="url">webboard.local/</span></div>
+      <div class="board" id="view"></div>
+    </section>
+
+    <div class="side">
+      <section class="layer dom" aria-labelledby="h-dom">
+        <div class="layer-head">
+          <span class="layer-num">2</span><h2 id="h-dom">Domain Layer</h2>
+          <span class="tech">ASP.NET Core Web API</span>
+        </div>
+        <div class="layer-body" id="domain"></div>
+      </section>
+
+      <section class="layer data" aria-labelledby="h-data">
+        <div class="layer-head">
+          <span class="layer-num">3</span><h2 id="h-data">Data Access Layer</h2>
+          <span class="tech">Entity Framework Core → PostgreSQL</span>
+        </div>
+        <div class="layer-body" id="data"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- tiny DOM helper (strings always go in as text, never HTML: NFR-003) ----------
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k === 'class') el.className = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+// replaceChildren() turns a skipped optional part (null) into the text "null"
+function setKids(el, ...kids) {
+  el.replaceChildren(...kids.flat().filter(k => k != null && k !== false));
+}
+
+// ---------- "PostgreSQL": in-memory tables ----------
+let db;
+function minsAgo(m) { return new Date(Date.now() - m * 60000).toISOString(); }
+function seed() {
+  db = { topic: [], comment: [], seq: { topic: 0, comment: 0 } };
+  const t1 = insert('topic', { title: 'ใช้ EF Core กับ PostgreSQL แล้ว DateTime ฟ้อง Kind=Local แก้ยังไง', body: 'ตอน SaveChanges() ลงคอลัมน์ timestamptz แล้ว Npgsql โยน exception ว่า Kind=Local ไม่รองรับ ต้องแก้ตรงไหนครับ', author_name: 'ต้น', created_at: minsAgo(185), room_id: null });
+  const t2 = insert('topic', { title: 'สรุป Layered Architecture ก่อนสอบกลางภาค', body: 'Presentation → Domain → Data Access → Database\nlayer บนเรียก layer ล่างได้ทางเดียว ใครมีจุดที่ต้องเพิ่มคอมเมนต์ได้เลย', author_name: 'แพรว', created_at: minsAgo(62), room_id: null });
+  insert('topic', { title: 'แนะนำร้านข้าวมันไก่แถวคณะหน่อย', body: 'เบื่อร้านเดิมแล้ว ขอร้านที่เดินไปได้', author_name: 'ปอนด์', created_at: minsAgo(9), room_id: null });
+  const c1 = insert('comment', { topic_id: t1.id, parent_comment_id: null, body: 'ใช้ DateTime.UtcNow แทน DateTime.Now ครับ Npgsql 6 ขึ้นไปบังคับให้ค่าที่ลง timestamptz เป็น UTC', author_name: 'มายด์', created_at: minsAgo(170) });
+  insert('comment', { topic_id: t1.id, parent_comment_id: c1.id, body: 'ได้แล้วครับ ขอบคุณมาก', author_name: 'ต้น', created_at: minsAgo(160) });
+  insert('comment', { topic_id: t2.id, parent_comment_id: null, body: 'อย่าลืมว่า Controller ไม่ควรแตะ DbContext ตรง ให้ผ่าน Service', author_name: 'บีม', created_at: minsAgo(40) });
+}
+function insert(table, row) {
+  const r = { id: ++db.seq[table], ...row };
+  db[table].push(r);
+  return r;
+}
+
+// ---------- Domain Layer: the REST API ----------
+const PROBLEM_400 = 'https://tools.ietf.org/html/rfc9110#section-15.5.1';
+const PROBLEM_404 = 'https://tools.ietf.org/html/rfc9110#section-15.5.5';
+function traceId() { return '00-' + Math.random().toString(16).slice(2, 18).padEnd(16, '0') + '-01'; }
+
+function topicSummary(t) {
+  return { id: t.id, title: t.title, authorName: t.author_name, createdAt: t.created_at, commentCount: db.comment.filter(c => c.topic_id === t.id).length };
+}
+function commentDto(c) {
+  return { id: c.id, topicId: c.topic_id, parentCommentId: c.parent_comment_id, authorName: c.author_name, body: c.body, createdAt: c.created_at };
+}
+function validate(body, rules) {
+  const errors = {};
+  for (const [field, prop, max] of rules) {
+    const v = (body[prop] ?? '').trim();
+    if (!v) (errors[field] ||= []).push(`The ${field} field is required.`);
+    else if (max && v.length > max) (errors[field] ||= []).push(`The field ${field} must be a string or array type with a maximum length of '${max}'.`);
+  }
+  return Object.keys(errors).length ? errors : null;
+}
+function badRequest(errors) {
+  return { status: 400, statusText: 'Bad Request', body: { type: PROBLEM_400, title: 'One or more validation errors occurred.', status: 400, errors, traceId: traceId() } };
+}
+function notFound(detail) {
+  return { status: 404, statusText: 'Not Found', body: { type: PROBLEM_404, title: 'Not Found', status: 404, detail, traceId: traceId() } };
+}
+function sqlLog(ms, params, text) {
+  const p = Object.entries(params).map(([k, v]) => `${k}=${v === null ? 'NULL' : typeof v === 'number' ? v : `'${v}'`}`).join(', ');
+  return `-- Executed DbCommand (${ms}ms) [Parameters=[${p}]]\n${text}`;
+}
+
+function handle(method, path, body) {
+  let m;
+  if (method === 'GET' && path === '/api/topics') {
+    const list = [...db.topic].sort((a, b) => b.created_at.localeCompare(a.created_at)).map(topicSummary);
+    return {
+      status: 200, statusText: 'OK', body: list,
+      handler: ['TopicsController.GetAll()', 'TopicService.ListAsync()'], fr: 'FR-TOPIC-002',
+      ef: `return await _db.Topics
+    .OrderByDescending(t => t.CreatedAt)
+    .Select(t => new TopicSummaryDto(
+        t.Id, t.Title, t.AuthorName, t.CreatedAt,
+        t.Comments.Count()))
+    .ToListAsync();`,
+      sql: [sqlLog(2, {}, `SELECT t.id, t.title, t.author_name, t.created_at, (
+    SELECT count(*)::int
+    FROM comment AS c
+    WHERE t.id = c.topic_id) AS comment_count
+FROM topic AS t
+ORDER BY t.created_at DESC`)],
+      table: 'topic'
+    };
+  }
+  if (method === 'GET' && (m = path.match(/^\/api\/topics\/(\d+)$/))) {
+    const id = +m[1];
+    const t = db.topic.find(x => x.id === id);
+    const res = {
+      handler: ['TopicsController.GetById(id)', 'TopicService.GetAsync(id)'], fr: 'FR-TOPIC-003',
+      ef: `var topic = await _db.Topics
+    .Include(t => t.Comments.OrderBy(c => c.CreatedAt))
+    .FirstOrDefaultAsync(t => t.Id == id);
+if (topic is null) return NotFound();
+return TopicDetailDto.From(topic);`,
+      sql: [sqlLog(3, { '@id': id }, `SELECT t.id, t.author_name, t.body, t.created_at, t.title,
+       c.id, c.author_name, c.body, c.created_at, c.parent_comment_id, c.topic_id
+FROM (
+    SELECT t0.* FROM topic AS t0 WHERE t0.id = @id LIMIT 1
+) AS t
+LEFT JOIN comment AS c ON t.id = c.topic_id
+ORDER BY t.id, c.created_at`)],
+      table: 'comment'
+    };
+    if (!t) return { ...res, ...notFound(`Topic ${id} was not found.`) };
+    const comments = db.comment.filter(c => c.topic_id === id).sort((a, b) => a.created_at.localeCompare(b.created_at)).map(commentDto);
+    return { ...res, status: 200, statusText: 'OK', body: { id: t.id, title: t.title, body: t.body, authorName: t.author_name, createdAt: t.created_at, comments } };
+  }
+  if (method === 'POST' && path === '/api/topics') {
+    const base = {
+      handler: ['TopicsController.Create(CreateTopicRequest)', 'TopicService.CreateAsync(request)'], fr: 'FR-TOPIC-001',
+      table: 'topic'
+    };
+    const errors = validate(body, [['Title', 'title', 200], ['Body', 'body', 0], ['AuthorName', 'authorName', 50]]);
+    if (errors) return { ...base, ...badRequest(errors), stoppedAt: 'api', fr: 'FR-TOPIC-004' };
+    const row = insert('topic', { title: body.title.trim(), body: body.body.trim(), author_name: body.authorName.trim(), created_at: new Date().toISOString(), room_id: null });
+    return {
+      ...base, status: 201, statusText: 'Created', headers: { Location: `/api/topics/${row.id}` },
+      body: topicSummary(row), highlight: row.id,
+      ef: `var topic = new Topic {
+    Title = request.Title,
+    Body = request.Body,
+    AuthorName = request.AuthorName,
+    CreatedAt = DateTime.UtcNow
+};
+_db.Topics.Add(topic);
+await _db.SaveChangesAsync();
+return CreatedAtAction(nameof(GetById), new { id = topic.Id }, TopicSummaryDto.From(topic));`,
+      sql: [sqlLog(4, { '@p0': row.author_name, '@p1': row.body, '@p2': row.created_at, '@p3': row.title }, `INSERT INTO topic (author_name, body, created_at, title)
+VALUES (@p0, @p1, @p2, @p3)
+RETURNING id;`)]
+    };
+  }
+  if (method === 'POST' && (m = path.match(/^\/api\/topics\/(\d+)\/comments$/))) {
+    const topicId = +m[1];
+    const parentId = body.parentCommentId ?? null;
+    const base = {
+      handler: ['CommentsController.Create(topicId, CreateCommentRequest)', 'CommentService.CreateAsync(topicId, request)'],
+      fr: parentId ? 'FR-REPLY-001' : 'FR-COMMENT-001', table: 'comment'
+    };
+    const errors = validate(body, [['Body', 'body', 0], ['AuthorName', 'authorName', 50]]);
+    if (errors) return { ...base, ...badRequest(errors), stoppedAt: 'api' };
+    const sql = [sqlLog(1, { '@topicId': topicId }, `SELECT EXISTS (
+    SELECT 1 FROM topic AS t WHERE t.id = @topicId)`)];
+    let ef = `if (!await _db.Topics.AnyAsync(t => t.Id == topicId))
+    return NotFound();`;
+    if (!db.topic.some(t => t.id === topicId)) return { ...base, ...notFound(`Topic ${topicId} was not found.`), fr: 'FR-COMMENT-003', ef, sql };
+    if (parentId != null) {
+      ef += `
+
+if (request.ParentCommentId is int parentId)
+{
+    var parent = await _db.Comments.FindAsync(parentId);
+    if (parent is null || parent.TopicId != topicId)
+        return ValidationProblem("Reply must be in the same topic as its parent.");
+}`;
+      sql.push(sqlLog(1, { '@parentId': parentId }, `SELECT c.id, c.author_name, c.body, c.created_at, c.parent_comment_id, c.topic_id
+FROM comment AS c
+WHERE c.id = @parentId
+LIMIT 1`));
+      const parent = db.comment.find(c => c.id === parentId);
+      if (!parent || parent.topic_id !== topicId) {
+        return { ...base, ...badRequest({ ParentCommentId: ['Reply must be in the same topic as its parent.'] }), fr: 'FR-REPLY-002', ef, sql };
+      }
+    }
+    const row = insert('comment', { topic_id: topicId, parent_comment_id: parentId, body: body.body.trim(), author_name: body.authorName.trim(), created_at: new Date().toISOString() });
+    ef += `
+
+var comment = new Comment {
+    TopicId = topicId,
+    ParentCommentId = request.ParentCommentId,
+    Body = request.Body,
+    AuthorName = request.AuthorName,
+    CreatedAt = DateTime.UtcNow
+};
+_db.Comments.Add(comment);
+await _db.SaveChangesAsync();
+return Created($"/api/topics/{topicId}/comments/{comment.Id}", CommentDto.From(comment));`;
+    sql.push(sqlLog(3, { '@p0': row.author_name, '@p1': row.body, '@p2': row.created_at, '@p3': row.parent_comment_id, '@p4': row.topic_id }, `INSERT INTO comment (author_name, body, created_at, parent_comment_id, topic_id)
+VALUES (@p0, @p1, @p2, @p3, @p4)
+RETURNING id;`));
+    return { ...base, status: 201, statusText: 'Created', headers: { Location: `/api/topics/${topicId}/comments/${row.id}` }, body: commentDto(row), highlight: row.id, ef, sql };
+  }
+  return { status: 404, statusText: 'Not Found', body: null, handler: ['(no route)'], stoppedAt: 'api' };
+}
+
+// ---------- request log + "HTTP" ----------
+const log = [];
+let focusIdx = -1;
+function api(method, path, body, opts = {}) {
+  const res = handle(method, path, body ? structuredClone(body) : undefined);
+  log.unshift({ method, path, reqBody: body, res, refresh: !!opts.refresh, at: new Date() });
+  if (log.length > 30) log.pop();
+  if (opts.refresh) { if (focusIdx >= 0) focusIdx++; }
+  else { focusIdx = 0; if (res.table) tab = res.table; }
+  renderDomain(); renderData(); renderFlow();
+  return res;
+}
+
+// ---------- Presentation Layer ----------
+let route = { page: 'list' };
+let replyTo = null;
+const view = document.getElementById('view');
+const urlEl = document.getElementById('url');
+
+function timeAgo(iso) {
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (m < 1) return 'เมื่อสักครู่';
+  if (m < 60) return `${m} นาทีที่แล้ว`;
+  if (m < 1440) return `${Math.floor(m / 60)} ชั่วโมงที่แล้ว`;
+  return `${Math.floor(m / 1440)} วันที่แล้ว`;
+}
+function field(id, label, name, opts = {}) {
+  const input = opts.multiline
+    ? h('textarea', { id, name, placeholder: opts.placeholder || '' })
+    : h('input', { id, name, type: 'text', placeholder: opts.placeholder || '', autocomplete: 'off' });
+  return h('div', { class: 'field', 'data-field': opts.key }, h('label', { for: id }, label), input, h('span', { class: 'err' }));
+}
+function readForm(form) {
+  return Object.fromEntries([...form.querySelectorAll('input, textarea')].map(el => [el.name, el.value]));
+}
+function showErrors(form, errors) {
+  form.querySelectorAll('.field').forEach(f => {
+    const msg = errors?.[f.dataset.field];
+    f.classList.toggle('bad', !!msg);
+    f.querySelector('.err').textContent = msg ? msg.join(' ') : '';
+  });
+}
+
+function goList(opts) {
+  route = { page: 'list' }; replyTo = null;
+  urlEl.textContent = 'webboard.local/';
+  const res = api('GET', '/api/topics', null, opts);
+  renderList(res.body);
+}
+function goTopic(id, opts) {
+  route = { page: 'topic', id };
+  urlEl.textContent = `webboard.local/topics/${id}`;
+  const res = api('GET', `/api/topics/${id}`, null, opts);
+  if (res.status !== 200) { setKids(view, h('p', { class: 'empty' }, 'ไม่พบกระทู้นี้')); return; }
+  renderTopic(res.body);
+}
+
+let showNewForm = false;
+function renderList(topics) {
+  const form = h('form', { class: 'card', id: 'new-topic', novalidate: true, onsubmit: e => {
+      e.preventDefault();
+      const v = readForm(e.target);
+      const res = api('POST', '/api/topics', { title: v.title, body: v.body, authorName: v.authorName });
+      if (res.status === 201) { showNewForm = false; goTopic(res.body.id, { refresh: true }); }
+      else showErrors(e.target, res.body.errors);
+    } },
+    field('nt-title', 'หัวข้อกระทู้', 'title', { key: 'Title', placeholder: 'ไม่เกิน 200 ตัวอักษร' }),
+    field('nt-body', 'เนื้อหา', 'body', { key: 'Body', multiline: true }),
+    h('div', { class: 'row' },
+      field('nt-author', 'ชื่อที่แสดง', 'authorName', { key: 'AuthorName', placeholder: 'ไม่เกิน 50 ตัวอักษร' }),
+      h('button', { class: 'btn', type: 'submit', style: 'align-self:end' }, 'ตั้งกระทู้')),
+    h('span', { class: 'hint' }, 'ลองกดตั้งกระทู้โดยเว้นช่องว่างไว้ เพื่อดู 400 จาก Domain Layer'));
+  setKids(view, 
+    h('div', { class: 'board-title' },
+      h('h3', {}, 'กระทู้ทั้งหมด'),
+      h('button', { class: 'btn' + (showNewForm ? ' ghost' : ''), type: 'button', onclick: () => { showNewForm = !showNewForm; renderList(topics); } }, showNewForm ? 'ยกเลิก' : '+ ตั้งกระทู้ใหม่')),
+    showNewForm ? form : null,
+    topics.length
+      ? h('ul', { class: 'topics' }, topics.map(t => h('li', {},
+          h('div', { class: 'main' },
+            h('button', { class: 'link', type: 'button', onclick: () => goTopic(t.id) }, t.title),
+            h('div', { class: 'meta' }, `${t.authorName} · ${timeAgo(t.createdAt)}`)),
+          h('span', { class: 'count' }, `${t.commentCount} ความเห็น`))))
+      : h('p', { class: 'empty' }, 'ยังไม่มีกระทู้ — กด "ตั้งกระทู้ใหม่" เพื่อเริ่ม'));
+}
+
+function commentForm(topicId, parentId) {
+  const key = parentId ? `r${parentId}` : 'c';
+  return h('form', { class: 'card', novalidate: true, onsubmit: e => {
+      e.preventDefault();
+      const v = readForm(e.target);
+      const res = api('POST', `/api/topics/${topicId}/comments`, { body: v.body, authorName: v.authorName, parentCommentId: parentId });
+      if (res.status === 201) { replyTo = null; goTopic(topicId, { refresh: true }); }
+      else showErrors(e.target, res.body.errors);
+    } },
+    field(`${key}-body`, parentId ? `ตอบความเห็น #${parentId}` : 'แสดงความเห็น', 'body', { key: 'Body', multiline: true }),
+    h('div', { class: 'row' },
+      field(`${key}-author`, 'ชื่อที่แสดง', 'authorName', { key: 'AuthorName' }),
+      h('button', { class: 'btn', type: 'submit', style: 'align-self:end' }, parentId ? 'ส่งคำตอบ' : 'ส่งความเห็น'),
+      parentId ? h('button', { class: 'btn ghost', type: 'button', style: 'align-self:end', onclick: () => { replyTo = null; rerenderTopic(); } }, 'ยกเลิก') : null));
+}
+
+let lastTopic = null;
+function rerenderTopic() { if (lastTopic) renderTopic(lastTopic); }
+function renderTopic(t) {
+  lastTopic = t;
+  const byParent = new Map();
+  for (const c of t.comments) {
+    const k = c.parentCommentId ?? 0;
+    if (!byParent.has(k)) byParent.set(k, []);
+    byParent.get(k).push(c);
+  }
+  const renderThread = (parentKey, depth) => (byParent.get(parentKey) || []).map(c =>
+    h('div', { class: 'comment' + (depth ? ' reply' : '') },
+      h('div', {}, h('span', { class: 'who' }, c.authorName), h('span', { class: 'meta' }, ` · #${c.id} · ${timeAgo(c.createdAt)}`)),
+      h('div', { class: 'text' }, c.body),
+      h('div', {}, h('button', { class: 'link', type: 'button', style: 'font-size:13px', onclick: () => { replyTo = c.id; rerenderTopic(); } }, 'ตอบ')),
+      replyTo === c.id ? commentForm(t.id, c.id) : null,
+      byParent.has(c.id) ? h('div', { class: 'kids' + (depth >= 2 ? ' flat' : '') }, renderThread(c.id, depth + 1)) : null));
+
+  setKids(view, 
+    h('div', {}, h('button', { class: 'link', type: 'button', onclick: () => goList() }, '← กระทู้ทั้งหมด')),
+    h('article', { class: 'topic-full' },
+      h('h3', {}, t.title),
+      h('div', { class: 'meta' }, `${t.authorName} · ${timeAgo(t.createdAt)} · กระทู้ #${t.id}`),
+      h('p', { class: 'body' }, t.body)),
+    h('div', { class: 'board-title' }, h('h3', { style: 'font-size:16px' }, `${t.comments.length} ความเห็น`)),
+    t.comments.length ? h('div', { class: 'comments' }, renderThread(0, 0)) : h('p', { class: 'empty' }, 'ยังไม่มีความเห็น เป็นคนแรกเลย'),
+    commentForm(t.id, null));
+}
+
+// ---------- Domain panel ----------
+const domainEl = document.getElementById('domain');
+function pillClass(s) { return s < 300 ? 's2' : s === 404 ? 's404' : 's4'; }
+function renderDomain() {
+  const e = log[focusIdx];
+  if (!e) { setKids(domainEl, ); return; }
+  const r = e.res;
+  const reqText = `${e.method} ${e.path} HTTP/1.1\nAccept: application/json` + (e.reqBody ? `\nContent-Type: application/json\n\n${JSON.stringify(e.reqBody, null, 2)}` : '');
+  const resHeaders = [`HTTP/1.1 ${r.status} ${r.statusText}`, `Content-Type: application/${r.status >= 400 ? 'problem+json' : 'json'}; charset=utf-8`]
+    .concat(Object.entries(r.headers || {}).map(([k, v]) => `${k}: ${v}`)).join('\n');
+  const resText = resHeaders + (r.body != null ? `\n\n${JSON.stringify(r.body, null, 2)}` : '');
+
+  const tests = h('div', { class: 'tests' },
+    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/topics', { title: '', body: '', authorName: '' }) }, 'POST กระทู้ว่าง → 400'),
+    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/topics', { title: 'ก'.repeat(210), body: 'ทดสอบหัวข้อยาว', authorName: 'ทดสอบ' }) }, 'หัวข้อยาว 210 ตัว → 400'),
+    h('button', { class: 'test', type: 'button', onclick: () => api('POST', '/api/topics/999/comments', { body: 'สวัสดี', authorName: 'ทดสอบ' }) }, 'คอมเมนต์ topic 999 → 404'),
+    h('button', { class: 'test', type: 'button', onclick: () => {
+        const c = db.comment[0]; const other = db.topic.find(t => c && t.id !== c.topic_id);
+        if (c && other) api('POST', `/api/topics/${other.id}/comments`, { body: 'ตอบข้ามกระทู้', authorName: 'ทดสอบ', parentCommentId: c.id });
+      } }, 'Reply ข้ามกระทู้ → 400'));
+
+  setKids(domainEl, 
+    h('div', {},
+      h('div', { class: 'label' }, 'ผู้รับผิดชอบ request นี้'),
+      h('div', { class: 'handler' }, h('b', {}, r.handler[0]), r.handler[1] ? h('span', { class: 'arrow' }, '→') : null, r.handler[1] ? h('b', {}, r.handler[1]) : null, r.fr ? h('span', { class: 'meta' }, `(${r.fr})`) : null)),
+    r.stoppedAt === 'api' ? h('div', { class: 'stopnote' }, 'Validation ไม่ผ่านที่ Domain Layer จึงตอบ 400 กลับทันที ไม่มีการเรียก DbContext และไม่มี SQL ถึงฐานข้อมูล') : null,
+    h('div', { class: 'two' },
+      h('div', { style: 'min-width:0' }, h('div', { class: 'label' }, 'Request (จาก Presentation)'), h('pre', {}, reqText)),
+      h('div', { style: 'min-width:0' },
+        h('div', { class: 'reqline' }, h('span', { class: 'label', style: 'margin:0' }, 'Response'), h('span', { class: 'pill ' + pillClass(r.status) }, `${r.status} ${r.statusText}`)),
+        h('pre', {}, resText))),
+    h('div', {}, h('div', { class: 'label' }, 'ลองยิงกรณีผิดพลาด'), tests),
+    h('div', {},
+      h('div', { class: 'label' }, 'Request log (กดเพื่อดูย้อนหลัง)'),
+      h('ul', { class: 'log' }, log.map((x, i) => h('li', { class: i === focusIdx ? 'cur' : '' },
+        h('button', { type: 'button', onclick: () => { focusIdx = i; if (x.res.table) tab = x.res.table; renderDomain(); renderData(); renderFlow(); } },
+          h('span', { class: 'pill ' + pillClass(x.res.status) }, x.res.status),
+          h('span', { class: 'method' }, x.method),
+          h('span', { class: 'p' }, x.path),
+          x.refresh ? h('span', { class: 'tag' }, 'refresh') : null))))));
+}
+
+// ---------- Data Access panel ----------
+const dataEl = document.getElementById('data');
+let tab = 'topic';
+function renderData() {
+  const e = log[focusIdx];
+  const r = e?.res;
+  const hl = r && r.highlight && r.table === tab ? r.highlight : null;
+  const cols = tab === 'topic'
+    ? ['id', 'title', 'body', 'author_name', 'created_at', 'room_id']
+    : ['id', 'topic_id', 'parent_comment_id', 'author_name', 'body', 'created_at'];
+  const rows = db[tab];
+  const cell = (row, c) => {
+    const v = row[c];
+    if (v === null) return h('td', { class: 'null' }, 'NULL');
+    if (c === 'created_at') return h('td', {}, v.replace('T', ' ').slice(0, 19) + 'Z');
+    return h('td', { class: (c === 'title' || c === 'body') ? 'trunc' : '', title: typeof v === 'string' ? v : null }, v);
+  };
+  setKids(dataEl, 
+    r?.ef
+      ? h('div', {}, h('div', { class: 'label' }, 'EF Core (ใน Service)'), h('pre', {}, r.ef))
+      : h('p', { class: 'nosql' }, 'Request นี้ไม่ถึง Data Access Layer'),
+    r?.sql ? h('div', {}, h('div', { class: 'label' }, 'SQL ที่ EF Core สร้างส่งไป PostgreSQL'), h('pre', {}, r.sql.join('\n\n'))) : null,
+    h('div', {},
+      h('div', { class: 'label' }, 'ตารางใน PostgreSQL (ปัจจุบัน)'),
+      h('div', { class: 'tabs', role: 'tablist' },
+        ['topic', 'comment'].map(t => h('button', { class: 'tab', role: 'tab', type: 'button', 'aria-selected': String(t === tab), onclick: () => { tab = t; renderData(); } }, `${t} (${db[t].length})`))),
+      h('div', { class: 'tablewrap' },
+        h('table', {},
+          h('thead', {}, h('tr', {}, cols.map(c => h('th', {}, c)))),
+          h('tbody', {}, rows.map(row => h('tr', { class: row.id === hl ? 'flash' : '' }, cols.map(c => cell(row, c)))))))));
+}
+
+// ---------- flow strip ----------
+function renderFlow() {
+  const r = log[focusIdx]?.res;
+  const order = ['ui', 'http', 'api', 'ef', 'pg'];
+  const last = !r ? -1 : r.stoppedAt === 'api' ? 2 : 4;
+  document.querySelectorAll('.node').forEach(n => {
+    const i = order.indexOf(n.dataset.n);
+    n.classList.toggle('on', i <= last);
+    n.classList.toggle('stop', r?.stoppedAt === 'api' && n.dataset.n === 'api');
+  });
+  document.getElementById('flowNote').textContent = r ? (r.stoppedAt === 'api' ? 'หยุดที่ Domain (validation)' : `${r.status} ${r.statusText}`) : '';
+}
+
+document.getElementById('reset').addEventListener('click', () => { log.length = 0; focusIdx = -1; showNewForm = false; seed(); goList(); });
+
+seed();
+goList();
+</script>

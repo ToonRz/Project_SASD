@@ -32,3 +32,4 @@
 | ศัพท์ของโดเมน (Topic, Comment, Room …) | [CONTEXT.md](CONTEXT.md) |
 | Branch / commit / PR | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | เหตุผลของการตัดสินใจเชิงสถาปัตยกรรม | [docs/architecture/decisions/](docs/architecture/decisions/) |
+| Mock แบบคลิกได้ ดูว่า request วิ่งผ่าน 3 layer อย่างไร | [docs/mockups/webboard-layers.html](docs/mockups/webboard-layers.html) (เปิดในเบราว์เซอร์ได้เลย) |
