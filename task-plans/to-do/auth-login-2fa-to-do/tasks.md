@@ -1,7 +1,7 @@
 # auth-login-2fa — Login ด้วยรหัสผ่าน + 2FA (TOTP)
 
 **Source spec:** [`task-plans/spec/spec-auth-login-2fa.md`](../../spec/spec-auth-login-2fa.md)
-**Status of spec/board:** Draft 2026-10-30 — รอ approve ก่อนเริ่ม AUTH-01
+**Status of spec/board:** Approved 2026-10-31 (narawichswu)
 
 ## Goal
 

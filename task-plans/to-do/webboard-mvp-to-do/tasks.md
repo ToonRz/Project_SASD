@@ -1,7 +1,7 @@
 # webboard-mvp — Topic และ Comment ผ่าน 3 layer
 
 **Source spec:** [`task-plans/spec/spec-webboard-mvp.md`](../../spec/spec-webboard-mvp.md)
-**Status of spec/board:** Draft 2026-10-30 — รอ approve ก่อนเริ่ม MVP-01
+**Status of spec/board:** Approved 2026-10-31 (narawichswu)
 
 ## Goal
 

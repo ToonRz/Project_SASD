@@ -1,6 +1,6 @@
 # SPEC: Webboard MVP — Topic และ Comment
 
-Status: Draft 2026-10-30 — รอทีม approve ก่อนเริ่ม task
+Status: Approved 2026-10-31 (narawichswu)
 Date: 2026-10-30
 Board: [webboard-mvp-to-do/tasks.md](../to-do/webboard-mvp-to-do/tasks.md)
 Requirements: FR-TOPIC-001…004, FR-COMMENT-001…003, NFR-001…005 ([SPECREQUIREMENT](../../docs/SPECREQUIREMENT.md))

@@ -1,6 +1,6 @@
 # SPEC: Login ด้วยรหัสผ่าน + 2FA (TOTP)
 
-Status: Draft 2026-10-30 — รอทีม approve ก่อนเริ่ม task
+Status: Approved 2026-10-31 (narawichswu)
 Date: 2026-10-30
 Board: [auth-login-2fa-to-do/tasks.md](../to-do/auth-login-2fa-to-do/tasks.md)
 Requirements: FR-AUTH-001…008, NFR-004, NFR-006, NFR-007 ([SPECREQUIREMENT](../../docs/SPECREQUIREMENT.md) §4.6)
