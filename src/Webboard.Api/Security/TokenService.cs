@@ -11,9 +11,14 @@ public class TokenService(IOptions<JwtOptions> options, TimeProvider time)
     public const string PurposeClaim = "purpose";
     public const string MfaPurpose = "mfa";
 
+    public const string AccessPurpose = "access";
+
     public static readonly TimeSpan MfaLifetime = TimeSpan.FromMinutes(5);
+    public static readonly TimeSpan AccessLifetime = TimeSpan.FromMinutes(60);
 
     public string CreateMfaToken(User user) => Create(user, MfaPurpose, MfaLifetime);
+
+    public string CreateAccessToken(User user) => Create(user, AccessPurpose, AccessLifetime);
 
     private string Create(User user, string purpose, TimeSpan lifetime)
     {

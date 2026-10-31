@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,6 +45,7 @@ public class WebboardApiFactory : WebApplicationFactory<Program>
         builder.UseSetting("ConnectionStrings:Webboard", _connectionString);
         builder.UseSetting("Jwt:SigningKey", SigningKey);
         builder.ConfigureLogging(logging => logging.AddProvider(Logs));
+        builder.ConfigureServices(services => services.AddDataProtection().UseEphemeralDataProtectionProvider());
     }
 
     // The factory is a collection fixture, so this runs once per test run.

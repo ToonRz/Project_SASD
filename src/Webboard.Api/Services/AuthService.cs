@@ -15,7 +15,19 @@ public enum LoginStatus
 
 public record LoginResult(LoginStatus Status, LoginResponse? Response = null, TimeSpan? RetryAfter = null);
 
-public class AuthService(WebboardDbContext db, TokenService tokens, TimeProvider time, ILogger<AuthService> logger)
+public enum TwoFactorStatus
+{
+    Success,
+    UserNotFound,
+    AlreadyEnabled,
+    SetupNotStarted,
+    InvalidCode,
+    LockedOut,
+}
+
+public record TwoFactorResult<T>(TwoFactorStatus Status, T? Value = default, TimeSpan? RetryAfter = null);
+
+public class AuthService(WebboardDbContext db, TokenService tokens, TotpService totp, TimeProvider time, ILogger<AuthService> logger)
 {
     public const int MaxFailedAttempts = 5;
     public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
@@ -86,6 +98,72 @@ public class AuthService(WebboardDbContext db, TokenService tokens, TimeProvider
 
         return new LoginResult(LoginStatus.Success, new LoginResponse(tokens.CreateMfaToken(user), !user.TwoFactorEnabled));
     }
+
+    public async Task<UserDto?> GetUserAsync(int userId) =>
+        await db.Users.AsNoTracking().Where(u => u.Id == userId).Select(u => ToDto(u)).SingleOrDefaultAsync();
+
+    /// <summary>Creates (or, until verified, replaces) the user's shared key and returns it once.</summary>
+    public async Task<TwoFactorResult<TwoFactorSetupResponse>> BeginTwoFactorSetupAsync(int userId)
+    {
+        var user = await db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+        {
+            return new(TwoFactorStatus.UserNotFound);
+        }
+
+        if (user.TwoFactorEnabled)
+        {
+            return new(TwoFactorStatus.AlreadyEnabled);
+        }
+
+        var sharedKey = TotpService.NewSharedKey();
+        user.TotpSecretProtected = totp.Protect(sharedKey);
+        await db.SaveChangesAsync();
+        return new(TwoFactorStatus.Success, new TwoFactorSetupResponse(sharedKey, TotpService.BuildOtpAuthUri(user.Username, sharedKey)));
+    }
+
+    public async Task<TwoFactorResult<AuthResponse>> VerifyTwoFactorAsync(int userId, string code)
+    {
+        var user = await db.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+        {
+            return new(TwoFactorStatus.UserNotFound);
+        }
+
+        var now = time.GetUtcNow();
+        if (user.LockoutUntil > now)
+        {
+            return new(TwoFactorStatus.LockedOut, RetryAfter: user.LockoutUntil.Value - now);
+        }
+
+        if (user.TotpSecretProtected is null)
+        {
+            return new(TwoFactorStatus.SetupNotStarted);
+        }
+
+        var step = totp.Match(totp.Unprotect(user.TotpSecretProtected), code);
+        if (step is not null && await TryAcceptStepAsync(user.Id, step.Value))
+        {
+            await db.Entry(user).ReloadAsync();
+            var response = new AuthResponse(tokens.CreateAccessToken(user), (int)TokenService.AccessLifetime.TotalSeconds, ToDto(user));
+            return new(TwoFactorStatus.Success, response);
+        }
+
+        // Wrong code or a time step that was already used: both count toward the lockout.
+        var retryAfter = await RegisterFailureAsync(user, now);
+        return retryAfter is null
+            ? new(TwoFactorStatus.InvalidCode)
+            : new(TwoFactorStatus.LockedOut, RetryAfter: retryAfter);
+    }
+
+    // A single conditional UPDATE, so two concurrent requests with the same code cannot both succeed.
+    private async Task<bool> TryAcceptStepAsync(int userId, long step) =>
+        await db.Users
+            .Where(u => u.Id == userId && (u.TotpLastStep == null || u.TotpLastStep < step))
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.TotpLastStep, step)
+                .SetProperty(u => u.TwoFactorEnabled, true)
+                .SetProperty(u => u.FailedLoginCount, 0)) == 1;
 
     /// <summary>Counts a failed attempt; returns the lockout length when this attempt triggered one.</summary>
     internal async Task<TimeSpan?> RegisterFailureAsync(User user, DateTimeOffset now)

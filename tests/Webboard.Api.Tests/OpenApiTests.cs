@@ -8,7 +8,9 @@ public class OpenApiTests(WebApplicationFactory<Program> factory) : IClassFixtur
 {
     // This class runs in the Development environment without WebboardApiFactory, so it supplies its own throwaway key.
     private readonly HttpClient _client = factory
-        .WithWebHostBuilder(b => b.UseSetting("Jwt:SigningKey", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))))
+        .WithWebHostBuilder(b => b
+            .UseSetting("Jwt:SigningKey", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)))
+            .UseSetting("DataProtection:KeysPath", Path.Combine(Path.GetTempPath(), "webboard-test-keys")))
         .CreateClient();
 
     [Fact]

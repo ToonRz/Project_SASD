@@ -22,7 +22,7 @@
 | --- | --- | --- | --- | --- |
 | [AUTH-01](TASK-AUTH-01-user-entity-password-hasher.md) | Entity `User` (`app_user`) + `PasswordHasher` | MVP-02 | narawichswu (Claude) | DONE |
 | [AUTH-02](TASK-AUTH-02-register-login.md) | `register`, `login` (MFA token), lockout | AUTH-01 | narawichswu (Claude) | DONE |
-| [AUTH-03](TASK-AUTH-03-totp-access-token.md) | 2FA setup/verify, access token, JWT bearer policies, `/me` | AUTH-02 | — | TODO |
+| [AUTH-03](TASK-AUTH-03-totp-access-token.md) | 2FA setup/verify, access token, JWT bearer policies, `/me` | AUTH-02 | narawichswu (Claude) | DONE |
 
 ## Dependency order
 
@@ -77,3 +77,26 @@ $ git grep -n "SigningKey" -- '*.json'  -> (no output)
 ```
 
 Deviations: added package `Microsoft.IdentityModel.JsonWebTokens` (token creation + test decoding). `OpenApiTests` now supplies a throwaway `Jwt:SigningKey` because startup validation (ValidateOnStart) fails without one. The signing key is validated in every environment, not only outside `Testing`.
+
+### AUTH-03
+
+```text
+$ dotnet test --filter FullyQualifiedName~AuthTwoFactorTests
+(red first: Failed: 14, Passed: 0, Total: 14 - endpoints did not exist)
+Passed!  - Failed:     0, Passed:    14, Skipped:     0, Total:    14
+
+$ dotnet build -warnaserror         -> 0 Warning(s) 0 Error(s)
+$ dotnet test                       -> Passed!  - Failed: 0, Passed: 40, Total: 40
+$ dotnet format --verify-no-changes -> exit 0
+$ git grep -n "SigningKey" -- '*.json'                       -> (no output)
+$ grep -rn "SHA256.HashData\|ComputeHash" src/ --include=*.cs -> (no output)
+```
+
+Not done: the manual step "scan `otpAuthUri` with a real Authenticator app" (needs a phone); the TOTP code is checked with Otp.NET in tests.
+
+Notes for MVP-04/05:
+- `using Webboard.Api.Security;` then `User.GetUserId()` (int, from the `sub` claim). `[Authorize]` alone is enough: the default policy requires `purpose=access`, and a wrong-purpose token gets `401` (not `403`) via `PurposeMismatchAs401Handler`.
+- Tests: `await TestAuth.GetAccessTokenAsync(client, "someuser")` registers that new username, logs in, sets up and verifies 2FA, and returns the access token; send it as `Authorization: Bearer <token>`. Call it once per username per test (the username must not exist yet). `TestAuth.Password` is the password it uses.
+- `TimeProvider` is injected everywhere (tokens, TOTP, lockout, JWT lifetime check); swap it with `FakeTimeProvider` through `factory.WithWebHostBuilder(...)`.
+
+Deviations: added `Otp.NET`, `Microsoft.AspNetCore.Authentication.JwtBearer` (Api) and `Microsoft.Extensions.TimeProvider.Testing`, `Otp.NET` (tests). `TokenValidationParameters` has no `TimeProvider`, so Program.cs sets a `LifetimeValidator` that uses the injected clock. Added `PurposeMismatchAs401Handler` and `AuthPolicies` (not in the task's file list). `OpenApiTests` now also supplies `DataProtection:KeysPath` (it runs in Development).

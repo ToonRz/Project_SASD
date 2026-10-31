@@ -51,6 +51,14 @@ dotnet user-secrets set Jwt:SigningKey "$(openssl rand -base64 32)" --project sr
 
 - ถ้าไม่ตั้ง หรือสั้นกว่า 32 bytes API จะไม่ start และข้อความ error บอกชื่อ `Jwt:SigningKey`
 
+### Data Protection key ring (สำหรับ `dotnet run` เท่านั้น — test ใช้ key แบบ ephemeral)
+
+```sh
+dotnet user-secrets set DataProtection:KeysPath <โฟลเดอร์นอก repo> --project src/Webboard.Api
+```
+
+- เก็บ shared key ของ 2FA แบบเข้ารหัสด้วย key ring นี้ — ถ้าลบโฟลเดอร์ ผู้ใช้ต้องตั้ง 2FA ใหม่; นอก environment `Testing` ถ้าไม่ตั้ง API จะไม่ start และข้อความ error บอกชื่อ `DataProtection:KeysPath`
+
 ## Documents
 
 | คำถาม | อ่านที่ |

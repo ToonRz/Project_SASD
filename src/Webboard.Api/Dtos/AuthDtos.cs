@@ -12,3 +12,9 @@ public record UserDto(int Id, string Username, string DisplayName, bool TwoFacto
 public record LoginRequest([Required] string Username, [Required] string Password);
 
 public record LoginResponse(string MfaToken, bool TwoFactorSetupRequired);
+
+public record TwoFactorSetupResponse(string SharedKey, string OtpAuthUri);
+
+public record VerifyTwoFactorRequest([Required, RegularExpression("^[0-9]{6}$")] string Code);
+
+public record AuthResponse(string AccessToken, int ExpiresIn, UserDto User);

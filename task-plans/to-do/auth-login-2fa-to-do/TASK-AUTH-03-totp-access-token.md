@@ -1,7 +1,7 @@
 # TASK-AUTH-03 — 2FA setup/verify, access token, JWT bearer policies, `/me`
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** AUTH-02
 **Spec:** `task-plans/spec/spec-auth-login-2fa.md` §2 D4–D8, §3; FR-AUTH-004, 005, 007, 008
 **Produces:** `TotpService`, `TokenService.CreateAccessToken`, JWT bearer ที่ default policy ต้องการ `purpose=access`, policy `MfaPending`, `ClaimsPrincipalExtensions.GetUserId()`, test helper `GetAccessTokenAsync(client, username)`
