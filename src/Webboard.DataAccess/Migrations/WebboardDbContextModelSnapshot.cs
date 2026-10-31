@@ -22,6 +22,91 @@ namespace Webboard.DataAccess.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Webboard.DataAccess.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("ParentCommentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("parent_comment_id");
+
+                    b.Property<int>("TopicId")
+                        .HasColumnType("integer")
+                        .HasColumnName("topic_id");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_comment");
+
+                    b.HasIndex("ParentCommentId")
+                        .HasDatabaseName("ix_comment_parent_comment_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_comment_user_id");
+
+                    b.HasIndex("TopicId", "CreatedAt")
+                        .HasDatabaseName("ix_comment_topic_id_created_at");
+
+                    b.ToTable("comment", (string)null);
+                });
+
+            modelBuilder.Entity("Webboard.DataAccess.Entities.Topic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_topic");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_topic_created_at");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_topic_user_id");
+
+                    b.ToTable("topic", (string)null);
+                });
+
             modelBuilder.Entity("Webboard.DataAccess.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -80,6 +165,52 @@ namespace Webboard.DataAccess.Migrations
                         .HasDatabaseName("ix_app_user_username");
 
                     b.ToTable("app_user", (string)null);
+                });
+
+            modelBuilder.Entity("Webboard.DataAccess.Entities.Comment", b =>
+                {
+                    b.HasOne("Webboard.DataAccess.Entities.Comment", "ParentComment")
+                        .WithMany()
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("fk_comment_comment_parent_comment_id");
+
+                    b.HasOne("Webboard.DataAccess.Entities.Topic", "Topic")
+                        .WithMany("Comments")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_comment_topics_topic_id");
+
+                    b.HasOne("Webboard.DataAccess.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_comment_users_user_id");
+
+                    b.Navigation("Author");
+
+                    b.Navigation("ParentComment");
+
+                    b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("Webboard.DataAccess.Entities.Topic", b =>
+                {
+                    b.HasOne("Webboard.DataAccess.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_topic_users_user_id");
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Webboard.DataAccess.Entities.Topic", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

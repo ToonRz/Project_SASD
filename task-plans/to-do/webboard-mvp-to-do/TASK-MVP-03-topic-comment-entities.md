@@ -1,7 +1,7 @@
 # TASK-MVP-03 — Entity `Topic`, `Comment` + migration
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** MVP-02, AUTH-01 (`User` ต้องมีก่อนเพราะ FK `user_id`)
 **Spec:** `task-plans/spec/spec-webboard-mvp.md` §2 D2–D4, D9, D11, D13; `docs/ARCHITECTURE.md` §6
 **Produces:** `DbSet<Topic> Topics`, `DbSet<Comment> Comments`, migration `AddTopicAndComment`
