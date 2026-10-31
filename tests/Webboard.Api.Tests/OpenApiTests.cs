@@ -1,11 +1,15 @@
 using System.Net;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Webboard.Api.Tests;
 
 public class OpenApiTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly HttpClient _client = factory.CreateClient();
+    // This class runs in the Development environment without WebboardApiFactory, so it supplies its own throwaway key.
+    private readonly HttpClient _client = factory
+        .WithWebHostBuilder(b => b.UseSetting("Jwt:SigningKey", Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))))
+        .CreateClient();
 
     [Fact]
     public async Task OpenApiDocument_IsServed()

@@ -1,7 +1,7 @@
 # TASK-AUTH-02 — `register`, `login` (MFA token), lockout
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** AUTH-01
 **Spec:** `task-plans/spec/spec-auth-login-2fa.md` §2 D3, D6, D8, D9, §3; FR-AUTH-001, 003, 006
 **Produces:** `AuthService.RegisterAsync/LoginAsync`, `TokenService.CreateMfaToken`, `AuthController` (`register`, `login`)

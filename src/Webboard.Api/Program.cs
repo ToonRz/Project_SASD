@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Webboard.Api.Security;
+using Webboard.Api.Services;
 using Webboard.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddOptions<JwtOptions>()
+    .Bind(builder.Configuration.GetSection("Jwt"))
+    .Validate(
+        o => o.HasValidKey(),
+        "Missing or too short 'Jwt:SigningKey' (base64, at least 32 bytes). Set it with dotnet user-secrets or the environment variable Jwt__SigningKey.")
+    .ValidateOnStart();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<TokenService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddDbContext<WebboardDbContext>((sp, options) =>
 {
     var cs = sp.GetRequiredService<IConfiguration>().GetConnectionString("Webboard")

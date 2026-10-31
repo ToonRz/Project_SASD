@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 using Webboard.DataAccess;
 
 namespace Webboard.Api.Tests;
@@ -12,7 +14,12 @@ public class WebboardApiFactory : WebApplicationFactory<Program>
 {
     private const string ConnectionStringKey = "ConnectionStrings:WebboardTest";
 
+    // Random per test run (spec-webboard-mvp D12); never read from user-secrets or any file.
+    private static readonly string SigningKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
     private readonly string _connectionString;
+
+    public CapturingLoggerProvider Logs { get; } = new();
 
     public WebboardApiFactory()
     {
@@ -35,6 +42,8 @@ public class WebboardApiFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Testing");
         builder.UseSetting("ConnectionStrings:Webboard", _connectionString);
+        builder.UseSetting("Jwt:SigningKey", SigningKey);
+        builder.ConfigureLogging(logging => logging.AddProvider(Logs));
     }
 
     // The factory is a collection fixture, so this runs once per test run.

@@ -21,7 +21,7 @@
 | Task | Title | Depends on | Owner | Status |
 | --- | --- | --- | --- | --- |
 | [AUTH-01](TASK-AUTH-01-user-entity-password-hasher.md) | Entity `User` (`app_user`) + `PasswordHasher` | MVP-02 | narawichswu (Claude) | DONE |
-| [AUTH-02](TASK-AUTH-02-register-login.md) | `register`, `login` (MFA token), lockout | AUTH-01 | — | TODO |
+| [AUTH-02](TASK-AUTH-02-register-login.md) | `register`, `login` (MFA token), lockout | AUTH-01 | narawichswu (Claude) | DONE |
 | [AUTH-03](TASK-AUTH-03-totp-access-token.md) | 2FA setup/verify, access token, JWT bearer policies, `/me` | AUTH-02 | — | TODO |
 
 ## Dependency order
@@ -62,3 +62,18 @@ $ grep -rn "SHA256.HashData\|ComputeHash" src/ --include=*.cs   -> (no output)
 
 Deviation: added `Microsoft.EntityFrameworkCore.Design` (PrivateAssets=all) to `Webboard.Api.csproj` because `dotnet ef --startup-project src/Webboard.Api` requires it.
 
+
+### AUTH-02
+
+```text
+$ dotnet test --filter FullyQualifiedName~AuthRegisterLoginTests
+(red first: Failed: 10, Passed: 1, Total: 11 - endpoints did not exist)
+Passed!  - Failed:     0, Passed:    11, Skipped:     0, Total:    11
+
+$ dotnet build -warnaserror         -> 0 Warning(s) 0 Error(s)
+$ dotnet test                       -> Passed!  - Failed: 0, Passed: 26, Total: 26
+$ dotnet format --verify-no-changes -> exit 0
+$ git grep -n "SigningKey" -- '*.json'  -> (no output)
+```
+
+Deviations: added package `Microsoft.IdentityModel.JsonWebTokens` (token creation + test decoding). `OpenApiTests` now supplies a throwaway `Jwt:SigningKey` because startup validation (ValidateOnStart) fails without one. The signing key is validated in every environment, not only outside `Testing`.

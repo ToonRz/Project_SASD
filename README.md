@@ -43,6 +43,14 @@ dotnet user-secrets set ConnectionStrings:WebboardTest "Host=localhost;Port=5432
 - script ใน `docker/initdb/` รันเฉพาะตอนสร้าง volume ครั้งแรก — ถ้ามี volume `pgdata` อยู่แล้วให้รัน `docker compose exec db createdb -U webboard webboard_test` เอง
 - Integration test ใช้ฐาน `webboard_test` เท่านั้น และต้องตั้ง `ConnectionStrings:WebboardTest` (หรือ env var `ConnectionStrings__WebboardTest`)
 
+### กุญแจ JWT (สำหรับ `dotnet run` เท่านั้น — test ไม่ต้องตั้ง)
+
+```sh
+dotnet user-secrets set Jwt:SigningKey "$(openssl rand -base64 32)" --project src/Webboard.Api
+```
+
+- ถ้าไม่ตั้ง หรือสั้นกว่า 32 bytes API จะไม่ start และข้อความ error บอกชื่อ `Jwt:SigningKey`
+
 ## Documents
 
 | คำถาม | อ่านที่ |
