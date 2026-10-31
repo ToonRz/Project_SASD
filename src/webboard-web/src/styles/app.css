@@ -1,8 +1,7 @@
-/* Coffee palette, fonts, topbar, panels and motion ported from docs/mockups/webboard-ui.html (MVP screens only). */
+/* Coffee palette, fonts (self-hosted via @fontsource in main.tsx), topbar, panels and motion ported from docs/mockups/webboard-ui.html (MVP screens only). */
 :root {
   --f-display: "Chakra Petch", "IBM Plex Sans Thai", system-ui, sans-serif;
   --f-body: "IBM Plex Sans Thai", system-ui, -apple-system, sans-serif;
-  --f-hand: "Mali", "Chakra Petch", cursive;
   --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   --ease-out: cubic-bezier(.22, 1, .36, 1);
   --ease-io: cubic-bezier(.65, 0, .35, 1);

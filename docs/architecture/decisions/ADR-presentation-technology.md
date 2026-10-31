@@ -65,7 +65,9 @@ origin กว้างเกินไป (เกณฑ์ 4) และยืน�
 
 ## 5. Decision 3 — Token อยู่ในหน่วยความจำเท่านั้น
 
-Access token และ MFA token อยู่ใน React state (context) — ไม่ใช้ `localStorage`, `sessionStorage`, cookie หรือ URL
+Access token, MFA token และข้อมูลผู้ใช้อยู่ใน React state (context) — ไม่ใช้ `localStorage`, `sessionStorage`, cookie หรือ URL
+ค่าตั้งค่า UI ที่ไม่ลับ (ปัจจุบันมีอย่างเดียวคือธีม light/dark ใน key `webboard-theme`) เก็บใน `localStorage` ได้ โดยอ่าน/เขียนใน `try/catch` และหน้าเว็บต้องทำงานได้เมื่อ storage ใช้ไม่ได้
+ฟอนต์เสิร์ฟจากแพ็กเกจ `@fontsource/*` ของแอปเอง ไม่โหลดจาก CDN ภายนอก เพื่อให้ทุก request ไปที่ origin เดียวกัน
 API client (`fetch` wrapper เดียว) ใส่ `Authorization: Bearer` เมื่อมี token และเมื่อได้ `401` จะลบ token แล้วพาไปหน้า login
 
 ### Why

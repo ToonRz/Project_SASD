@@ -56,3 +56,16 @@ register 201 → login 200 → `/api/auth/2fa/setup` เรียก **1 คร�
 ปรับระหว่างเดิน: โหมดมืดที่บันทึกไว้กระพริบเป็นสว่างตอนโหลด (ตั้ง `data-theme` ใน effect) → ตั้งตอนโหลด module; header บน 375px ตกบรรทัด → ลด padding/ขนาดปุ่มให้อยู่แถวเดียว
 
 ไม่ได้ทำ (ตั้งใจ): left nav, rooms/tags/reply/profile/MOCK switcher, mascot/sticker ของ mock — ไม่อยู่ใน MVP
+
+## Receipt — follow-up (self-host fonts, theme preference docs)
+
+```
+$ npm i @fontsource/chakra-petch @fontsource/ibm-plex-sans-thai @fontsource/ibm-plex-mono   (Mali ไม่ติดตั้ง: CSS ไม่ใช้)
+$ npm run lint / typecheck / test / build  -> 0 warnings / clean / 17 passed / built (20 woff2 ใน dist/assets, ไม่มี fonts.g* ใน dist/index.html)
+$ dotnet build -warnaserror -> 0 Warning(s), 0 Error(s);  dotnet test -> Passed 61/61;  dotnet format --verify-no-changes -> exit 0
+$ grep -rn "dangerouslySetInnerHTML\|sessionStorage" src/webboard-web/src                -> (ไม่มีผลลัพธ์)
+$ grep -rn "localStorage" src/webboard-web/src | grep -v webboard-theme                  -> (ไม่มีผลลัพธ์)
+```
+
+Network log (dev server, browser pane): ทุก resource มาจาก origin `http://localhost:5173` เท่านั้น (`/@vite`, `/src`, `/node_modules/@fontsource/*/files/*.woff2`, `/api/...`) ไม่มี request ไป fonts.googleapis.com / fonts.gstatic.com
+Thai: `document.fonts.check('400 15px "IBM Plex Sans Thai"', 'กระทู้')` = true; โหลด `ibm-plex-sans-thai-thai-400-normal.woff2` และ `chakra-petch-thai-{600,700}` จริง

@@ -40,7 +40,7 @@
   - เวลา `createdAt` (UTC) แสดงเป็นเวลาท้องถิ่น (NFR-002)
   - ไม่มีการเรียก URL ที่ไม่ขึ้นต้นด้วย `/api/` (MSW `onUnhandledRequest: 'error'`)
 - [x] รันให้แดง
-- [x] Implement หน้าต่างๆ; ห้าม `dangerouslySetInnerHTML`; token อยู่ใน memory เท่านั้น ไม่ใส่ใน URL หรือ storage
+- [x] Implement หน้าต่างๆ; ห้าม `dangerouslySetInnerHTML`; token อยู่ใน memory เท่านั้น ไม่ใส่ใน URL หรือ storage (ยกเว้น key ธีม `webboard-theme`)
 - [x] รันให้เขียว + gate ของ UI (ADR D5) + gate ของ .NET
 - [x] เดินตาม Acceptance ของทั้งสอง spec ด้วยมือในเบราว์เซอร์ บันทึกผลเป็น receipt
 
@@ -54,7 +54,8 @@ npm run typecheck --prefix src/webboard-web           # ไม่มี error
 npm test --prefix src/webboard-web                    # ผ่านทั้งหมด
 npm run build --prefix src/webboard-web               # built in …
 npm run dev --prefix src/webboard-web                 # terminal 2
-grep -rn "dangerouslySetInnerHTML\|localStorage\|sessionStorage" src/webboard-web/src   # ไม่มีผลลัพธ์
+grep -rn "dangerouslySetInnerHTML\|sessionStorage" src/webboard-web/src                 # ไม่มีผลลัพธ์
+grep -rn "localStorage" src/webboard-web/src | grep -v webboard-theme                   # ไม่มีผลลัพธ์ (อนุญาตเฉพาะ key ธีม)
 ```
 
 - เดิน flow: สมัคร → ตั้ง 2FA ด้วยแอป Authenticator จริง → ตั้งกระทู้ → เขียนความเห็น → logout → เห็นว่าฟอร์มหายไป
