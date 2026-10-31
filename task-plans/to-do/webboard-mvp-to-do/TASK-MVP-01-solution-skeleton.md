@@ -1,7 +1,7 @@
 # TASK-MVP-01 — Solution, projects, OpenAPI, ProblemDetails, test project
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** —
 **Spec:** `task-plans/spec/spec-webboard-mvp.md` §2 D1, D6
 **Produces:** `Webboard.sln` ที่ build ได้, `Program.cs` ที่ task อื่นเพิ่ม service/endpoint เข้าไป, test project ที่มี `WebApplicationFactory<Program>`

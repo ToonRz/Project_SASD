@@ -10,9 +10,9 @@
 
 | Concern | Choice | Notes |
 | --- | --- | --- |
-| Runtime | **.NET 10 (LTS)** | ใช้ SDK เดียวกันทั้งทีม — ปักเวอร์ชันด้วย `global.json` |
+| Runtime | **.NET 10 (LTS)** | SDK 10.0.403 (`rollForward: latestFeature`) — ปักเวอร์ชันด้วย `global.json` |
 | Web framework | **ASP.NET Core Web API** (controllers) | โจทย์กำหนด |
-| API docs | **OpenAPI** (`Microsoft.AspNetCore.OpenApi`) + Swagger UI | เปิดเฉพาะ Development |
+| API docs | **OpenAPI** (`Microsoft.AspNetCore.OpenApi` 10.0.14) + Swagger UI (`Swashbuckle.AspNetCore.SwaggerUI` 10.3.1) | เปิดเฉพาะ Development |
 | Validation | DataAnnotations (`[Required]`, `[MaxLength]`) | ตอบ `400` เป็น Problem Details อัตโนมัติ |
 | Errors | `AddProblemDetails()` | RFC 9457 |
 | Auth — password hash | **PBKDF2-HMAC-SHA256** ผ่าน `Rfc2898DeriveBytes.Pbkdf2` (BCL) | 600,000 รอบ, salt 16 bytes, hash 32 bytes, เทียบด้วย `CryptographicOperations.FixedTimeEquals` — ดู [ADR](architecture/decisions/ADR-auth-password-2fa.md) |
@@ -26,7 +26,7 @@
 | --- | --- | --- |
 | ORM | **Entity Framework Core 10** | โจทย์กำหนด |
 | Provider | **Npgsql.EntityFrameworkCore.PostgreSQL** | driver ของ PostgreSQL สำหรับ EF Core |
-| Migrations | `dotnet-ef` CLI | ติดตั้งเป็น local tool (`dotnet tool restore`) ให้ทุกคนใช้เวอร์ชันเดียวกัน |
+| Migrations | `dotnet-ef` CLI 10.0.14 | ติดตั้งเป็น local tool (`dotnet tool restore`) ให้ทุกคนใช้เวอร์ชันเดียวกัน |
 | Naming | snake_case ใน DB | ใช้ `EFCore.NamingConventions` (`UseSnakeCaseNamingConvention()`) |
 
 ## 3. Database
@@ -52,7 +52,7 @@
 
 | Tool | Purpose |
 | --- | --- |
-| **xUnit** | unit + integration test ของ Domain Layer |
-| `Microsoft.AspNetCore.Mvc.Testing` | ยิง HTTP เข้า API จริงใน test |
+| **xUnit** 2.9.3 | unit + integration test ของ Domain Layer |
+| `Microsoft.AspNetCore.Mvc.Testing` 10.0.14 | ยิง HTTP เข้า API จริงใน test |
 | `dotnet format` | จัดรูปแบบโค้ดตาม `.editorconfig` |
 | `dotnet build -warnaserror` | build ต้องไม่มี warning ก่อน merge |

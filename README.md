@@ -21,7 +21,14 @@
 
 ## Quick start
 
-> ยังไม่มีโค้ด — ส่วนนี้จะเติมเมื่อสร้าง solution แล้ว (คำสั่ง `dotnet run`, การตั้งค่า connection string, `dotnet ef database update`)
+ต้องมี .NET SDK 10 (ปักเวอร์ชันไว้ใน `global.json`)
+
+```sh
+dotnet tool restore                       # ติดตั้ง dotnet-ef (local tool)
+dotnet build
+dotnet test
+dotnet run --project src/Webboard.Api     # Development: Swagger UI ที่ /swagger, OpenAPI ที่ /openapi/v1.json
+```
 
 ## Documents
 

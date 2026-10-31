@@ -20,7 +20,7 @@ Solution .NET ที่ build/test ได้, PostgreSQL ที่สร้า�
 
 | Task | Title | Depends on | Owner | Status |
 | --- | --- | --- | --- | --- |
-| [MVP-01](TASK-MVP-01-solution-skeleton.md) | Solution, projects, OpenAPI, ProblemDetails, test project | — | — | TODO |
+| [MVP-01](TASK-MVP-01-solution-skeleton.md) | Solution, projects, OpenAPI, ProblemDetails, test project | — | narawichswu (Claude) | DONE |
 | [MVP-02](TASK-MVP-02-database-dbcontext.md) | PostgreSQL ผ่าน compose, `WebboardDbContext`, test fixture | MVP-01 | — | TODO |
 | [MVP-03](TASK-MVP-03-topic-comment-entities.md) | Entity `Topic`, `Comment` + migration | MVP-02, AUTH-01 | — | TODO |
 | [MVP-04](TASK-MVP-04-topics-api.md) | `GET/POST /api/topics`, `GET /api/topics/{id}` | MVP-03, AUTH-03 | — | TODO |
@@ -49,3 +49,22 @@ AUTH-xx อยู่ใน [auth-login-2fa-to-do](../auth-login-2fa-to-do/tasks.
 ## Receipts
 
 _(เพิ่มเมื่อ task เสร็จ: คำสั่งจริง + output จริง)_
+
+### MVP-01 — DONE (narawichswu (Claude), 2026-10-31)
+
+Test แดงก่อน: `UnknownRoute_ReturnsProblemDetails404` fail (`Expected: "application/problem+json"` / `Actual: null`), แล้วเขียวหลังเพิ่ม `AddProblemDetails()` + `UseStatusCodePages()`
+
+```text
+$ dotnet --list-sdks
+10.0.403 [C:\Program Files\dotnet\sdk]
+$ dotnet tool restore
+Restore was successful.
+$ dotnet build -warnaserror
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+$ dotnet test
+Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2 - Webboard.Api.Tests.dll (net10.0)
+$ dotnet format --verify-no-changes
+(exit 0)
+```
