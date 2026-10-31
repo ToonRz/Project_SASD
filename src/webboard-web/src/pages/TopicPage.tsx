@@ -34,7 +34,7 @@ export default function TopicPage() {
   return (
     <div className="board">
       <article className="topic-full">
-        <h3>{topic.title}</h3>
+        <h1 className="topic-title">{topic.title}</h1>
         <div className="meta">
           โดย {topic.authorName} · <time dateTime={topic.createdAt}>{formatDateTime(topic.createdAt)}</time>
         </div>
@@ -42,13 +42,16 @@ export default function TopicPage() {
       </article>
 
       <section className="comments" aria-label="รายการความเห็น">
+        <h2 className="c-toolbar">ความเห็น <span className="c-count">{topic.comments.length}</span></h2>
         {topic.comments.length === 0 && <p className="empty">ยังไม่มีความเห็น</p>}
         {topic.comments.map((c: CommentDto) => (
           <div className="comment" key={c.id}>
-            <span className="who">{c.authorName}</span>
-            <span className="meta">
-              <time dateTime={c.createdAt}>{formatDateTime(c.createdAt)}</time>
-            </span>
+            <div className="c-top">
+              <span className="who">{c.authorName}</span>
+              <span className="meta">
+                <time dateTime={c.createdAt}>{formatDateTime(c.createdAt)}</time>
+              </span>
+            </div>
             <span className="text">{c.body}</span>
           </div>
         ))}
@@ -93,7 +96,7 @@ function NewCommentForm({ topicId, onPosted }: { topicId: number; onPosted: () =
       <Field label="ความเห็น" name="body" errorKey="Body" errors={fieldErrors} multiline value={body} onChange={setBody} />
       {error !== null && Object.keys(fieldErrors).length === 0 && <FormError>{errorMessage(error)}</FormError>}
       <div className="row">
-        <button className="btn" type="submit" disabled={busy}>
+        <button className="btn btn-honey" type="submit" disabled={busy}>
           ส่งความเห็น
         </button>
       </div>

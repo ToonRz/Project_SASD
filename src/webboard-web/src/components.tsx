@@ -74,3 +74,16 @@ export function FormError({ children }: { children: ReactNode }) {
     </p>
   ) : null
 }
+
+/** The mock's three-bar mark; decorative, so hidden from assistive tech. */
+export function BrandMark() {
+  return (
+    <span className="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <rect x="2" y="3" width="20" height="3.4" rx="1.7" />
+        <rect x="6.5" y="10.3" width="15.5" height="3.4" rx="1.7" />
+        <rect x="11" y="17.6" width="11" height="3.4" rx="1.7" />
+      </svg>
+    </span>
+  )
+}

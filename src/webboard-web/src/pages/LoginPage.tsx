@@ -34,13 +34,13 @@ export default function LoginPage() {
   const fieldErrors = fieldErrorsOf(error)
   return (
     <div className="board">
-      <h3>เข้าสู่ระบบ</h3>
+      <h1 className="page-title">เข้าสู่ระบบ</h1>
       <form className="card narrow" onSubmit={submit}>
         <Field label="ชื่อผู้ใช้" name="username" errorKey="Username" errors={fieldErrors} autoComplete="username" value={username} onChange={setUsername} />
         <Field label="รหัสผ่าน" name="password" errorKey="Password" errors={fieldErrors} type="password" autoComplete="current-password" value={password} onChange={setPassword} />
         {error !== null && Object.keys(fieldErrors).length === 0 && <FormError>{errorMessage(error)}</FormError>}
         <div className="row">
-          <button className="btn" type="submit" disabled={busy}>
+          <button className="btn btn-honey" type="submit" disabled={busy}>
             ถัดไป
           </button>
         </div>

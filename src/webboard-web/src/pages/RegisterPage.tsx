@@ -32,14 +32,14 @@ export default function RegisterPage() {
   const fieldErrors = fieldErrorsOf(error)
   return (
     <div className="board">
-      <h3>สมัครสมาชิก</h3>
+      <h1 className="page-title">สมัครสมาชิก</h1>
       <form className="card narrow" onSubmit={submit}>
         <Field label="ชื่อผู้ใช้ (ใช้ login)" name="username" errorKey="Username" errors={fieldErrors} placeholder="3–30 ตัว: a-z 0-9 _" autoComplete="username" value={username} onChange={setUsername} />
         <Field label="ชื่อที่แสดง" name="displayName" errorKey="DisplayName" errors={fieldErrors} placeholder="ไม่เกิน 50 ตัวอักษร" value={displayName} onChange={setDisplayName} />
         <Field label="รหัสผ่าน" name="password" errorKey="Password" errors={fieldErrors} type="password" placeholder="อย่างน้อย 8 ตัว" autoComplete="new-password" value={password} onChange={setPassword} />
         {error !== null && Object.keys(fieldErrors).length === 0 && <FormError>{errorMessage(error)}</FormError>}
         <div className="row">
-          <button className="btn" type="submit" disabled={busy}>
+          <button className="btn btn-honey" type="submit" disabled={busy}>
             สมัครสมาชิก
           </button>
         </div>

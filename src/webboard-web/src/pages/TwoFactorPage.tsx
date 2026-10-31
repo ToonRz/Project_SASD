@@ -52,7 +52,7 @@ export default function TwoFactorPage() {
   const fieldErrors = fieldErrorsOf(error)
   return (
     <div className="board">
-      <h3>{twoFactorSetupRequired ? 'ตั้งค่าการยืนยันตัวตนสองขั้นตอน' : 'ยืนยันตัวตนสองขั้นตอน'}</h3>
+      <h1 className="page-title">{twoFactorSetupRequired ? 'ตั้งค่าการยืนยันตัวตนสองขั้นตอน' : 'ยืนยันตัวตนสองขั้นตอน'}</h1>
       {twoFactorSetupRequired && (
         <div className="qr">
           {qr ? (
@@ -87,7 +87,7 @@ export default function TwoFactorPage() {
         />
         {error !== null && Object.keys(fieldErrors).length === 0 && <FormError>{errorMessage(error)}</FormError>}
         <div className="row">
-          <button className="btn" type="submit" disabled={busy}>
+          <button className="btn btn-honey" type="submit" disabled={busy}>
             {twoFactorSetupRequired ? 'ยืนยันและเปิดใช้ 2FA' : 'เข้าสู่ระบบ'}
           </button>
           <Link className="link" to="/login">

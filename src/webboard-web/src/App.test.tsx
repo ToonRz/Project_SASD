@@ -179,3 +179,16 @@ describe('rendering of API data', () => {
     expect(await screen.findByText('Topic not found.')).toBeInTheDocument()
   })
 })
+
+describe('theme toggle', () => {
+  it('switches the page between light and dark', async () => {
+    renderApp('/')
+    const ue = userEvent.setup()
+    const toggle = await screen.findByRole('button', { name: /ธีม/ })
+    await ue.click(toggle)
+    const first = document.documentElement.dataset.theme
+    expect(['light', 'dark']).toContain(first)
+    await ue.click(toggle)
+    expect(document.documentElement.dataset.theme).not.toBe(first)
+  })
+})
