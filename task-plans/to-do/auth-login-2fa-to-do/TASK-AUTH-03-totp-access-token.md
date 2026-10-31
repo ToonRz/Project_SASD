@@ -26,7 +26,7 @@
 
 ## Steps
 
-- [ ] เขียน test ที่ fail (คำนวณรหัสใน test ด้วย Otp.NET จาก `sharedKey` ที่ setup คืนมา):
+- [x] เขียน test ที่ fail (คำนวณรหัสใน test ด้วย Otp.NET จาก `sharedKey` ที่ setup คืนมา):
   - setup ด้วย MFA token → `200` มี `sharedKey`, `otpAuthUri` รูปแบบตาม spec; ค่าใน DB ≠ sharedKey (ถูก protect)
   - setup ซ้ำหลังเปิด 2FA แล้ว → `409`
   - verify รหัสถูก → `200` `accessToken` (`purpose=access`) และ `two_factor_enabled = true`
@@ -34,10 +34,10 @@
   - `GET /api/auth/me` ด้วย access token → `200`; ด้วย MFA token → `401`
   - `POST /api/auth/2fa/verify` ด้วย access token → `401`
   - MFA token หมดอายุ (ปรับเวลาด้วย `TimeProvider` ปลอม) → `401`
-- [ ] รันให้แดง
-- [ ] Implement ตาม D4–D8; ใช้ `TimeProvider` ทั้งใน `TotpService` และ `TokenService` เพื่อให้ test คุมเวลาได้
-- [ ] สร้าง `TestAuth.GetAccessTokenAsync` ให้ MVP-04/05 ใช้
-- [ ] รันให้เขียว + quality gates
+- [x] รันให้แดง
+- [x] Implement ตาม D4–D8; ใช้ `TimeProvider` ทั้งใน `TotpService` และ `TokenService` เพื่อให้ test คุมเวลาได้
+- [x] สร้าง `TestAuth.GetAccessTokenAsync` ให้ MVP-04/05 ใช้
+- [x] รันให้เขียว + quality gates
 
 ## Verification
 

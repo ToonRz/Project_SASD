@@ -20,16 +20,16 @@ Reader ดูรายการและรายละเอียดกระ�
 
 ## Steps
 
-- [ ] เขียน test ที่ fail:
+- [x] เขียน test ที่ fail:
   - `GET /api/topics` → `200`, เรียงใหม่ → เก่า, `commentCount` ถูก
   - `GET /api/topics/999` → `404` problem+json
   - `POST /api/topics` ไม่มี token → `401`; ใช้ MFA token → `401`
   - `POST` ด้วย access token, `Title` ว่าง → `400` มี `errors.Title`; Title 201 ตัว → `400`
   - `POST` ถูกต้อง → `201`, header `Location` = `/api/topics/{id}`, `authorName` = display name ของผู้ใช้ใน token
   - `POST` ที่ส่ง `authorName` แปลกปลอมมาใน body → ถูกเพิกเฉย
-- [ ] รันให้แดง
-- [ ] Implement Service (ใช้ `Select` เป็น DTO ใน query, ไม่ `ToList()` ก่อน project) และ Controller
-- [ ] รันให้เขียว + quality gates
+- [x] รันให้แดง
+- [x] Implement Service (ใช้ `Select` เป็น DTO ใน query, ไม่ `ToList()` ก่อน project) และ Controller
+- [x] รันให้เขียว + quality gates
 
 ## Verification
 

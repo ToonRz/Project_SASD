@@ -26,15 +26,15 @@
 
 ## Steps
 
-- [ ] เขียน test ที่ fail:
+- [x] เขียน test ที่ fail:
   - resolve `WebboardDbContext` จาก factory แล้ว `Database.CanConnectAsync()` เป็น `true`
   - ไม่ได้ตั้ง `ConnectionStrings:WebboardTest` → factory throw และข้อความมีชื่อ key (ไม่มีค่า connection string)
-- [ ] รันให้แดง (ยังไม่มี DbContext)
-- [ ] เพิ่ม compose, DbContext, DI; factory override `ConnectionStrings:Webboard` ด้วย `ConnectionStrings:WebboardTest` และรัน `Database.MigrateAsync()` ครั้งเดียวต่อ test run
-- [ ] `ResetDatabaseAsync()`: ดึงชื่อตารางจาก `context.Model.GetEntityTypes()` แล้ว `TRUNCATE … RESTART IDENTITY CASCADE` ในคำสั่งเดียว; model ยังไม่มีตาราง → ไม่ทำอะไร (AUTH-01/MVP-03 จะมี test ที่ใช้จริง)
-- [ ] `DatabaseTests` อยู่ใน `[Collection("Database")]` เป็นตัวอย่างให้ test class ถัดไป
-- [ ] รันให้เขียว แล้วรัน quality gates
-- [ ] ตรวจว่า `git status` ไม่มี `.env`
+- [x] รันให้แดง (ยังไม่มี DbContext)
+- [x] เพิ่ม compose, DbContext, DI; factory override `ConnectionStrings:Webboard` ด้วย `ConnectionStrings:WebboardTest` และรัน `Database.MigrateAsync()` ครั้งเดียวต่อ test run
+- [x] `ResetDatabaseAsync()`: ดึงชื่อตารางจาก `context.Model.GetEntityTypes()` แล้ว `TRUNCATE … RESTART IDENTITY CASCADE` ในคำสั่งเดียว; model ยังไม่มีตาราง → ไม่ทำอะไร (AUTH-01/MVP-03 จะมี test ที่ใช้จริง)
+- [x] `DatabaseTests` อยู่ใน `[Collection("Database")]` เป็นตัวอย่างให้ test class ถัดไป
+- [x] รันให้เขียว แล้วรัน quality gates
+- [x] ตรวจว่า `git status` ไม่มี `.env`
 
 ## Verification
 

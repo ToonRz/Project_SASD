@@ -24,7 +24,7 @@
 
 ## Steps
 
-- [ ] เขียน test ที่ fail:
+- [x] เขียน test ที่ fail:
   - register ถูกต้อง → `201` `twoFactorEnabled: false`; username `TON` แล้ว `ton` → `409`
   - register password 7 ตัว → `400` มี `errors.Password`; username `a b` → `400`
   - login ถูก → `200` มี `mfaToken` (decode แล้ว `purpose=mfa`, `exp` ≈ 5 นาที) และ `twoFactorSetupRequired: true`
@@ -32,9 +32,9 @@
   - รหัสผิด 5 ครั้งติด → ครั้งที่ 5 `429` มี `Retry-After`; รหัสถูกระหว่างล็อก → `429`
   - log ที่ test จับได้ (`ILogger` sink) ไม่มีสตริงรหัสผ่านที่ส่ง
   - นอก environment `Testing` ถ้าไม่มี `Jwt:SigningKey` หรือสั้นกว่า 32 bytes → API ไม่ start และข้อความบอกชื่อ key
-- [ ] รันให้แดง
-- [ ] Implement ตาม D3 (เรียก `Verify` กับ `DummyHash` เมื่อไม่พบ user), D8, D9
-- [ ] รันให้เขียว + quality gates
+- [x] รันให้แดง
+- [x] Implement ตาม D3 (เรียก `Verify` กับ `DummyHash` เมื่อไม่พบ user), D8, D9
+- [x] รันให้เขียว + quality gates
 
 ## Verification
 

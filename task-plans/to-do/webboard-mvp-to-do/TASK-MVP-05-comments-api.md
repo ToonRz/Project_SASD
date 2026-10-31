@@ -20,15 +20,15 @@ Member ที่มี access token เขียนความเห็นใ�
 
 ## Steps
 
-- [ ] เขียน test ที่ fail:
+- [x] เขียน test ที่ fail:
   - ไม่มี token → `401`
   - Topic 999 → `404`
   - `Body` ว่าง → `400` มี `errors.Body`
   - ถูกต้อง → `201`, `authorName` จาก token, `parentCommentId` เป็น `null`
   - เขียนสองความเห็นแล้ว `GET /api/topics/{id}` คืนเรียงเก่า → ใหม่ และ `commentCount` ใน `GET /api/topics` = 2
-- [ ] รันให้แดง
-- [ ] Implement: Service เช็ก `Topics.AnyAsync` ก่อน insert
-- [ ] รันให้เขียว + quality gates
+- [x] รันให้แดง
+- [x] Implement: Service เช็ก `Topics.AnyAsync` ก่อน insert
+- [x] รันให้เขียว + quality gates
 
 ## Verification
 

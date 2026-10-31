@@ -73,14 +73,14 @@ Configuration (user-secrets ตอน dev, env var ตอน deploy — ห้�
 
 ## 4. Acceptance
 
-- [ ] ในฐานข้อมูลไม่มีคอลัมน์ใดเก็บรหัสผ่านหรือ shared key แบบอ่านได้ (`SELECT password_hash, totp_secret_protected FROM app_user`)
-- [ ] Unit test: hash เดียวกันสองครั้งได้ string ต่างกัน (salt ต่าง) แต่ verify ผ่านทั้งคู่; รหัสผิด verify ไม่ผ่าน
-- [ ] สมัคร → login → ได้ `twoFactorSetupRequired: true` → setup → verify ด้วยรหัสจาก Otp.NET → ได้ access token → `GET /api/auth/me` = `200`
-- [ ] ใช้รหัส TOTP เดิมซ้ำใน step เดียวกัน → `401`
-- [ ] ใช้ MFA token เรียก `POST /api/topics` → `401`; ใช้ access token เรียก `/api/auth/2fa/verify` → `401`
-- [ ] รหัสผ่านผิด 5 ครั้งติด → ครั้งที่ 5 ได้ `429` และ login ด้วยรหัสถูกระหว่างล็อกก็ได้ `429`
-- [ ] Username ไม่มีจริงกับรหัสผิด ได้ status และ body เหมือนกัน
-- [ ] ไม่มีรหัสผ่าน, รหัส TOTP หรือ token ใน log ของ API ระหว่างรัน test ทั้งหมด
+- [x] ในฐานข้อมูลไม่มีคอลัมน์ใดเก็บรหัสผ่านหรือ shared key แบบอ่านได้ (`SELECT password_hash, totp_secret_protected FROM app_user`) — ตรวจ 2026-10-31: `password_hash` ขึ้นต้น `PBKDF2-SHA256$600000$`, `totp_secret_protected` เป็น payload ของ Data Protection (`CfDJ8…`)
+- [x] Unit test: hash เดียวกันสองครั้งได้ string ต่างกัน (salt ต่าง) แต่ verify ผ่านทั้งคู่; รหัสผิด verify ไม่ผ่าน — `PasswordHasherTests`
+- [x] สมัคร → login → ได้ `twoFactorSetupRequired: true` → setup → verify ด้วยรหัสจาก Otp.NET → ได้ access token → `GET /api/auth/me` = `200` — `Verify_CorrectCode_ReturnsAccessTokenAndEnablesTwoFactor`, `Me_WithAccessToken_ReturnsCurrentUser`
+- [x] ใช้รหัส TOTP เดิมซ้ำใน step เดียวกัน → `401` — `Verify_SameCodeTwice_SecondIsRejected`
+- [x] ใช้ MFA token เรียก `POST /api/topics` → `401`; ใช้ access token เรียก `/api/auth/2fa/verify` → `401` — `TopicsApiTests.Post_WithMfaToken_Returns401`, `TwoFactorEndpoints_WithAccessToken_Return401`
+- [x] รหัสผ่านผิด 5 ครั้งติด → ครั้งที่ 5 ได้ `429` และ login ด้วยรหัสถูกระหว่างล็อกก็ได้ `429` — `Login_FiveWrongPasswords_LocksAccountEvenForCorrectPassword`
+- [x] Username ไม่มีจริงกับรหัสผิด ได้ status และ body เหมือนกัน — `Login_WrongPasswordAndUnknownUser_AreIndistinguishable`
+- [ ] ไม่มีรหัสผ่าน, รหัส TOTP หรือ token ใน log ของ API ระหว่างรัน test ทั้งหมด — ยังตรวจแค่รหัสผ่าน (`Logs_NeverContainPasswords`) — ยังไม่มี test ที่ตรวจรหัส TOTP และ token ใน log
 
 ## 5. Open questions
 

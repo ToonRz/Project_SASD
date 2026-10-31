@@ -21,11 +21,11 @@
 
 ## Steps
 
-- [ ] เขียน test ที่ fail: insert `Comment` ที่ `TopicId` ไม่มีจริง → `DbUpdateException` (FK); `ParentCommentId` ไม่มีจริง → `DbUpdateException`; ลบ `Topic` → comment หายด้วย; `Title` 201 ตัว → `DbUpdateException`
-- [ ] รันให้แดง
-- [ ] เพิ่ม entity + configuration แล้ว `dotnet ef migrations add AddTopicAndComment --project src/Webboard.DataAccess --startup-project src/Webboard.Api`
-- [ ] อ่าน migration ที่ได้: ชื่อตาราง/คอลัมน์เป็น snake_case, มี `ON DELETE CASCADE`
-- [ ] `dotnet ef database update` แล้วรัน test ให้เขียว + quality gates
+- [x] เขียน test ที่ fail: insert `Comment` ที่ `TopicId` ไม่มีจริง → `DbUpdateException` (FK); `ParentCommentId` ไม่มีจริง → `DbUpdateException`; ลบ `Topic` → comment หายด้วย; `Title` 201 ตัว → `DbUpdateException`
+- [x] รันให้แดง
+- [x] เพิ่ม entity + configuration แล้ว `dotnet ef migrations add AddTopicAndComment --project src/Webboard.DataAccess --startup-project src/Webboard.Api`
+- [x] อ่าน migration ที่ได้: ชื่อตาราง/คอลัมน์เป็น snake_case, มี `ON DELETE CASCADE`
+- [x] `dotnet ef database update` แล้วรัน test ให้เขียว + quality gates
 
 ## Verification
 

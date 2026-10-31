@@ -66,12 +66,12 @@ Configuration:
 
 ## 4. Acceptance
 
-- [ ] `dotnet build -warnaserror` และ `dotnet test` ผ่านบนเครื่องที่ clone ใหม่ หลังทำตาม README Quick start
-- [ ] `dotnet ef database update` สร้างตาราง `app_user`, `topic`, `comment` ที่มี FK และ index ตาม ARCHITECTURE §6
-- [ ] `GET /api/topics` ไม่ต้องมี token และเรียงใหม่ → เก่า พร้อม `commentCount` ถูกต้อง
-- [ ] `POST /api/topics` ไม่มี token → `401`; มี access token แต่ Title ว่าง → `400` มี `errors.Title`; ถูกต้อง → `201` และ `authorName` = ผู้ใช้ใน token
-- [ ] `POST /api/topics/999/comments` พร้อม token → `404`
-- [ ] หน้าเว็บ: ดูรายการ, เปิดกระทู้, login (รวม 2FA), ตั้งกระทู้, เขียนความเห็น ได้ครบโดยไม่เรียกอะไรนอกจาก `/api/...`
+- [ ] `dotnet build -warnaserror` และ `dotnet test` ผ่านบนเครื่องที่ clone ใหม่ หลังทำตาม README Quick start — clone ใหม่จาก GitHub ผ่าน 61/61 บนเครื่อง dev (2026-10-31) แต่ใช้ user-secrets ที่มีอยู่แล้ว — ยังไม่ได้ลองบนเครื่องใหม่ที่ทำตาม README ตั้งแต่ต้น
+- [x] `dotnet ef database update` สร้างตาราง `app_user`, `topic`, `comment` ที่มี FK และ index ตาม ARCHITECTURE §6 — receipt ของ MVP-03 (`\d comment`, `\dt`)
+- [x] `GET /api/topics` ไม่ต้องมี token และเรียงใหม่ → เก่า พร้อม `commentCount` ถูกต้อง — `List_WithoutToken_ReturnsTopicsNewestFirstWithCommentCount`
+- [x] `POST /api/topics` ไม่มี token → `401`; มี access token แต่ Title ว่าง → `400` มี `errors.Title`; ถูกต้อง → `201` และ `authorName` = ผู้ใช้ใน token — `TopicsApiTests`
+- [x] `POST /api/topics/999/comments` พร้อม token → `404` — `CommentsApiTests`
+- [x] หน้าเว็บ: ดูรายการ, เปิดกระทู้, login (รวม 2FA), ตั้งกระทู้, เขียนความเห็น ได้ครบโดยไม่เรียกอะไรนอกจาก `/api/...` — เดิน flow ในเบราว์เซอร์ตาม receipt ของ MVP-06 และ TASK-ui-coffee-restyle-01; ทุก request ไป `/api/...`
 
 ## 5. Open questions
 

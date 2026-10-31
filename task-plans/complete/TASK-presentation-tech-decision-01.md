@@ -19,9 +19,9 @@
 
 ## Steps
 
-- [ ] ทีมเทียบตัวเลือกด้วยเกณฑ์: คนในทีมเขียนเป็นหรือไม่, เรียก REST + Bearer token ได้ง่าย, มี library สร้าง QR, รันคู่กับ `dotnet run` ได้ง่าย
-- [ ] ตัวเลือกตั้งต้น (ไม่จำกัด): Blazor WebAssembly (C# ทั้งระบบ), React + Vite, HTML + JavaScript ล้วน (แบบ mock)
-- [ ] เขียน ADR และแก้ไฟล์ตาม Exact files
+- [x] ทีมเทียบตัวเลือกด้วยเกณฑ์: คนในทีมเขียนเป็นหรือไม่, เรียก REST + Bearer token ได้ง่าย, มี library สร้าง QR, รันคู่กับ `dotnet run` ได้ง่าย
+- [x] ตัวเลือกตั้งต้น (ไม่จำกัด): Blazor WebAssembly (C# ทั้งระบบ), React + Vite, HTML + JavaScript ล้วน (แบบ mock)
+- [x] เขียน ADR และแก้ไฟล์ตาม Exact files
 
 ## Verification
 

@@ -23,11 +23,11 @@ Clone repo แล้ว `dotnet build` กับ `dotnet test` ผ่าน ม�
 
 ## Steps
 
-- [ ] สร้าง solution และสามโปรเจกต์ด้วย `dotnet new`; ตั้ง `<Nullable>enable</Nullable>`, `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`
-- [ ] เขียน test ที่ fail: `GET /openapi/v1.json` → `200` และ `GET /api/does-not-exist` → `404` แบบ `application/problem+json`
-- [ ] รัน `dotnet test` ให้แดง
-- [ ] `Program.cs`: `AddControllers()`, `AddProblemDetails()`, `AddOpenApi()`, `UseExceptionHandler()`, `UseStatusCodePages()`, `MapOpenApi()` + Swagger UI เฉพาะ Development; เพิ่ม `public partial class Program;` ให้ test เห็น
-- [ ] รัน `dotnet test` ให้เขียว แล้วรัน quality gates
+- [x] สร้าง solution และสามโปรเจกต์ด้วย `dotnet new`; ตั้ง `<Nullable>enable</Nullable>`, `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`
+- [x] เขียน test ที่ fail: `GET /openapi/v1.json` → `200` และ `GET /api/does-not-exist` → `404` แบบ `application/problem+json`
+- [x] รัน `dotnet test` ให้แดง
+- [x] `Program.cs`: `AddControllers()`, `AddProblemDetails()`, `AddOpenApi()`, `UseExceptionHandler()`, `UseStatusCodePages()`, `MapOpenApi()` + Swagger UI เฉพาะ Development; เพิ่ม `public partial class Program;` ให้ test เห็น
+- [x] รัน `dotnet test` ให้เขียว แล้วรัน quality gates
 
 ## Verification
 

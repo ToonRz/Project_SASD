@@ -21,14 +21,14 @@
 
 ## Steps
 
-- [ ] เขียน test ที่ fail:
+- [x] เขียน test ที่ fail:
   - `Hash("webboard123")` สองครั้งได้ string ต่างกัน, ขึ้นต้น `PBKDF2-SHA256$600000$`, และ `Verify` ผ่านทั้งคู่
   - `Verify("wrong", hash)` = `false`; `Verify(x, DummyHash)` = `false` เสมอ
   - Known-answer: salt และ hash ที่คำนวณด้วย Python `hashlib.pbkdf2_hmac('sha256', b'webboard123', salt, 600000, 32)` ต้อง verify ผ่าน (ตรวจว่าใช้อัลกอริทึมเดียวกันจริง)
   - insert `User` สองคน username ซ้ำ → `DbUpdateException`
-- [ ] รันให้แดง
-- [ ] Implement `PasswordHasher` ตาม D1/D2 (อ่าน iterations จาก string ตอน Verify), entity + migration
-- [ ] รันให้เขียว + quality gates
+- [x] รันให้แดง
+- [x] Implement `PasswordHasher` ตาม D1/D2 (อ่าน iterations จาก string ตอน Verify), entity + migration
+- [x] รันให้เขียว + quality gates
 
 ## Verification
 
