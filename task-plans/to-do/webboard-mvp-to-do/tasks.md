@@ -25,7 +25,7 @@ Solution .NET ที่ build/test ได้, PostgreSQL ที่สร้า�
 | [MVP-03](TASK-MVP-03-topic-comment-entities.md) | Entity `Topic`, `Comment` + migration | MVP-02, AUTH-01 | narawichswu (Claude) | DONE |
 | [MVP-04](TASK-MVP-04-topics-api.md) | `GET/POST /api/topics`, `GET /api/topics/{id}` | MVP-03, AUTH-03 | narawichswu (Claude) | DONE |
 | [MVP-05](TASK-MVP-05-comments-api.md) | `POST /api/topics/{id}/comments` | MVP-04 | narawichswu (Claude) | DONE |
-| [MVP-06](TASK-MVP-06-presentation.md) | หน้าเว็บ: รายการ, กระทู้, login + 2FA, ตั้งกระทู้, ความเห็น | MVP-05, AUTH-03 | — | TODO |
+| [MVP-06](TASK-MVP-06-presentation.md) | หน้าเว็บ: รายการ, กระทู้, login + 2FA, ตั้งกระทู้, ความเห็น | MVP-05, AUTH-03 | narawichswu (Claude) | DONE |
 
 ## Dependency order
 
@@ -154,3 +154,56 @@ $ dotnet format --verify-no-changes
 ```
 
 หมายเหตุ: `Location` ของ `POST /api/topics/{id}/comments` ชี้ `/api/topics/{id}` เพราะ MVP ไม่มี endpoint อ่าน comment เดี่ยว
+
+### MVP-06 — DONE (narawichswu (Claude), 2026-10-31)
+
+Test แดงก่อน: `npx vitest run` → `Test Files 2 failed (2) / Tests no tests` (ยังไม่มี `./client`, `App` — import resolve ไม่ได้) แล้วเขียวหลัง implement หน้าเว็บ
+
+```text
+$ npm ci --prefix src/webboard-web
+$ npm run lint --prefix src/webboard-web
+> eslint . --max-warnings 0
+(0 problems)
+$ npm run typecheck --prefix src/webboard-web
+> tsc -b --noEmit
+(no errors)
+$ npm test --prefix src/webboard-web
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+$ npm run build --prefix src/webboard-web
+✓ 129 modules transformed.
+dist/assets/index-DWpwjAqx.js   292.76 kB │ gzip: 93.69 kB
+✓ built in 186ms
+$ grep -rn "dangerouslySetInnerHTML\|localStorage\|sessionStorage" src/webboard-web/src
+(no output, exit 1)
+$ dotnet build -warnaserror
+    0 Warning(s)
+    0 Error(s)
+$ dotnet test
+Passed!  - Failed:     0, Passed:    61, Skipped:     0, Total:    61 - Webboard.Api.Tests.dll (net10.0)
+$ dotnet format --verify-no-changes
+(exit 0)
+```
+
+เดินด้วยมือในเบราว์เซอร์ (Browser pane ของ Claude desktop; `dotnet run --project src/Webboard.Api` + `npm run dev`, เปิด `http://localhost:5173`):
+
+| ขั้น | ผล |
+| --- | --- |
+| สมัคร `webui01` (`/register`) | `201` → พาไป `/login` |
+| login → `/login/2fa` | แสดง QR (`<img data:image/png>`) และ `sharedKey` (`twoFactorSetupRequired: true`) |
+| คำนวณรหัส TOTP จาก `sharedKey` ด้วยสคริปต์ node RFC 6238 ในเครื่อง แล้วกรอก | `/api/auth/2fa/verify` → เข้าสู่ระบบ เห็น "สวัสดี Web UI" และฟอร์มตั้งกระทู้ |
+| ตั้งกระทู้หัวข้อ `<script>alert(1)</script>` เนื้อหา `body <b>bold?</b>` | พาไป `/topics/1`; หัวข้อและเนื้อหาแสดงเป็นข้อความ ไม่มี alert ไม่มี `<b>` |
+| เขียนความเห็น | ความเห็นขึ้นในกระทู้ทันที เวลาแสดงเป็นเวลาท้องถิ่น (15:24) |
+| logout แล้วเปิด `/topics/1` | ฟอร์มตั้งกระทู้และฟอร์มความเห็นหาย เหลือ "เข้าสู่ระบบเพื่อแสดงความเห็น" |
+| Network (`performance` resource entries ของ fetch) | ทุกอันขึ้นต้น `/api/` (`register`, `login`, `2fa/setup`, `2fa/verify`, `topics`, `topics/1`, `topics/1/comments`); `localStorage`/`sessionStorage` ว่าง (0, 0) |
+
+ข้อจำกัด: ไม่ได้สแกน QR ด้วยแอป Authenticator บนมือถือจริง (ทำใน sandbox นี้ไม่ได้) — พิสูจน์ด้วยรหัสที่คำนวณจาก `sharedKey` ที่หน้าเว็บแสดงแล้ว API ยอมรับ ส่วนภาพ QR ยังไม่ได้ยืนยันด้วยกล้อง และหลังแก้ให้เรียก `2fa/setup` ครั้งเดียวใน StrictMode (ตอนเดินมือเรียกสองครั้ง) ยังไม่ได้เดิน flow สมัครใหม่ซ้ำ — มี test ครอบ QR/`sharedKey` แล้ว
+
+ข้อสังเกต / ส่วนที่ต่างจากข้อความใน task:
+
+- Mock `docs/mockups/webboard-layers.html` ใช้พาเลตต์ teal (`--pres: #0B7A64`) / น้ำเงินเทา ไม่ใช่ "coffee" — ยกพาเลตต์และ layout จาก mock ตามจริง รวมโหมดมืด
+- MSW 3 ไม่มี `onUnhandledRequest` แล้ว; ใช้ `server.listen({ onUnhandledFrame: 'error' })` แทน (ผลเท่ากัน)
+- TypeScript ปัก `~6.0.3` ไม่ใช่ 7 ที่ Vite template มาให้ เพราะ `typescript-eslint` 8.72 รองรับ `<6.1`; template ใช้ oxlint แต่ task กำหนด ESLint จึงถอด oxlint
+- `401` ตอนเรียกด้วย MFA token (รหัส 2FA ผิด) แสดงข้อความ error บนหน้า ไม่ลบ token/พาไป `/login`; กฎ "401 → ลบ token แล้วไป `/login`" ใช้กับ access token (API ตอบ `401 Invalid or already used code.` สำหรับรหัสผิด)
+- `npm install` รายงาน 12 moderate vulnerabilities จาก dev dependency (`npm audit`) — ยังไม่ได้แก้
+- รัน `dotnet run` ต้องมี `Jwt:SigningKey` (สุ่ม base64 32 bytes) และ `DataProtection:KeysPath` (โฟลเดอร์นอก repo) ใน user-secrets ของ `src/Webboard.Api` — ตั้งให้แล้วบนเครื่องนี้

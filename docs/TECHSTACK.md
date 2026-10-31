@@ -39,18 +39,20 @@
 ## 4. Presentation Layer
 
 ตัดสินใน [ADR-presentation-technology](architecture/decisions/ADR-presentation-technology.md) — อยู่ที่ `src/webboard-web/`
-(ไม่อยู่ใน `Webboard.sln`) เมื่อ scaffold แล้วให้แก้ตารางนี้ให้ตรงกับเวอร์ชันใน `package.json`
+(ไม่อยู่ใน `Webboard.sln`) เวอร์ชันในตารางนี้ตรงกับ `src/webboard-web/package.json` (ตรวจเมื่อ MVP-06)
 
 | Concern | Choice | Notes |
 | --- | --- | --- |
-| Runtime (dev) | **Node.js LTS** (≥ 20) | ปักใน `package.json` `engines` และ `.nvmrc`; commit `package-lock.json` |
-| Framework | **React 19** + **TypeScript** (`strict`) | JSX escape ให้เอง — ห้าม `dangerouslySetInnerHTML` (ESLint `react/no-danger` = error) |
-| Build / dev server | **Vite** | proxy `/api` → `Webboard.Api` (env `WEBBOARD_API_URL`) จึงไม่ต้องตั้ง CORS ตอน dev |
-| Routing | **React Router** | `/`, `/topics/:id`, `/register`, `/login`, `/login/2fa` |
+| Runtime (dev) | **Node.js LTS** (≥ 20; `.nvmrc` = 24) | ปักใน `package.json` `engines` และ `.nvmrc`; commit `package-lock.json` |
+| Framework | **React 19.3** + **TypeScript 6.0** (`strict`) | JSX escape ให้เอง — ห้าม `dangerouslySetInnerHTML` (ESLint `react/no-danger` = error) |
+| Build / dev server | **Vite 8.3** (+ `@vitejs/plugin-react` 6.1) | proxy `/api` → `Webboard.Api` (env `WEBBOARD_API_URL`) จึงไม่ต้องตั้ง CORS ตอน dev |
+| Routing | **React Router 8.5** | `/`, `/topics/:id`, `/register`, `/login`, `/login/2fa` |
 | HTTP client | `fetch` wrapper เดียว (`src/api/client.ts`) | ใส่ `Authorization: Bearer`; `401` → ลบ token แล้วไปหน้า login; token อยู่ใน memory เท่านั้น |
-| QR code | **`qrcode`** (npm) | `QRCode.toDataURL(otpAuthUri)` ในเบราว์เซอร์ — ห้ามส่ง URI ไปบริการภายนอก |
-| Test | **Vitest** + **Testing Library** + **MSW** | MSW จำลอง `/api/...` ใน test |
-| Lint / format | **ESLint** (+ `eslint-plugin-react`, `typescript-eslint`) | `npm run lint` ต้อง 0 warning |
+| QR code | **`qrcode` 1.5** (npm) | `QRCode.toDataURL(otpAuthUri)` ในเบราว์เซอร์ — ห้ามส่ง URI ไปบริการภายนอก |
+| Test | **Vitest 5.0** + **Testing Library** (react 16.3, user-event 14.6, jest-dom 7.0) + **MSW 3.0** + jsdom 29 | MSW จำลอง `/api/...` ใน test |
+| Lint / format | **ESLint 9.39** (+ `eslint-plugin-react` 7.37, `eslint-plugin-react-hooks` 7.1, `typescript-eslint` 8.72) | `npm run lint` ต้อง 0 warning |
+
+หมายเหตุ: TypeScript ปักที่ `~6.0` เพราะ `typescript-eslint` 8.72 รองรับ `<6.1` (Vite template ใหม่มาพร้อม TypeScript 7 ซึ่งยังใช้กับ typescript-eslint ไม่ได้) MSW 3 เปลี่ยนชื่อตัวเลือกเป็น `server.listen({ onUnhandledFrame: 'error' })` (เดิม `onUnhandledRequest`)
 
 ## 5. Dev / Test Tooling
 

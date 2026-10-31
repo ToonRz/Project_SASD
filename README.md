@@ -30,6 +30,20 @@ dotnet test
 dotnet run --project src/Webboard.Api     # Development: Swagger UI ที่ /swagger, OpenAPI ที่ /openapi/v1.json
 ```
 
+### หน้าเว็บ (React + Vite, `src/webboard-web/`)
+
+ต้องมี Node.js ≥ 20 (`.nvmrc`) — เลือกเทคโนโลยีใน [ADR-presentation-technology](docs/architecture/decisions/ADR-presentation-technology.md)
+
+```sh
+dotnet run --project src/Webboard.Api        # terminal 1 (ต้องตั้ง Jwt:SigningKey และ DataProtection:KeysPath ก่อน)
+npm ci --prefix src/webboard-web
+npm run dev --prefix src/webboard-web        # terminal 2 → เปิด http://localhost:5173
+```
+
+- Vite proxy `/api` ไปที่ `http://localhost:5001` (ค่าเริ่มต้นตาม `launchSettings.json`); ถ้า API อยู่ที่อื่นตั้ง env `WEBBOARD_API_URL`
+- Gate ของ UI (ต้องผ่านก่อน merge): `npm run lint` (0 warning), `npm run typecheck`, `npm test`, `npm run build` — รันด้วย `--prefix src/webboard-web`
+- Token อยู่ใน memory เท่านั้น: refresh หน้า = ต้อง login ใหม่
+
 ### ฐานข้อมูล (PostgreSQL 17 ผ่าน Docker)
 
 ```sh

@@ -1,7 +1,7 @@
 # TASK-MVP-06 — หน้าเว็บ: รายการ, กระทู้, login + 2FA, ตั้งกระทู้, ความเห็น
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** MVP-05, AUTH-03
 **Spec:** `task-plans/spec/spec-webboard-mvp.md` §1.3, §3, §4; `docs/ARCHITECTURE.md` §9.1 (แถว Presentation); `docs/architecture/decisions/ADR-presentation-technology.md`
 **Produces:** `src/webboard-web/` (React + Vite + TypeScript) ที่รันคู่กับ API ได้
@@ -31,18 +31,18 @@
 ## Steps
 
 - [x] Unblock: ทำ TASK-presentation-tech-decision-01 และเติม Exact files ด้านบน
-- [ ] Scaffold ด้วย Vite แล้วตั้ง ESLint, Vitest, MSW ให้ `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` รันผ่านกับโปรเจกต์เปล่า
-- [ ] เขียน test ที่ fail (MSW จำลอง API):
+- [x] Scaffold ด้วย Vite แล้วตั้ง ESLint, Vitest, MSW ให้ `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` รันผ่านกับโปรเจกต์เปล่า
+- [x] เขียน test ที่ fail (MSW จำลอง API):
   - ไม่มี token → หน้า `/` ไม่แสดงฟอร์มตั้งกระทู้ และหน้า `/topics/:id` ไม่แสดงฟอร์มความเห็น
   - `client` ได้ `401` → ลบ token และพาไป `/login`
   - login ได้ `twoFactorSetupRequired: true` → หน้า 2FA แสดง QR (`<img src="data:image/png...">`) และ `sharedKey`
   - หัวข้อกระทู้ `<script>alert(1)</script>` แสดงเป็นข้อความ (มี text นั้นใน DOM, ไม่มี `<script>` ที่สร้างจากข้อมูล)
   - เวลา `createdAt` (UTC) แสดงเป็นเวลาท้องถิ่น (NFR-002)
   - ไม่มีการเรียก URL ที่ไม่ขึ้นต้นด้วย `/api/` (MSW `onUnhandledRequest: 'error'`)
-- [ ] รันให้แดง
-- [ ] Implement หน้าต่างๆ; ห้าม `dangerouslySetInnerHTML`; token อยู่ใน memory เท่านั้น ไม่ใส่ใน URL หรือ storage
-- [ ] รันให้เขียว + gate ของ UI (ADR D5) + gate ของ .NET
-- [ ] เดินตาม Acceptance ของทั้งสอง spec ด้วยมือในเบราว์เซอร์ บันทึกผลเป็น receipt
+- [x] รันให้แดง
+- [x] Implement หน้าต่างๆ; ห้าม `dangerouslySetInnerHTML`; token อยู่ใน memory เท่านั้น ไม่ใส่ใน URL หรือ storage
+- [x] รันให้เขียว + gate ของ UI (ADR D5) + gate ของ .NET
+- [x] เดินตาม Acceptance ของทั้งสอง spec ด้วยมือในเบราว์เซอร์ บันทึกผลเป็น receipt
 
 ## Verification
 
