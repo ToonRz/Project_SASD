@@ -75,5 +75,5 @@ Configuration:
 
 ## 5. Open questions
 
-- Q1 — Presentation Layer ใช้เทคโนโลยีอะไร → [TASK-presentation-tech-decision-01](../to-do/backlog/TASK-presentation-tech-decision-01.md) (MVP-06 รอข้อนี้)
+- ~~Q1 — Presentation Layer ใช้เทคโนโลยีอะไร~~ → ตัดสินแล้ว: React + Vite + TypeScript ([ADR-presentation-technology](../../docs/architecture/decisions/ADR-presentation-technology.md))
 - ~~Q2 — ต้องมี pagination ของรายการกระทู้หรือไม่~~ → ตัดสินแล้วเป็น D14 (ไม่มีใน MVP)

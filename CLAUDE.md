@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project
 
 **Webboard App** (SASD course, problem C) — users create **Topics** and write **Comments**, like Reddit/Pantip.
-Three layers, technology fixed by the assignment: Presentation (free choice, not yet chosen) → Domain
+Three layers, technology fixed by the assignment: Presentation (React + Vite + TypeScript in `src/webboard-web/`, see `docs/architecture/decisions/ADR-presentation-technology.md`) → Domain
 (ASP.NET Core REST API) → Data Access (Entity Framework Core) → PostgreSQL.
 
 **Document map** (read the right one for the question):

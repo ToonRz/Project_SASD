@@ -25,7 +25,7 @@ Solution .NET ที่ build/test ได้, PostgreSQL ที่สร้า�
 | [MVP-03](TASK-MVP-03-topic-comment-entities.md) | Entity `Topic`, `Comment` + migration | MVP-02, AUTH-01 | narawichswu (Claude) | DONE |
 | [MVP-04](TASK-MVP-04-topics-api.md) | `GET/POST /api/topics`, `GET /api/topics/{id}` | MVP-03, AUTH-03 | narawichswu (Claude) | DONE |
 | [MVP-05](TASK-MVP-05-comments-api.md) | `POST /api/topics/{id}/comments` | MVP-04 | narawichswu (Claude) | DONE |
-| [MVP-06](TASK-MVP-06-presentation.md) | หน้าเว็บ: รายการ, กระทู้, login + 2FA, ตั้งกระทู้, ความเห็น | MVP-05, AUTH-03 | — | BLOCKED: รอ TASK-presentation-tech-decision-01 |
+| [MVP-06](TASK-MVP-06-presentation.md) | หน้าเว็บ: รายการ, กระทู้, login + 2FA, ตั้งกระทู้, ความเห็น | MVP-05, AUTH-03 | — | TODO |
 
 ## Dependency order
 

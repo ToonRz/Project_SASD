@@ -101,6 +101,7 @@ Breakdown folder ย้ายได้เมื่อ **ทุก** task เป�
 
 - **Quality gates** (ต้องผ่านก่อน task จะเป็น `DONE`):
   `dotnet build -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes`
+  และถ้าแก้ `src/webboard-web/`: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` (ดู ADR-presentation-technology D5)
 - **Spec location**: `task-plans/spec/`
 - **Migration**: สร้างด้วย `dotnet ef migrations add <Name> --project src/Webboard.DataAccess --startup-project src/Webboard.Api` แล้วรัน `dotnet ef database update` ให้ผ่านก่อน commit — ห้ามแก้ migration ที่ merge แล้ว
 - **Reject gates** (สำคัญกว่า checklist ที่ติ๊กครบ):

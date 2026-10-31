@@ -79,7 +79,7 @@ Project_SASD/
       Configurations/        IEntityTypeConfiguration<T> (Fluent API)
       Migrations/            สร้างด้วย dotnet ef เท่านั้น ห้ามแก้มือ
       WebboardDbContext.cs
-    webboard-web/            Presentation Layer (เทคโนโลยีตามที่ทีมเลือก)
+    webboard-web/            Presentation Layer — React + Vite + TypeScript (ADR-presentation-technology)
   tests/
     Webboard.Api.Tests/      unit + integration tests ของ Domain Layer
   docs/

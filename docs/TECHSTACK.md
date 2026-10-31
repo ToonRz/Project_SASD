@@ -38,15 +38,19 @@
 
 ## 4. Presentation Layer
 
-**ยังไม่กำหนด** — โจทย์ให้เลือกได้อิสระ เงื่อนไขเดียวคือคุยกับ Domain Layer ผ่าน REST API (NFR-001)
-ตัดสินใจแล้วให้เขียน ADR ใน `docs/architecture/decisions/` และเติมตารางนี้
+ตัดสินใน [ADR-presentation-technology](architecture/decisions/ADR-presentation-technology.md) — อยู่ที่ `src/webboard-web/`
+(ไม่อยู่ใน `Webboard.sln`) เมื่อ scaffold แล้วให้แก้ตารางนี้ให้ตรงกับเวอร์ชันใน `package.json`
 
 | Concern | Choice | Notes |
 | --- | --- | --- |
-| Framework | TBD | |
-| HTTP client | TBD | |
-| Dev server / CORS | TBD | ถ้า UI รันคนละ port กับ API ต้องตั้ง CORS ที่ `Program.cs` (อนุญาต header `Authorization`) |
-| QR code | TBD | แปลง `otpAuthUri` จาก `/api/auth/2fa/setup` เป็น QR ให้แอป Authenticator สแกน |
+| Runtime (dev) | **Node.js LTS** (≥ 20) | ปักใน `package.json` `engines` และ `.nvmrc`; commit `package-lock.json` |
+| Framework | **React 19** + **TypeScript** (`strict`) | JSX escape ให้เอง — ห้าม `dangerouslySetInnerHTML` (ESLint `react/no-danger` = error) |
+| Build / dev server | **Vite** | proxy `/api` → `Webboard.Api` (env `WEBBOARD_API_URL`) จึงไม่ต้องตั้ง CORS ตอน dev |
+| Routing | **React Router** | `/`, `/topics/:id`, `/register`, `/login`, `/login/2fa` |
+| HTTP client | `fetch` wrapper เดียว (`src/api/client.ts`) | ใส่ `Authorization: Bearer`; `401` → ลบ token แล้วไปหน้า login; token อยู่ใน memory เท่านั้น |
+| QR code | **`qrcode`** (npm) | `QRCode.toDataURL(otpAuthUri)` ในเบราว์เซอร์ — ห้ามส่ง URI ไปบริการภายนอก |
+| Test | **Vitest** + **Testing Library** + **MSW** | MSW จำลอง `/api/...` ใน test |
+| Lint / format | **ESLint** (+ `eslint-plugin-react`, `typescript-eslint`) | `npm run lint` ต้อง 0 warning |
 
 ## 5. Dev / Test Tooling
 

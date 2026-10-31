@@ -1,7 +1,7 @@
 # TASK-presentation-tech-decision-01 — เลือกเทคโนโลยีของ Presentation Layer
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu
 **Depends on:** —
 **Spec:** `task-plans/spec/spec-webboard-mvp.md` §5 Q1; `docs/TECHSTACK.md` §4
 **Produces:** ADR ที่ระบุเทคโนโลยี UI; ปลด BLOCKED ของ MVP-06
