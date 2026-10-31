@@ -80,7 +80,7 @@ Configuration (user-secrets ตอน dev, env var ตอน deploy — ห้�
 - [x] ใช้ MFA token เรียก `POST /api/topics` → `401`; ใช้ access token เรียก `/api/auth/2fa/verify` → `401` — `TopicsApiTests.Post_WithMfaToken_Returns401`, `TwoFactorEndpoints_WithAccessToken_Return401`
 - [x] รหัสผ่านผิด 5 ครั้งติด → ครั้งที่ 5 ได้ `429` และ login ด้วยรหัสถูกระหว่างล็อกก็ได้ `429` — `Login_FiveWrongPasswords_LocksAccountEvenForCorrectPassword`
 - [x] Username ไม่มีจริงกับรหัสผิด ได้ status และ body เหมือนกัน — `Login_WrongPasswordAndUnknownUser_AreIndistinguishable`
-- [ ] ไม่มีรหัสผ่าน, รหัส TOTP หรือ token ใน log ของ API ระหว่างรัน test ทั้งหมด — ยังตรวจแค่รหัสผ่าน (`Logs_NeverContainPasswords`) — ยังไม่มี test ที่ตรวจรหัส TOTP และ token ใน log
+- [x] ไม่มีรหัสผ่าน, รหัส TOTP หรือ token ใน log ของ API ระหว่างรัน test ทั้งหมด — `Logs_NeverContainPasswords`, `Logs_NeverContainTotpCodesSharedKeysOrTokens` (เปิด Trace; พบและแก้ password รั่วจาก `ToString` ของ request record)
 
 ## 5. Open questions
 

@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Webboard.DataAccess;
@@ -208,6 +209,63 @@ public class AuthTwoFactorTests(WebboardApiFactory factory) : IAsyncLifetime
         var response = await TestAuth.VerifyAsync(client, mfaToken, TestAuth.CurrentCode(sharedKey, clock.GetUtcNow().UtcDateTime));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Logs_NeverContainTotpCodesSharedKeysOrTokens()
+    {
+        // Raise every relevant category to Trace so a leak at a verbose level is caught.
+        // EF sensitive-data logging stays off (never enabled here).
+        using var verbose = factory.WithWebHostBuilder(b => b.ConfigureLogging(logging =>
+        {
+            logging.AddFilter("Webboard", LogLevel.Trace);
+            logging.AddFilter("Microsoft.AspNetCore", LogLevel.Trace);
+            logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Trace);
+        }));
+        using var client = verbose.CreateClient();
+        var logsBefore = factory.Logs.Entries.Count;
+        var codes = new List<string>();
+        var secrets = new List<string> { TestAuth.Password };
+
+        await client.PostAsJsonAsync("/api/auth/register", new { username = "ton", displayName = "Ton", password = TestAuth.Password });
+        var login = await (await client.PostAsJsonAsync("/api/auth/login", new { username = "ton", password = TestAuth.Password }))
+            .Content.ReadFromJsonAsync<JsonElement>();
+        var mfaToken = login.GetProperty("mfaToken").GetString()!;
+        secrets.Add(mfaToken);
+
+        using var setup = Authed(HttpMethod.Post, "/api/auth/2fa/setup", mfaToken);
+        var setupBody = await (await client.SendAsync(setup)).Content.ReadFromJsonAsync<JsonElement>();
+        var sharedKey = setupBody.GetProperty("sharedKey").GetString()!;
+        var uriSecret = System.Web.HttpUtility.ParseQueryString(new Uri(setupBody.GetProperty("otpAuthUri").GetString()!).Query)["secret"]!;
+        secrets.Add(sharedKey);
+        secrets.Add(uriSecret);
+
+        var wrong = TestAuth.WrongCode(sharedKey);
+        codes.Add(wrong);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await TestAuth.VerifyAsync(client, mfaToken, wrong)).StatusCode);
+
+        var correct = TestAuth.CurrentCode(sharedKey);
+        codes.Add(correct);
+        var verify = await TestAuth.VerifyAsync(client, mfaToken, correct);
+        Assert.Equal(HttpStatusCode.OK, verify.StatusCode);
+        var accessToken = (await verify.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("accessToken").GetString()!;
+        secrets.Add(accessToken);
+
+        using var me = Authed(HttpMethod.Get, "/api/auth/me", accessToken);
+        Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(me)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await TestAuth.VerifyAsync(client, mfaToken, correct)).StatusCode);
+
+        using var topic = Authed(HttpMethod.Post, "/api/topics", accessToken);
+        topic.Content = JsonContent.Create(new { title = "hello", body = "world" });
+        await client.SendAsync(topic);
+
+        var entries = factory.Logs.Entries.Skip(logsBefore).ToList();
+        Assert.NotEmpty(entries);
+        Assert.All(secrets, s => Assert.DoesNotContain(entries, e => e.Contains(s)));
+        // A 6-digit code can show up by coincidence inside a longer number or id, so match
+        // codes only as whole tokens (not glued to other letters or digits).
+        Assert.All(codes.Distinct(), c =>
+            Assert.DoesNotContain(entries, e => System.Text.RegularExpressions.Regex.IsMatch(e, $"(?<![A-Za-z0-9]){c}(?![A-Za-z0-9])")));
     }
 
     [Fact]
