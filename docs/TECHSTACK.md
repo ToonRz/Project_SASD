@@ -24,17 +24,17 @@
 
 | Concern | Choice | Notes |
 | --- | --- | --- |
-| ORM | **Entity Framework Core 10** | โจทย์กำหนด |
-| Provider | **Npgsql.EntityFrameworkCore.PostgreSQL** | driver ของ PostgreSQL สำหรับ EF Core |
+| ORM | **Entity Framework Core 10** (10.0.14) | โจทย์กำหนด |
+| Provider | **Npgsql.EntityFrameworkCore.PostgreSQL** 10.0.3 | driver ของ PostgreSQL สำหรับ EF Core |
 | Migrations | `dotnet-ef` CLI 10.0.14 | ติดตั้งเป็น local tool (`dotnet tool restore`) ให้ทุกคนใช้เวอร์ชันเดียวกัน |
-| Naming | snake_case ใน DB | ใช้ `EFCore.NamingConventions` (`UseSnakeCaseNamingConvention()`) |
+| Naming | snake_case ใน DB | ใช้ `EFCore.NamingConventions` 10.0.1 (`UseSnakeCaseNamingConvention()`) |
 
 ## 3. Database
 
 | Concern | Choice | Notes |
 | --- | --- | --- |
 | DBMS | **PostgreSQL 17** | โจทย์กำหนด |
-| Local dev | Docker (`postgres:17`) หรือ PostgreSQL ที่ติดตั้งในเครื่อง | connection string อยู่ใน user-secrets ห้าม commit |
+| Local dev | Docker (`postgres:17`) ผ่าน `compose.yaml` หรือ PostgreSQL ที่ติดตั้งในเครื่อง | password อยู่ใน `.env` (gitignored); connection string อยู่ใน user-secrets ห้าม commit |
 
 ## 4. Presentation Layer
 

@@ -30,6 +30,19 @@ dotnet test
 dotnet run --project src/Webboard.Api     # Development: Swagger UI ที่ /swagger, OpenAPI ที่ /openapi/v1.json
 ```
 
+### ฐานข้อมูล (PostgreSQL 17 ผ่าน Docker)
+
+```sh
+cp .env.example .env                      # แล้วแก้ POSTGRES_PASSWORD (ไฟล์ .env ไม่ถูก commit)
+docker compose up -d db
+dotnet user-secrets set ConnectionStrings:Webboard "Host=localhost;Port=5432;Database=webboard;Username=webboard;Password=<POSTGRES_PASSWORD>" --project src/Webboard.Api
+dotnet user-secrets set ConnectionStrings:WebboardTest "Host=localhost;Port=5432;Database=webboard_test;Username=webboard;Password=<POSTGRES_PASSWORD>" --project tests/Webboard.Api.Tests
+```
+
+- ถ้าพอร์ต 5432 ถูกใช้อยู่ (เช่นมี PostgreSQL ติดตั้งในเครื่อง) ให้ตั้ง `POSTGRES_PORT=5433` ใน `.env` และใช้ `Port=5433` ใน connection string
+- script ใน `docker/initdb/` รันเฉพาะตอนสร้าง volume ครั้งแรก — ถ้ามี volume `pgdata` อยู่แล้วให้รัน `docker compose exec db createdb -U webboard webboard_test` เอง
+- Integration test ใช้ฐาน `webboard_test` เท่านั้น และต้องตั้ง `ConnectionStrings:WebboardTest` (หรือ env var `ConnectionStrings__WebboardTest`)
+
 ## Documents
 
 | คำถาม | อ่านที่ |

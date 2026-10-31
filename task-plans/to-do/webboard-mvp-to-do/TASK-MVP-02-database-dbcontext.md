@@ -1,7 +1,7 @@
 # TASK-MVP-02 — PostgreSQL ผ่าน compose, `WebboardDbContext`, test fixture
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** MVP-01
 **Spec:** `task-plans/spec/spec-webboard-mvp.md` §2 D3, D7, D10, D11, D12, §3 Configuration
 **Produces:** `WebboardDbContext` ที่ register ใน DI, `compose.yaml` สำหรับ dev, `WebboardApiFactory` ที่ชี้ `webboard_test` พร้อม `ResetDatabaseAsync()`, collection `"Database"` ที่ test class ถัดไปใช้

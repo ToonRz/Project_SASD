@@ -21,7 +21,7 @@ Solution .NET ที่ build/test ได้, PostgreSQL ที่สร้า�
 | Task | Title | Depends on | Owner | Status |
 | --- | --- | --- | --- | --- |
 | [MVP-01](TASK-MVP-01-solution-skeleton.md) | Solution, projects, OpenAPI, ProblemDetails, test project | — | narawichswu (Claude) | DONE |
-| [MVP-02](TASK-MVP-02-database-dbcontext.md) | PostgreSQL ผ่าน compose, `WebboardDbContext`, test fixture | MVP-01 | — | TODO |
+| [MVP-02](TASK-MVP-02-database-dbcontext.md) | PostgreSQL ผ่าน compose, `WebboardDbContext`, test fixture | MVP-01 | narawichswu (Claude) | DONE |
 | [MVP-03](TASK-MVP-03-topic-comment-entities.md) | Entity `Topic`, `Comment` + migration | MVP-02, AUTH-01 | — | TODO |
 | [MVP-04](TASK-MVP-04-topics-api.md) | `GET/POST /api/topics`, `GET /api/topics/{id}` | MVP-03, AUTH-03 | — | TODO |
 | [MVP-05](TASK-MVP-05-comments-api.md) | `POST /api/topics/{id}/comments` | MVP-04 | — | TODO |
@@ -68,3 +68,28 @@ Passed!  - Failed:     0, Passed:     2, Skipped:     0, Total:     2 - Webboard
 $ dotnet format --verify-no-changes
 (exit 0)
 ```
+
+### MVP-02 — DONE (narawichswu (Claude), 2026-10-31)
+
+Test แดงก่อน: build ล้มเพราะยังไม่มี `WebboardDbContext` / `WebboardApiFactory` (CS0234, CS0246) แล้วเขียวหลัง implement
+
+```text
+$ docker compose up -d db
+ Container project_sasd-db-1 Started
+$ docker compose exec db psql -U webboard -lqt | cut -d'|' -f1 | grep -w webboard_test
+webboard_test
+$ dotnet user-secrets list --project tests/Webboard.Api.Tests
+ConnectionStrings:WebboardTest = Host=localhost;Port=5433;Username=webboard;Password=***;Database=webboard_test
+$ dotnet build -warnaserror
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+$ dotnet test
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4 - Webboard.Api.Tests.dll (net10.0)
+$ dotnet format --verify-no-changes
+(exit 0)
+$ git check-ignore .env
+.env
+```
+
+หมายเหตุ: เครื่องนี้มี PostgreSQL ของ Windows ฟังพอร์ต 5432 อยู่แล้ว จึงเพิ่ม `POSTGRES_PORT` (default `5432`) ใน `compose.yaml` และใช้ `5433` ใน `.env` ของเครื่องนี้
