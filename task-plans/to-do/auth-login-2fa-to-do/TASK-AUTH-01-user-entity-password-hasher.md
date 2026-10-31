@@ -1,7 +1,7 @@
 # TASK-AUTH-01 — Entity `User` (`app_user`) + `PasswordHasher`
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** MVP-02
 **Spec:** `task-plans/spec/spec-auth-login-2fa.md` §2 D1, D2, D9; `docs/ARCHITECTURE.md` §6 (`APP_USER`)
 **Produces:** `DbSet<User> Users`, migration `AddAppUser`, `PasswordHasher.Hash/Verify/DummyHash`

@@ -20,7 +20,7 @@
 
 | Task | Title | Depends on | Owner | Status |
 | --- | --- | --- | --- | --- |
-| [AUTH-01](TASK-AUTH-01-user-entity-password-hasher.md) | Entity `User` (`app_user`) + `PasswordHasher` | MVP-02 | — | TODO |
+| [AUTH-01](TASK-AUTH-01-user-entity-password-hasher.md) | Entity `User` (`app_user`) + `PasswordHasher` | MVP-02 | narawichswu (Claude) | DONE |
 | [AUTH-02](TASK-AUTH-02-register-login.md) | `register`, `login` (MFA token), lockout | AUTH-01 | — | TODO |
 | [AUTH-03](TASK-AUTH-03-totp-access-token.md) | 2FA setup/verify, access token, JWT bearer policies, `/me` | AUTH-02 | — | TODO |
 
@@ -41,3 +41,24 @@ MVP-02 ─► AUTH-01 ─► AUTH-02 ─► AUTH-03 ─► (MVP-04, MVP-06)
 ## Receipts
 
 _(เพิ่มเมื่อ task เสร็จ: คำสั่งจริง + output จริง)_
+
+### AUTH-01
+
+```text
+$ dotnet test --filter "FullyQualifiedName~PasswordHasherTests|FullyQualifiedName~UserSchemaTests"
+(red first: CS0234 Webboard.Api.Security / Webboard.DataAccess.Entities not found)
+Passed!  - Failed:     0, Passed:    11, Skipped:     0, Total:    11
+
+$ dotnet build -warnaserror        -> 0 Warning(s) 0 Error(s)
+$ dotnet test                      -> Passed!  - Failed: 0, Passed: 15, Total: 15
+$ dotnet format --verify-no-changes -> exit 0 (after `dotnet format` normalised the generated migration's EOL/BOM)
+$ dotnet ef database update ...    -> Applying migration '20261031070039_AddAppUser'. Done.
+$ docker compose exec -T db psql -U webboard -c '\d app_user'
+ username | character varying(30) | not null ; display_name varchar(50) ; password_hash text ; ...
+ "pk_app_user" PRIMARY KEY, btree (id)
+ "ix_app_user_username" UNIQUE, btree (username)
+$ grep -rn "SHA256.HashData\|ComputeHash" src/ --include=*.cs   -> (no output)
+```
+
+Deviation: added `Microsoft.EntityFrameworkCore.Design` (PrivateAssets=all) to `Webboard.Api.csproj` because `dotnet ef --startup-project src/Webboard.Api` requires it.
+
