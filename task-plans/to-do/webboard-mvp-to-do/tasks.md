@@ -12,6 +12,7 @@ Solution .NET ที่ build/test ได้, PostgreSQL ที่สร้า�
 - กฎ layer ตาม [ARCHITECTURE §3](../../../docs/ARCHITECTURE.md#3-กฎการพึ่งพา-dependency-rules): Controller → Service → `DbContext`; response เป็น DTO
 - ชื่อผู้เขียนมาจาก claim `sub` ของ access token เท่านั้น
 - Integration test ใช้ PostgreSQL จริง (`webboard_test`) ไม่ใช้ EF InMemory
+- Integration test ทุก class อยู่ใน `[Collection("Database")]` และเรียก `ResetDatabaseAsync()` ก่อนแต่ละ test ([spec](../../spec/spec-webboard-mvp.md) D11); secret ที่ test ต้องตั้งมีแค่ `ConnectionStrings:WebboardTest` (D12)
 - Schema เปลี่ยนผ่าน `dotnet ef migrations add` เท่านั้น
 - Stage เฉพาะ path ที่ task ระบุ ห้าม `git add -A`
 

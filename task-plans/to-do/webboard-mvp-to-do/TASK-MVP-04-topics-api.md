@@ -2,9 +2,9 @@
 
 **Status:** TODO
 **Owner:** —
-**Depends on:** MVP-03, AUTH-03 (JWT bearer + access-token policy)
-**Spec:** `task-plans/spec/spec-webboard-mvp.md` §3; FR-TOPIC-001…004, FR-AUTH-007
-**Produces:** `TopicService`, `TopicsController`, DTO `TopicSummaryDto`, `TopicDetailDto`, `CommentDto`, helper `User.GetUserId()`
+**Depends on:** MVP-03, AUTH-03 (JWT bearer + access-token policy, `ClaimsPrincipalExtensions.GetUserId()`, `TestAuth.GetAccessTokenAsync`)
+**Spec:** `task-plans/spec/spec-webboard-mvp.md` §2 D14, §3; FR-TOPIC-001…004, FR-AUTH-007
+**Produces:** `TopicService`, `TopicsController`, DTO `TopicSummaryDto`, `TopicDetailDto`, `CommentDto`
 
 ## Goal
 
@@ -14,10 +14,9 @@ Reader ดูรายการและรายละเอียดกระ�
 
 - Create `src/Webboard.Api/Dtos/TopicDtos.cs`, `CommentDto.cs`
 - Create `src/Webboard.Api/Services/TopicService.cs` — `ListAsync`, `GetAsync(id)`, `CreateAsync(userId, request)`
-- Create `src/Webboard.Api/Controllers/TopicsController.cs` — `[Authorize]` เฉพาะ `POST`
-- Create `src/Webboard.Api/Security/ClaimsPrincipalExtensions.cs` — `GetUserId()` อ่าน `sub` (ถ้า AUTH-03 สร้างไว้แล้ว ให้ใช้ของเดิม)
+- Create `src/Webboard.Api/Controllers/TopicsController.cs` — `[Authorize]` เฉพาะ `POST`; ผู้เขียนจาก `User.GetUserId()` ของ AUTH-03 (ไม่สร้าง helper ใหม่)
 - Modify `src/Webboard.Api/Program.cs` — register `TopicService`
-- Create `tests/Webboard.Api.Tests/TopicsApiTests.cs` — ใช้ helper ขอ access token จาก AUTH-03
+- Create `tests/Webboard.Api.Tests/TopicsApiTests.cs` — `[Collection("Database")]`, ขอ access token ด้วย `TestAuth.GetAccessTokenAsync` จาก AUTH-03
 
 ## Steps
 

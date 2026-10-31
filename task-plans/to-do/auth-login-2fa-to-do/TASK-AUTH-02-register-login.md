@@ -18,8 +18,9 @@
 - Create `src/Webboard.Api/Controllers/AuthController.cs`
 - Modify `src/Webboard.Api/Program.cs` — register services, bind `Jwt` options
 - Modify `src/Webboard.Api/appsettings.json` — `Jwt:Issuer`, `Jwt:Audience` (ไม่มี `SigningKey`)
-- Modify `README.md` — `dotnet user-secrets set Jwt:SigningKey "$(openssl rand -base64 32)"`
-- Create `tests/Webboard.Api.Tests/AuthRegisterLoginTests.cs`
+- Modify `README.md` — `dotnet user-secrets set Jwt:SigningKey "$(openssl rand -base64 32)" --project src/Webboard.Api` (สำหรับ `dotnet run` เท่านั้น — test ไม่ต้องตั้ง)
+- Modify `tests/Webboard.Api.Tests/WebboardApiFactory.cs` — ใส่ `Jwt:SigningKey` สุ่ม 32 bytes ต่อ test run ผ่าน in-memory configuration (spec-webboard-mvp D12)
+- Create `tests/Webboard.Api.Tests/AuthRegisterLoginTests.cs` — `[Collection("Database")]`
 
 ## Steps
 
@@ -30,6 +31,7 @@
   - login รหัสผิด กับ username ไม่มีจริง → ทั้งคู่ `401` body `detail` เดียวกัน
   - รหัสผิด 5 ครั้งติด → ครั้งที่ 5 `429` มี `Retry-After`; รหัสถูกระหว่างล็อก → `429`
   - log ที่ test จับได้ (`ILogger` sink) ไม่มีสตริงรหัสผ่านที่ส่ง
+  - นอก environment `Testing` ถ้าไม่มี `Jwt:SigningKey` หรือสั้นกว่า 32 bytes → API ไม่ start และข้อความบอกชื่อ key
 - [ ] รันให้แดง
 - [ ] Implement ตาม D3 (เรียก `Verify` กับ `DummyHash` เมื่อไม่พบ user), D8, D9
 - [ ] รันให้เขียว + quality gates
@@ -45,4 +47,4 @@ git grep -n "SigningKey" -- '*.json'                              # ไม่ม
 
 `feat(auth): add register and password login with lockout`
 
-Stage: `src/Webboard.Api/ README.md tests/Webboard.Api.Tests/AuthRegisterLoginTests.cs`
+Stage: `src/Webboard.Api/ README.md tests/Webboard.Api.Tests/WebboardApiFactory.cs tests/Webboard.Api.Tests/AuthRegisterLoginTests.cs`

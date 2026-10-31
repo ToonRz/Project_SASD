@@ -19,8 +19,10 @@
 - Modify `src/Webboard.Api/Dtos/AuthDtos.cs` — `TwoFactorSetupResponse`, `VerifyTwoFactorRequest`, `AuthResponse`
 - Modify `src/Webboard.Api/Services/AuthService.cs` — `BeginTwoFactorSetupAsync`, `VerifyTwoFactorAsync`
 - Modify `src/Webboard.Api/Controllers/AuthController.cs` — `2fa/setup`, `2fa/verify` (`[Authorize(Policy = "MfaPending")]`), `me` (`[Authorize]`)
-- Modify `src/Webboard.Api/Program.cs` — `AddAuthentication().AddJwtBearer(...)`, default policy + `MfaPending`, `AddDataProtection().PersistKeysToFileSystem(...)`
-- Create `tests/Webboard.Api.Tests/AuthTwoFactorTests.cs`, `TestAuth.cs` (helper)
+- Modify `src/Webboard.Api/Program.cs` — `AddAuthentication().AddJwtBearer(...)`, default policy + `MfaPending`, `AddDataProtection().PersistKeysToFileSystem(DataProtection:KeysPath)` (นอก `Testing` ถ้าไม่ได้ตั้ง key นี้ → ไม่ start และบอกชื่อ key)
+- Modify `tests/Webboard.Api.Tests/WebboardApiFactory.cs` — `AddDataProtection().UseEphemeralDataProtectionProvider()` (spec-webboard-mvp D12)
+- Modify `README.md` — `dotnet user-secrets set DataProtection:KeysPath <โฟลเดอร์นอก repo> --project src/Webboard.Api`
+- Create `tests/Webboard.Api.Tests/AuthTwoFactorTests.cs` (`[Collection("Database")]`), `TestAuth.cs` (helper)
 
 ## Steps
 
@@ -50,4 +52,4 @@ dotnet test                                                   # Passed! - Failed
 
 `feat(auth): add totp two-factor verification and access tokens`
 
-Stage: `src/Webboard.Api/ tests/Webboard.Api.Tests/AuthTwoFactorTests.cs tests/Webboard.Api.Tests/TestAuth.cs`
+Stage: `src/Webboard.Api/ README.md tests/Webboard.Api.Tests/WebboardApiFactory.cs tests/Webboard.Api.Tests/AuthTwoFactorTests.cs tests/Webboard.Api.Tests/TestAuth.cs`

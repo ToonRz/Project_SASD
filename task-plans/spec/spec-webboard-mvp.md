@@ -29,6 +29,10 @@ Related spec: [spec-auth-login-2fa.md](spec-auth-login-2fa.md) — endpoint เ�
 | D8 | ลำดับ | Topic ใหม่ → เก่า; Comment เก่า → ใหม่ | FR-TOPIC-002, FR-COMMENT-002 |
 | D9 | ลบ Topic | `ON DELETE CASCADE` ไป comment (แม้ยังไม่มีการลบ) | ARCHITECTURE §6 |
 | D10 | Dev database | `compose.yaml` รัน `postgres:17`; password มาจาก `.env` (gitignored) มี `.env.example` ให้ copy | NFR-004 |
+| D11 | Test isolation | Integration test ทุก class อยู่ใน `[Collection("Database")]` (`ICollectionFixture<WebboardApiFactory>`) จึงไม่รันขนานบนฐานเดียวกัน; `WebboardApiFactory.ResetDatabaseAsync()` สั่ง `TRUNCATE … RESTART IDENTITY CASCADE` ทุกตารางใน EF model (ยกเว้น `__EFMigrationsHistory`) และ test class เรียกใน `IAsyncLifetime.InitializeAsync` | D7 — ฐาน `webboard_test` ใช้ร่วมกัน ถ้ารันขนานหรือไม่ล้างข้อมูล test จะ flaky |
+| D12 | Test configuration | Secret ที่ test ต้องตั้งเองมีตัวเดียวคือ `ConnectionStrings:WebboardTest`; `WebboardApiFactory` ใช้ environment `Testing` และใส่ `Jwt:SigningKey` แบบสุ่มต่อ test run กับ Data Protection แบบ ephemeral ให้เอง; ถ้าไม่พบ `ConnectionStrings:WebboardTest` ให้ throw พร้อมข้อความที่บอกชื่อ key | NFR-004 — test ต้องรันได้ทั้งบนเครื่องที่ clone ใหม่และใน CI โดยไม่มี secret ใน repo |
+| D13 | `parent_comment_id` | สร้างคอลัมน์ `comment.parent_comment_id` (nullable, FK → `comment(id)`, `ON DELETE CASCADE`) ใน migration ของ MVP เลย แต่ API ของ MVP ไม่รับค่านี้ — เป็น `null` เสมอ; spec ของ Reply ภายหลังเพิ่มแค่ฟิลด์ใน request และ validation | CLAUDE.md กฎข้อ 5, CONTEXT.md — `CommentDto` มี `ParentCommentId` อยู่แล้ว และไม่ต้อง migrate ตารางที่มีข้อมูลทีหลัง |
+| D14 | Pagination | ไม่มีใน MVP — `GET /api/topics` คืน array ทั้งหมด ถ้าจะเพิ่มต้องเพิ่ม FR และ spec แยก (เปลี่ยนรูป response จึงเป็น breaking change) | ARCHITECTURE §8 จัด pagination เป็น Optional; ปิด Q2 |
 
 ## 3. Contracts
 
@@ -56,7 +60,9 @@ Configuration:
 | Key | ที่อยู่ | ตัวอย่าง |
 | --- | --- | --- |
 | `ConnectionStrings:Webboard` | user-secrets (dev), env var (deploy) | `Host=localhost;Port=5432;Database=webboard;Username=webboard;Password=…` |
-| `ConnectionStrings:WebboardTest` | user-secrets ของ test project | `…;Database=webboard_test;…` |
+| `ConnectionStrings:WebboardTest` | user-secrets ของ test project (dev), env var `ConnectionStrings__WebboardTest` (CI) | `…;Database=webboard_test;…` |
+
+`Jwt:SigningKey` และ `DataProtection:KeysPath` ไม่ต้องตั้งตอนรัน test — factory ใส่ค่าให้ (D12)
 
 ## 4. Acceptance
 
@@ -70,4 +76,4 @@ Configuration:
 ## 5. Open questions
 
 - Q1 — Presentation Layer ใช้เทคโนโลยีอะไร → [TASK-presentation-tech-decision-01](../to-do/backlog/TASK-presentation-tech-decision-01.md) (MVP-06 รอข้อนี้)
-- Q2 — ต้องมี pagination ของรายการกระทู้หรือไม่ (ยังไม่มี FR) — ถ้าต้องการ ให้เพิ่ม FR ก่อน
+- ~~Q2 — ต้องมี pagination ของรายการกระทู้หรือไม่~~ → ตัดสินแล้วเป็น D14 (ไม่มีใน MVP)

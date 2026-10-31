@@ -11,7 +11,8 @@
 
 - รหัสผ่านเก็บเป็น PBKDF2-HMAC-SHA256 600,000 รอบเท่านั้น ([ADR](../../../docs/architecture/decisions/ADR-auth-password-2fa.md))
 - ไม่มีเส้นทางใดได้ access token โดยไม่ผ่านรหัส TOTP
-- `Jwt:SigningKey` และ Data Protection key ring อยู่นอก repo
+- `Jwt:SigningKey` และ Data Protection key ring อยู่นอก repo; test ไม่ใช้สองค่านี้จาก user-secrets — `WebboardApiFactory` ใส่ค่าสุ่ม/ephemeral ให้ ([spec-webboard-mvp](../../spec/spec-webboard-mvp.md) D12)
+- Integration test ทุก class อยู่ใน `[Collection("Database")]` และเรียก `ResetDatabaseAsync()` ก่อนแต่ละ test (spec-webboard-mvp D11)
 - ห้าม log รหัสผ่าน, รหัส TOTP, shared key หรือ token (NFR-006) — รวมถึงใน test output และ exception message
 - Stage เฉพาะ path ที่ task ระบุ ห้าม `git add -A`
 

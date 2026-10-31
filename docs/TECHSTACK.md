@@ -46,7 +46,7 @@
 | Framework | TBD | |
 | HTTP client | TBD | |
 | Dev server / CORS | TBD | ถ้า UI รันคนละ port กับ API ต้องตั้ง CORS ที่ `Program.cs` (อนุญาต header `Authorization`) |
-| QR code | TBD | แปลง `otpauthUri` จาก `/api/auth/2fa/setup` เป็น QR ให้แอป Authenticator สแกน |
+| QR code | TBD | แปลง `otpAuthUri` จาก `/api/auth/2fa/setup` เป็น QR ให้แอป Authenticator สแกน |
 
 ## 5. Dev / Test Tooling
 

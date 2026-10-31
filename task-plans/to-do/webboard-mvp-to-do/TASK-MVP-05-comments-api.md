@@ -16,7 +16,7 @@ Member ที่มี access token เขียนความเห็นใ�
 - Create `src/Webboard.Api/Controllers/CommentsController.cs` — route `api/topics/{topicId:int}/comments`, `[Authorize]`
 - Create `src/Webboard.Api/Dtos/CreateCommentRequest.cs`
 - Modify `src/Webboard.Api/Program.cs` — register `CommentService`
-- Create `tests/Webboard.Api.Tests/CommentsApiTests.cs`
+- Create `tests/Webboard.Api.Tests/CommentsApiTests.cs` — `[Collection("Database")]`
 
 ## Steps
 

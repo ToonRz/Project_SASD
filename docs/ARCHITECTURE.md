@@ -132,7 +132,7 @@ erDiagram
         int id PK
         int topic_id FK "not null"
         int user_id FK "not null — Author"
-        int parent_comment_id FK "nullable — optional (Reply)"
+        int parent_comment_id FK "nullable — Reply (MVP: null เสมอ)"
         string body "not null"
         timestamptz created_at "UTC"
     }
@@ -146,11 +146,11 @@ erDiagram
     }
 ```
 
-- **MVP** ใช้ `APP_USER`, `TOPIC` และ `COMMENT` (ไม่มี `parent_comment_id`, `room_id`)
+- **MVP** ใช้ `APP_USER`, `TOPIC` และ `COMMENT` (ยังไม่มี `room_id`, `TAG`, `ROOM`) — คอลัมน์ `parent_comment_id` สร้างตั้งแต่ migration ของ MVP แต่ API ของ MVP ไม่รับค่านี้ จึงเป็น `null` เสมอ ([spec-webboard-mvp](../task-plans/spec/spec-webboard-mvp.md) D13)
 - ตารางผู้ใช้ชื่อ `app_user` เพราะ `user` เป็นคำสงวนของ PostgreSQL; ชื่อผู้เขียนที่แสดงมาจาก join `app_user.display_name`
 - **Reply** ไม่ใช่ตารางแยก — คือ `COMMENT` ที่มี `parent_comment_id` (ดู [CONTEXT.md](../CONTEXT.md))
 - `TOPIC ↔ TAG` เป็น many-to-many ผ่านตารางเชื่อม `topic_tag` (EF Core สร้างให้อัตโนมัติ)
-- ลบ Topic → ลบ Comment ตาม (`ON DELETE CASCADE`) — แม้ MVP จะยังไม่มีการลบ ก็ตั้งไว้ให้ข้อมูลไม่ค้าง
+- ลบ Topic → ลบ Comment ตาม และลบ Comment → ลบ Reply ของมันตาม (`ON DELETE CASCADE` ทั้งคู่) — แม้ MVP จะยังไม่มีการลบ ก็ตั้งไว้ให้ข้อมูลไม่ค้าง
 
 ## 7. REST API
 
@@ -162,7 +162,7 @@ Base path: `/api` · รูปแบบ JSON แบบ camelCase · Swagger UI �
 | --- | --- | --- | --- | --- |
 | `POST` | `/api/auth/register` | — | FR-AUTH-001 | `201` ผู้ใช้ใหม่ · `400` · `409` username ซ้ำ |
 | `POST` | `/api/auth/login` | — | FR-AUTH-003 | `200` `{ mfaToken, twoFactorSetupRequired }` · `401` · `429` |
-| `POST` | `/api/auth/2fa/setup` | MFA | FR-AUTH-004 | `200` `{ sharedKey, otpauthUri }` · `409` ถ้าตั้งไว้แล้ว |
+| `POST` | `/api/auth/2fa/setup` | MFA | FR-AUTH-004 | `200` `{ sharedKey, otpAuthUri }` · `409` ถ้าตั้งไว้แล้ว |
 | `POST` | `/api/auth/2fa/verify` | MFA | FR-AUTH-005 | `200` `{ accessToken, expiresIn, user }` · `401` รหัสผิด · `429` |
 | `GET` | `/api/auth/me` | Access | FR-AUTH-008 | `200` ผู้ใช้ปัจจุบัน · `401` |
 | `GET` | `/api/topics` | — | FR-TOPIC-002 | `200` รายการ Topic (ใหม่ → เก่า) |
@@ -212,7 +212,7 @@ Base path: `/api` · รูปแบบ JSON แบบ camelCase · Swagger UI �
             ▼ ใช่
           200 { mfaToken (5 นาที), twoFactorSetupRequired }
             │
-            ├─ ยังไม่ตั้ง 2FA ─► POST /auth/2fa/setup (MFA) ─► { sharedKey, otpauthUri } ─► UI แสดง QR ─► ผู้ใช้สแกน
+            ├─ ยังไม่ตั้ง 2FA ─► POST /auth/2fa/setup (MFA) ─► { sharedKey, otpAuthUri } ─► UI แสดง QR ─► ผู้ใช้สแกน
             ▼
  ขั้น 2   POST /auth/2fa/verify (MFA) {code}
             │ TOTP ตรง (±30 วินาที, ไม่ซ้ำรหัสเดิม)?  ── ไม่ ──► 401 (นับรวมกับ failed_login_count)
@@ -224,7 +224,7 @@ Base path: `/api` · รูปแบบ JSON แบบ camelCase · Swagger UI �
 
 | Layer | หน้าที่ด้าน auth |
 | --- | --- |
-| Presentation | ฟอร์มสมัคร/login/2FA, แสดง QR จาก `otpauthUri`, เก็บ access token ในหน่วยความจำ (ไม่ใส่ใน URL), ลบ token เมื่อ logout หรือได้ `401` |
+| Presentation | ฟอร์มสมัคร/login/2FA, แสดง QR จาก `otpAuthUri`, เก็บ access token ในหน่วยความจำ (ไม่ใส่ใน URL), ลบ token เมื่อ logout หรือได้ `401` |
 | Domain | `PasswordHasher` (PBKDF2-HMAC-SHA256 600,000 รอบ), `TotpService` (RFC 6238), `TokenService` (ออก/ตรวจ JWT, claim `purpose`), นับครั้งที่ผิดและล็อก, `[Authorize]` บน endpoint ที่ต้อง login |
 | Data Access | Entity `User` → ตาราง `app_user`, unique index บน `username` |
 | Database | เก็บ hash และ shared key ที่เข้ารหัสแล้วเท่านั้น — ไม่มีรหัสผ่านหรือ shared key แบบอ่านได้ |

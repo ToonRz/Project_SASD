@@ -558,7 +558,7 @@ return Ok(new TwoFactorSetupResponse(sharedKey, OtpAuthUri(user, sharedKey)));`;
     sql.push(sqlLog(2, { '@p0': user.totp_secret_protected, '@id': user.id }, `UPDATE app_user SET totp_secret_protected = @p0
 WHERE id = @id;`));
     const uri = `otpauth://totp/Webboard:${user.username}?secret=${secret}&issuer=Webboard&algorithm=SHA1&digits=6&period=30`;
-    return { ...base, status: 200, statusText: 'OK', body: { sharedKey: secret.match(/.{1,4}/g).join(' '), otpauthUri: uri }, ef, sql, highlight: user.id,
+    return { ...base, status: 200, statusText: 'OK', body: { sharedKey: secret.match(/.{1,4}/g).join(' '), otpAuthUri: uri }, ef, sql, highlight: user.id,
       note: 'Shared key ถูกเข้ารหัสด้วย Data Protection ก่อนลง DB — ต่างจากรหัสผ่านที่ hash เพราะระบบต้องอ่าน key กลับมาคำนวณรหัสทุกครั้ง' };
   }
 
@@ -992,10 +992,10 @@ async function goTwoFactor() {
 
   let setupBlock = null;
   if (pending.setup) {
-    const { sharedKey, otpauthUri } = pending.setup;
+    const { sharedKey, otpAuthUri } = pending.setup;
     const qrBox = h('div', { class: 'qr-box', role: 'img', 'aria-label': 'QR code สำหรับแอป Authenticator' });
     if (window.qrcode) {
-      const qr = qrcode(0, 'M'); qr.addData(otpauthUri); qr.make();
+      const qr = qrcode(0, 'M'); qr.addData(otpAuthUri); qr.make();
       qrBox.innerHTML = qr.createSvgTag(4, 2); // library output, built from a URI the API returned
     } else qrBox.append(h('span', { class: 'hint', style: 'line-height:1.4' }, 'โหลดตัวสร้าง QR ไม่ได้ — ใช้ key ด้านขวาแทน'));
     const added = authenticator.some(a => a.username === pending.username && a.secret === sharedKey.replace(/ /g, ''));

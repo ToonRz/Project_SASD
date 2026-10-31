@@ -59,6 +59,8 @@ public record AuthResponse(string AccessToken, int ExpiresIn, UserDto User);
 
 `OtpAuthUri` = `otpauth://totp/Webboard:<username>?secret=<base32>&issuer=Webboard&algorithm=SHA1&digits=6&period=30`
 
+JSON เป็น camelCase: response ของ `2fa/setup` คือ `{ "sharedKey": …, "otpAuthUri": … }`
+
 Configuration (user-secrets ตอน dev, env var ตอน deploy — ห้ามอยู่ใน `appsettings*.json`):
 
 | Key | ค่า |
@@ -66,6 +68,8 @@ Configuration (user-secrets ตอน dev, env var ตอน deploy — ห้�
 | `Jwt:SigningKey` | สุ่มอย่างน้อย 32 bytes (base64) |
 | `Jwt:Issuer` / `Jwt:Audience` | `webboard` / `webboard-api` (อยู่ใน `appsettings.json` ได้) |
 | `DataProtection:KeysPath` | โฟลเดอร์นอก repo ที่เก็บ key ring |
+
+ตอนรัน test ไม่ต้องตั้ง `Jwt:SigningKey` และ `DataProtection:KeysPath` — `WebboardApiFactory` ใส่ signing key แบบสุ่มและใช้ Data Protection แบบ ephemeral ให้ ([spec-webboard-mvp](spec-webboard-mvp.md) D12)
 
 ## 4. Acceptance
 
