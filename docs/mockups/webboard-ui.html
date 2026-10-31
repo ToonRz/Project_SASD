@@ -6,68 +6,80 @@
 <title>Webboard UI Mock</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Mali:ital,wght@1,600;1,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Mali:ital,wght@1,600;1,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!--
   Webboard — UI mock (Presentation Layer, ยังไม่ implement)
   ไฟล์เดียว เปิดใน browser ได้เลย ข้อมูลและ API ทั้งหมดจำลองอยู่ใน <script> ด้านล่าง
-  ทิศทางภาพ: อ้างอิงโทน Dribbble "Bank App - Account Balance Overview" (Ronas IT) —
-  พื้นดำ/ขาวนวล, สีมะนาว + ม่วงลาเวนเดอร์, หัวข้อหนา, การ์ดโค้งมน, สติกเกอร์เอียง
+  ทิศทางภาพ:
+    layout/motion — Dribbble "Gaming Dashboard UI Animation" (Nixtio): แผงโค้งมนใหญ่ลอยบนพื้นอ่อน,
+      รอยเว้า (notch) ขอบแผง, ชิปตัวเลขลอยบนรูป, ตัวเลขใหญ่แบ่งครึ่ง, แถวรายการทรง pill มีป้ายเกาะขอบบน, ปุ่ม CTA ไล่สี
+    สี — Dribbble "Pardo – Coffee Shop Brand Identity" (recentcraft): ครีม #DEC7A4, เอสเปรสโซ #120705,
+      น้ำตาล #613C29, คาราเมล #AC8D67 / #946849, เทาอุ่น #7D7C83 / #BBB8B1
+  ยังเป็นเว็บบอร์ดแบบ Reddit: ฟีดกระทู้ + ห้อง + แท็ก + ความเห็นซ้อนชั้น
   ครอบคลุม FR-TOPIC/COMMENT/REPLY/TAG/ROOM + flow บัญชีที่ยังเป็น Non-Goal ใน SPEC:
   สมัคร → ยืนยันอีเมล → ตั้ง 2FA, เข้าสู่ระบบ (+2FA), ลืม/รีเซ็ตรหัสผ่าน, โปรไฟล์, อัปโหลดรูป
   ปุ่ม "MOCK" มุมจอ: สลับหน้าจอ สถานะ API และดูบัญชีทดสอบ
 -->
 <style>
 :root{
-  --f-display:"Kanit",system-ui,sans-serif;
+  --f-display:"Chakra Petch","IBM Plex Sans Thai",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;
-  --f-hand:"Mali","Kanit",cursive;
+  --f-hand:"Mali","Chakra Petch",cursive;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --ease-out:cubic-bezier(.22,1,.36,1);
   --ease-io:cubic-bezier(.65,0,.35,1);
   --ease-spring:cubic-bezier(.34,1.45,.64,1);
   --d1:150ms; --d2:240ms; --d3:420ms;
-  --top-h:72px;
+  --top-h:76px;
 
-  --c-lime:#d4f25a; --c-purple:#b796ff; --c-pink:#ff9fd6; --c-orange:#ffb460; --c-blue:#92cbff; --c-mint:#86e6c4;
-  --c-purple-ink:#7a4ff0;
-  --black:#111111;
-  --nav-w:272px;
-  --page:#ffffff; --side:#f3f3ef; --raise:#ffffff;
+  /* coffee palette (fills behind espresso ink — same in both themes) */
+  --c-honey:#e6c995; --c-latte:#cfae8a; --c-peach:#e9bea4; --c-caramel:#d69f68; --c-stone:#c3bfb6; --c-matcha:#bfc79c;
+  --c-latte-ink:#946849;
+  --esp:#120705; --esp-2:#1e120d; --brown:#613c29; --caramel:#ac8d67; --cream:#dec7a4; --milk:#f6efe3;
+  --cta:linear-gradient(100deg,#ecd9b6 0%,#d1ad7e 55%,#ac8d67 100%);
+  --nav-w:284px;
+  --frame:16px;
+  --page:#fbf8f2; --side:#f3ebde; --raise:#fffdf8;
 
-  --bg:#ebebe6;
-  --card:#ffffff;
-  --card-2:#f4f4f0;
-  --ink:#111111;
-  --ink-2:#4b4b46;
-  --ink-3:#8a8a83;
-  --line:#e3e3dd;
-  --line-2:#cdcdc5;
-  --hero:#111111;
-  --hero-ink:#ffffff;
-  --primary:#111111; --primary-ink:#ffffff; --primary-hover:#2c2c2c;
-  --danger:#e0484d; --danger-soft:#fde9e8; --ok:#1f9d55; --warn:#d98a1c;
-  --overlay:rgba(12,12,10,.45);
-  --elev:0 1px 2px rgba(0,0,0,.05),0 12px 32px rgba(0,0,0,.10);
+  --bg:#e8dcc7;
+  --card:#fffdf8;
+  --card-2:#f4ecdf;
+  --ink:#1e120d;
+  --ink-2:#5b4537;
+  --ink-3:#8f7f72;
+  --line:#ebe0cf;
+  --line-2:#d9c9b2;
+  --hero:#1e120d;
+  --hero-ink:#f6efe3;
+  --primary:#1e120d; --primary-ink:#f6efe3; --primary-hover:#3a2519;
+  --danger:#c4473a; --danger-soft:#f8e3dc; --ok:#4d7a4f; --warn:#b9772a;
+  --overlay:rgba(18,7,5,.5);
+  --elev:0 1px 2px rgba(60,35,20,.06),0 18px 40px rgba(60,35,20,.14);
+  --soft:0 1px 0 rgba(255,255,255,.7) inset,0 10px 28px -12px rgba(60,35,20,.22);
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0b0b0b; --card:#171717; --card-2:#1f1f1f; --ink:#f2f2ec; --ink-2:#bdbdb5; --ink-3:#7d7d77;
-    --line:#252525; --line-2:#353535; --hero:#171717; --hero-ink:#f2f2ec;
-    --page:#0b0b0b; --side:#161616; --raise:#232323;
-    --primary:#d4f25a; --primary-ink:#111111; --primary-hover:#e3fb84;
-    --danger:#ff7a76; --danger-soft:#3a1a19; --ok:#5fd394; --overlay:rgba(0,0,0,.65);
-    --elev:0 1px 2px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.55);
+    --bg:#0c0504; --card:#1d130e; --card-2:#261a13; --ink:#f3e8d6; --ink-2:#cdb9a0; --ink-3:#8e7c6b;
+    --line:#2c2018; --line-2:#3e2e23; --hero:#24170f; --hero-ink:#f3e8d6;
+    --page:#150c08; --side:#20150f; --raise:#2a1d15;
+    --primary:#dec7a4; --primary-ink:#120705; --primary-hover:#ecd9b6;
+    --danger:#e8806f; --danger-soft:#3a1914; --ok:#9fc38f; --overlay:rgba(0,0,0,.65);
+    --elev:0 1px 2px rgba(0,0,0,.4),0 18px 44px rgba(0,0,0,.6);
+    --soft:0 1px 0 rgba(255,255,255,.03) inset,0 12px 30px -14px rgba(0,0,0,.7);
+    --c-latte-ink:#d6b087;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0b0b0b; --card:#171717; --card-2:#1f1f1f; --ink:#f2f2ec; --ink-2:#bdbdb5; --ink-3:#7d7d77;
-  --line:#252525; --line-2:#353535; --hero:#171717; --hero-ink:#f2f2ec;
-  --page:#0b0b0b; --side:#161616; --raise:#232323;
-  --primary:#d4f25a; --primary-ink:#111111; --primary-hover:#e3fb84;
-  --danger:#ff7a76; --danger-soft:#3a1a19; --ok:#5fd394; --overlay:rgba(0,0,0,.65);
-  --elev:0 1px 2px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.55);
+  --bg:#0c0504; --card:#1d130e; --card-2:#261a13; --ink:#f3e8d6; --ink-2:#cdb9a0; --ink-3:#8e7c6b;
+  --line:#2c2018; --line-2:#3e2e23; --hero:#24170f; --hero-ink:#f3e8d6;
+  --page:#150c08; --side:#20150f; --raise:#2a1d15;
+  --primary:#dec7a4; --primary-ink:#120705; --primary-hover:#ecd9b6;
+  --danger:#e8806f; --danger-soft:#3a1914; --ok:#9fc38f; --overlay:rgba(0,0,0,.65);
+  --elev:0 1px 2px rgba(0,0,0,.4),0 18px 44px rgba(0,0,0,.6);
+  --soft:0 1px 0 rgba(255,255,255,.03) inset,0 12px 30px -14px rgba(0,0,0,.7);
+  --c-latte-ink:#d6b087;
   color-scheme:dark;
 }
 
@@ -82,8 +94,9 @@ img{display:block;max-width:100%}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .display{font-family:var(--f-display);letter-spacing:-.015em}
-.hand{font-family:var(--f-hand);font-style:italic;font-weight:700;color:var(--c-purple-ink);letter-spacing:0}
-.hero .hand,.auth-art .hand{color:var(--c-purple)}
+.hand{font-family:var(--f-hand);font-style:italic;font-weight:700;color:var(--c-latte-ink);letter-spacing:0}
+.welcome .hand,.auth-art .hand{color:var(--cream)}
+.num{font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .muted{color:var(--ink-3)}
 
 /* ---------- Buttons: flat fills, no glow ---------- */
@@ -97,8 +110,12 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .btn svg.i{width:18px;height:18px}
 .btn-primary{background:var(--primary);color:var(--primary-ink)}
 .btn-primary:hover:not(:disabled){background:var(--primary-hover)}
-.btn-lime{background:var(--c-lime);color:#111}
-.btn-lime:hover:not(:disabled){background:#e0fa78}
+.btn-honey,.btn-cta{background:var(--cta);color:var(--esp);box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 8px 20px -10px rgba(97,60,41,.6)}
+.btn-honey:hover:not(:disabled),.btn-cta:hover:not(:disabled){filter:brightness(1.05) saturate(1.05)}
+.btn-cta{justify-content:space-between;height:54px;padding:0 9px 0 22px;border-radius:20px;font-size:16px}
+.btn-cta .go{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--esp);color:var(--cream);transition:transform var(--d3) var(--ease-spring)}
+.btn-cta:hover .go{transform:translateX(3px) rotate(-8deg)}
+.btn-cta .go svg.i{width:18px;height:18px}
 .btn-white{background:var(--card);border-color:var(--line-2);color:var(--ink)}
 .btn-white:hover:not(:disabled){border-color:var(--ink-3)}
 .btn-ghost{background:transparent;color:var(--ink-2)}
@@ -122,13 +139,13 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 /* ---------- Stickers & doodles ---------- */
 .sticker{
   position:absolute;z-index:2;display:inline-block;padding:7px 12px 6px;border-radius:8px;
-  background:#111;color:#fff;font:700 13px/1.15 var(--f-display);letter-spacing:.01em;white-space:nowrap;
+  background:var(--esp);color:var(--cream);font:700 13px/1.15 var(--f-display);letter-spacing:.01em;white-space:nowrap;
   transform:rotate(var(--r,-6deg));transition:transform var(--d3) var(--ease-spring);pointer-events:none;
   animation:stickerIn 560ms var(--ease-spring) both;animation-delay:var(--sd,120ms);
 }
-.sticker.lime{background:var(--c-lime);color:#111}
-.sticker.purple{background:var(--c-purple);color:#111}
-.sticker.white{background:#fff;color:#111;border:1.5px solid #111}
+.sticker.honey{background:var(--c-honey);color:#1e120d}
+.sticker.latte{background:var(--c-latte);color:#1e120d}
+.sticker.white{background:#fff;color:#1e120d;border:1.5px solid #1e120d}
 .sticker.big{font-size:17px;padding:10px 14px 9px;border-radius:10px}
 .sticker.ticket{border-radius:4px;-webkit-mask:radial-gradient(circle 5px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;padding-left:16px;padding-right:16px}
 @keyframes stickerIn{from{opacity:0;transform:rotate(calc(var(--r,-6deg) - 14deg)) scale(.6)}}
@@ -136,23 +153,24 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 @keyframes fadeIn{from{opacity:0}}
 
 /* ---------- Progress ---------- */
-#progress{position:fixed;inset:0 0 auto 0;height:3px;z-index:90;background:var(--c-purple);transform:scaleX(0);transform-origin:left;opacity:0;pointer-events:none}
+#progress{position:fixed;inset:0 0 auto 0;height:3px;z-index:90;background:var(--caramel);transform:scaleX(0);transform-origin:left;opacity:0;pointer-events:none}
 #progress.run{opacity:1;transform:scaleX(.72);transition:transform 1.8s cubic-bezier(.1,.7,.2,1),opacity 0s}
 #progress.done{opacity:0;transform:scaleX(1);transition:transform 200ms var(--ease-out),opacity 260ms 180ms ease}
 
 /* ---------- Top bar ---------- */
-.topbar{position:sticky;top:0;z-index:40;height:var(--top-h);background:color-mix(in srgb,var(--page) 90%,transparent);-webkit-backdrop-filter:saturate(1.3) blur(14px);backdrop-filter:saturate(1.3) blur(14px);box-shadow:0 1px 0 var(--line);transition:background-color var(--d3);view-transition-name:topbar}
-body[data-layout="auth"] .topbar{background:color-mix(in srgb,var(--bg) 86%,transparent);box-shadow:none}
+.topbar{position:sticky;top:0;z-index:40;height:var(--top-h);background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:saturate(1.3) blur(14px);backdrop-filter:saturate(1.3) blur(14px);transition:background-color var(--d3);view-transition-name:topbar}
 .topbar-in{position:relative;height:100%;padding:0 20px 0 14px;display:grid;grid-template-columns:calc(var(--nav-w) - 14px) minmax(0,1fr) auto;gap:16px;align-items:center}
 .brand-wrap{display:flex;align-items:center;gap:6px;min-width:0;transition:opacity var(--d2)}
 .nav-toggle{display:none}
 .brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font:700 21px/1 var(--f-display);letter-spacing:-.02em}
-.brand-mark{width:34px;height:34px;border-radius:11px;background:var(--c-lime);display:grid;place-items:center;transform:rotate(-6deg);transition:transform var(--d3) var(--ease-spring)}
+.brand-mark{width:40px;height:40px;border-radius:14px;background:var(--esp);display:grid;place-items:center;transition:transform var(--d3) var(--ease-spring);box-shadow:0 6px 14px -6px rgba(18,7,5,.6)}
 .brand:hover .brand-mark{transform:rotate(4deg) scale(1.05)}
-.brand-mark svg{width:20px;height:20px;fill:#111}
-.search{position:relative;display:flex;align-items:center;gap:10px;width:100%;max-width:620px;justify-self:center;height:44px;padding:0 10px 0 16px;background:var(--side);border:1px solid transparent;border-radius:999px;color:var(--ink-3);transition:border-color var(--d2),background-color var(--d2),opacity var(--d2),transform var(--d2) var(--ease-out),visibility var(--d2)}
+.brand-mark svg{width:22px;height:22px;fill:var(--cream)}
+:root[data-theme="dark"] .brand-mark{background:var(--cream)}:root[data-theme="dark"] .brand-mark svg{fill:var(--esp)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .brand-mark{background:var(--cream)}:root:not([data-theme="light"]) .brand-mark svg{fill:var(--esp)}}
+.search{position:relative;display:flex;align-items:center;gap:10px;width:100%;max-width:620px;justify-self:center;height:48px;padding:0 8px 0 18px;background:var(--card);border:1px solid var(--line);border-radius:999px;color:var(--ink-3);box-shadow:var(--soft);transition:border-color var(--d2),background-color var(--d2),opacity var(--d2),transform var(--d2) var(--ease-out),visibility var(--d2)}
 .search:hover{border-color:var(--line-2)}
-.search:focus-within{background:var(--page);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.search:focus-within{background:var(--card);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .search input{flex:1;min-width:0;height:100%;border:0;background:none;outline:none;font-size:14.5px;color:var(--ink)}
 .search input::placeholder{color:var(--ink-3)}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none}
@@ -164,10 +182,10 @@ body[data-layout="auth"] .topbar{background:color-mix(in srgb,var(--bg) 86%,tran
 body[data-layout="auth"] .search,body[data-layout="auth"] #newBtn{visibility:hidden;opacity:0}
 body[data-layout="auth"] .nav-toggle{display:none!important}
 
-.av{--s:24px;position:relative;width:var(--s);height:var(--s);border-radius:50%;flex:none;display:inline-grid;place-items:center;overflow:hidden;background:var(--av,var(--c-lime));color:#111;font:600 calc(var(--s) * .44)/1 var(--f-display);user-select:none}
+.av{--s:24px;position:relative;width:var(--s);height:var(--s);border-radius:50%;flex:none;display:inline-grid;place-items:center;overflow:hidden;background:var(--av,var(--c-honey));color:#1e120d;font:600 calc(var(--s) * .44)/1 var(--f-display);user-select:none}
 .av img{width:100%;height:100%;object-fit:cover}
 .av-20{--s:20px}.av-22{--s:22px}.av-28{--s:28px}.av-32{--s:32px}.av-36{--s:36px}.av-40{--s:40px}.av-48{--s:48px}.av-96{--s:96px}.av-120{--s:120px}
-.me-btn{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 10px 0 4px;border-radius:999px;border:1px solid var(--line);background:var(--page);transition:border-color var(--d1)}
+.me-btn{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 12px 0 5px;border-radius:999px;border:1px solid var(--line);background:var(--card);box-shadow:var(--soft);transition:border-color var(--d1)}
 .me-btn:hover{border-color:var(--line-2)}
 .me-btn .av{--s:36px}
 .me-btn svg.i{width:16px;height:16px;color:var(--ink-3);transition:transform var(--d3) var(--ease-out)}
@@ -188,39 +206,49 @@ body[data-layout="auth"] .nav-toggle{display:none!important}
 .menu hr{border:0;border-top:1px solid var(--line);margin:6px 0}
 
 /* ---------- Shell: left nav + content ---------- */
-body[data-layout="board"]{background:var(--page)}
-.shell{display:grid;grid-template-columns:var(--nav-w) minmax(0,1fr);min-height:calc(100vh - var(--top-h))}
-body[data-layout="auth"] .shell{grid-template-columns:minmax(0,1fr)}
+body[data-layout="board"]{background:var(--bg)}
+.shell{display:grid;grid-template-columns:var(--nav-w) minmax(0,1fr);gap:var(--frame);padding:0 var(--frame) var(--frame);min-height:calc(100vh - var(--top-h))}
+body[data-layout="auth"] .shell{grid-template-columns:minmax(0,1fr);padding:0}
 body[data-layout="auth"] .lnav,body[data-layout="auth"] .scrim{display:none}
-.view{min-width:0;min-height:72vh;padding:20px 24px 120px;outline:none}
-body[data-layout="auth"] .view{width:100%;max-width:1280px;margin:0 auto}
+.view{min-width:0;min-height:72vh;padding:28px 28px 120px;outline:none;background:var(--page);border-radius:34px;box-shadow:var(--elev)}
+body[data-layout="auth"] .view{width:100%;max-width:1280px;margin:0 auto;background:none;box-shadow:none;border-radius:0;padding:20px 24px 120px}
 .view.enter{animation:viewIn 340ms var(--ease-out)}
 @keyframes viewIn{from{opacity:0;transform:translateY(8px)}}
-.lnav{position:sticky;top:var(--top-h);height:calc(100vh - var(--top-h));overflow-y:auto;overscroll-behavior:contain;padding:14px 14px 40px;border-right:1px solid var(--line);background:var(--page);scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;view-transition-name:lnav}
-.nav-item{position:relative;display:flex;align-items:center;gap:12px;height:42px;padding:0 12px;border-radius:12px;text-decoration:none;color:var(--ink-2);font:500 14.5px/1.2 var(--f-display);transition:background-color var(--d2) var(--ease-out),color var(--d2)}
-.nav-item:hover{background:var(--side);color:var(--ink)}
-.nav-item.active{background:var(--side);color:var(--ink);font-weight:600}
-.nav-item.active::before{content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:var(--ink);animation:barIn var(--d3) var(--ease-spring)}
+.lnav{position:sticky;top:var(--top-h);height:calc(100vh - var(--top-h) - var(--frame));overflow-y:auto;overscroll-behavior:contain;padding:18px 14px 28px;border-radius:34px;background:var(--hero);color:var(--hero-ink);box-shadow:var(--elev);scrollbar-width:none;view-transition-name:lnav;
+  --n-ink:color-mix(in srgb,var(--hero-ink) 74%,transparent);--n-mute:color-mix(in srgb,var(--hero-ink) 46%,transparent);--n-hover:color-mix(in srgb,var(--hero-ink) 8%,transparent);--n-line:color-mix(in srgb,var(--hero-ink) 13%,transparent)}
+.lnav::-webkit-scrollbar{display:none}
+.nav-item{position:relative;display:flex;align-items:center;gap:12px;height:46px;padding:0 12px;border-radius:16px;text-decoration:none;color:var(--n-ink);font:500 15px/1.2 var(--f-display);transition:background-color var(--d2) var(--ease-out),color var(--d2)}
+.nav-item:hover{background:var(--n-hover);color:var(--hero-ink)}
+.nav-item.active{background:var(--cream);color:var(--esp);font-weight:600;box-shadow:0 8px 18px -10px rgba(0,0,0,.6)}
+.nav-item.active::before{content:"";position:absolute;left:-14px;top:12px;bottom:12px;width:5px;border-radius:0 5px 5px 0;background:var(--cream);animation:barIn var(--d3) var(--ease-spring)}
 @keyframes barIn{from{transform:scaleY(0)}}
 .nav-item>svg.i{width:20px;height:20px}
-.nav-item .n{margin-left:auto;font:400 12.5px var(--f-body);color:var(--ink-3);font-variant-numeric:tabular-nums}
-.nav-item .hash{width:28px;height:28px;border-radius:50%;background:var(--side);display:grid;place-items:center;font:600 13px var(--f-display);color:var(--ink-3);transition:background-color var(--d2)}
-.nav-item:hover .hash,.nav-item.active .hash{background:var(--raise)}
-.r-ic{width:28px;height:28px;border-radius:50%;background:var(--rc);color:#111;display:grid;place-items:center;flex:none;transition:transform var(--d3) var(--ease-spring)}
+.nav-item .n{margin-left:auto;font:600 12.5px var(--f-display);color:var(--n-mute);font-variant-numeric:tabular-nums}
+.nav-item.active .n{color:var(--brown)}
+.nav-item .hash{width:28px;height:28px;border-radius:9px;background:var(--n-hover);display:grid;place-items:center;font:700 13px var(--f-display);color:var(--n-mute);transition:background-color var(--d2)}
+.nav-item:hover .hash{background:var(--n-line)}
+.nav-item.active .hash{background:var(--esp);color:var(--cream)}
+.r-ic{width:28px;height:28px;border-radius:50%;background:var(--rc);color:#1e120d;display:grid;place-items:center;flex:none;transition:transform var(--d3) var(--ease-spring)}
 .r-ic svg.i{width:14px;height:14px}
 .r-ic.lg{width:38px;height:38px}
 .r-ic.lg svg.i{width:18px;height:18px}
 .r-ic.none{background:var(--side);color:var(--ink-3)}
 .nav-item:hover .r-ic{transform:rotate(-12deg)}
-.nav-sec{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
-.nav-h{display:flex;align-items:center;justify-content:space-between;width:100%;height:38px;padding:0 12px;border:0;border-radius:10px;background:none;font:600 12px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);transition:background-color var(--d1),color var(--d1)}
-.nav-h:hover{background:var(--side);color:var(--ink)}
+.nav-sec{margin-top:12px;padding-top:12px;border-top:1px dashed var(--n-line)}
+.nav-h{display:flex;align-items:center;justify-content:space-between;width:100%;height:38px;padding:0 12px;border:0;border-radius:12px;background:none;font:600 12px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--n-mute);transition:background-color var(--d1),color var(--d1)}
+.nav-h:hover{background:var(--n-hover);color:var(--hero-ink)}
 .nav-h svg.i{width:16px;height:16px;transition:transform var(--d3) var(--ease-out)}
 .nav-sec:not(.open) .nav-h svg.i{transform:rotate(-90deg)}
 .nav-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows var(--d3) var(--ease-out)}
 .nav-body>div{min-height:0;overflow:hidden;display:grid;gap:2px;padding-top:2px}
 .nav-sec:not(.open) .nav-body{grid-template-rows:0fr}
-.nav-foot{margin:18px 12px 0;font-size:12px;line-height:1.6;color:var(--ink-3)}
+.nav-foot{margin:14px 12px 0;font-size:12px;line-height:1.6;color:var(--n-mute)}
+.nav-mascot{position:relative;display:block;margin:20px 2px 0;padding:16px 16px 18px;min-height:112px;border-radius:24px;background:var(--cream);color:var(--esp);overflow:hidden;text-decoration:none;transition:transform var(--d3) var(--ease-out)}
+.nav-mascot:hover{transform:translateY(-2px)}
+.nav-mascot svg.mascot{position:absolute;right:-14px;bottom:-16px;width:96px;height:90px;transform:rotate(-8deg);transition:transform var(--d3) var(--ease-spring)}
+.nav-mascot:hover svg.mascot{transform:rotate(0) translateY(-4px)}
+.nav-mascot b{position:relative;display:block;font:700 16px/1.25 var(--f-display);max-width:10ch}
+.nav-mascot span{position:relative;display:block;font-size:12px;line-height:1.5;margin-top:4px;max-width:14ch;color:var(--brown)}
 .scrim{display:none}
 
 ::view-transition-old(root){animation:vtOut 150ms var(--ease-io) both}
@@ -238,14 +266,14 @@ html.vt-local::view-transition-old(root),html.vt-local::view-transition-new(root
 @keyframes vtTitleIn{from{opacity:0}}
 
 /* ---------- Content columns ---------- */
-.feed-layout{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:28px;max-width:1120px;margin:0 auto;align-items:start}
+.feed-layout{display:grid;grid-template-columns:minmax(0,1fr) 328px;gap:30px;max-width:1140px;margin:0 auto;align-items:start}
 .feed-main{min-width:0;width:100%;max-width:760px;justify-self:center}
 .narrow{max-width:760px;margin:0 auto}
 .rail-r{position:sticky;top:calc(var(--top-h) + 20px);display:grid;gap:16px;max-height:calc(100vh - var(--top-h) - 40px);overflow-y:auto;scrollbar-width:none;border-radius:22px}
 .rail-r::-webkit-scrollbar{display:none}
 .rail-foot{margin:0 6px;font-size:12px;color:var(--ink-3)}
 
-.card{position:relative;background:var(--side);border-radius:22px;padding:20px;transition:background-color var(--d3)}
+.card{position:relative;background:var(--side);border-radius:28px;padding:20px;transition:background-color var(--d3)}
 .card .chip{background:transparent;box-shadow:inset 0 0 0 1px var(--line-2)}
 .card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
 .card-h h2,.card-h h3{font:700 17px/1.3 var(--f-display);letter-spacing:-.005em;margin:0}
@@ -257,28 +285,35 @@ html.vt-local::view-transition-old(root),html.vt-local::view-transition-new(root
 .chip{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:999px;background:var(--side);font:500 13px/1 var(--f-body);color:var(--ink-2);text-decoration:none;white-space:nowrap;transition:background-color var(--d1),color var(--d1),transform var(--d2) var(--ease-out),box-shadow var(--d1)}
 a.chip:hover{color:var(--ink);background:var(--raise);box-shadow:inset 0 0 0 1px var(--ink-3)}
 .badge{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;border-radius:999px;font:600 12px/1 var(--f-display);letter-spacing:.01em;background:var(--card-2);color:var(--ink-2)}
-.badge.lime{background:var(--c-lime);color:#111}
-.badge.purple{background:var(--c-purple);color:#111}
+.badge.honey{background:var(--c-honey);color:#1e120d}
+.badge.latte{background:var(--c-latte);color:#1e120d}
 .badge.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
 .badge svg.i{width:13px;height:13px}
 .tag-cloud{display:flex;flex-wrap:wrap;gap:8px}
 .tag-cloud a.on{background:var(--ink);color:var(--page);box-shadow:none}
 .who-inline{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:500}
-mark{background:var(--c-lime);color:#111;border-radius:4px;padding:0 2px}
+mark{background:var(--c-honey);color:#1e120d;border-radius:4px;padding:0 2px}
 .more{display:flex;justify-content:center;padding:18px 0 0}
 
 /* ---------- Home top: welcome / create bar ---------- */
-.welcome{position:relative;overflow:hidden;border-radius:24px;padding:26px 26px 24px;background:var(--hero);color:var(--hero-ink);margin-bottom:14px}
-:root[data-theme="dark"] .welcome{border:1px solid var(--line)}
-.welcome h1{position:relative;font:700 clamp(26px,3vw,36px)/1.2 var(--f-display);letter-spacing:-.02em;margin:0;max-width:16ch}
-.welcome p{position:relative;margin:8px 0 18px;color:color-mix(in srgb,var(--hero-ink) 62%,transparent);max-width:46ch;font-size:14.5px}
-.welcome .acts{position:relative;display:flex;gap:8px;flex-wrap:wrap}
+.welcome{position:relative;overflow:hidden;border-radius:30px;padding:30px 30px 28px;min-height:240px;background:var(--hero);color:var(--hero-ink);margin-bottom:22px;
+  -webkit-mask:radial-gradient(circle 20px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat,linear-gradient(#000,#000) left/50% 100% no-repeat;mask:radial-gradient(circle 20px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat,linear-gradient(#000,#000) left/50% 100% no-repeat}
+.welcome::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 10%,rgba(222,199,164,.22),transparent 55%),radial-gradient(60% 70% at 0% 100%,rgba(172,141,103,.25),transparent 60%);pointer-events:none}
+.welcome svg.mascot{position:absolute;right:96px;bottom:-12px;width:178px;height:167px;color:var(--esp);z-index:1;animation:bob 4.5s var(--ease-io) infinite alternate}
+@keyframes bob{to{transform:translateY(-8px) rotate(-2deg)}}
+.w-chip{position:absolute;z-index:2;display:grid;gap:3px;min-width:108px;padding:12px 14px;border-radius:20px;background:color-mix(in srgb,var(--milk) 90%,transparent);color:var(--esp);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 12px 26px -12px rgba(0,0,0,.7);animation:popIn 640ms var(--ease-spring) both;animation-delay:var(--pd,.2s)}
+.w-chip b{font:700 26px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.w-chip span{font-size:11.5px;color:var(--brown)}
+.w-chip svg.i{position:absolute;right:10px;top:10px;width:15px;height:15px;color:var(--caramel)}
+.welcome h1{position:relative;z-index:2;font:700 clamp(28px,3.2vw,40px)/1.15 var(--f-display);letter-spacing:-.015em;margin:0;max-width:12ch}
+.welcome p{position:relative;z-index:2;margin:10px 0 20px;color:color-mix(in srgb,var(--hero-ink) 62%,transparent);max-width:32ch;font-size:14.5px}
+.welcome .acts{position:relative;z-index:2;display:flex;gap:8px;flex-wrap:wrap}
 .welcome .btn-white{background:transparent;color:var(--hero-ink);border-color:color-mix(in srgb,var(--hero-ink) 30%,transparent)}
-.create-bar{display:flex;align-items:center;gap:12px;padding:8px 8px 8px 10px;margin-bottom:12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;transition:border-color var(--d2)}
-.create-bar:hover{border-color:var(--ink-3)}
+.create-bar{display:flex;align-items:center;gap:12px;padding:8px 8px 8px 10px;margin-bottom:18px;border:1px solid var(--line);border-radius:999px;background:var(--card);box-shadow:var(--soft);text-decoration:none;transition:border-color var(--d2),transform var(--d2) var(--ease-out)}
+.create-bar:hover{border-color:var(--line-2);transform:translateY(-1px)}
 .create-bar .fake{flex:1;height:40px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:var(--side);color:var(--ink-3);font-size:14.5px}
-.feed-bar{display:flex;align-items:center;gap:10px;padding:2px 4px 10px;margin-bottom:4px;border-bottom:1px solid var(--line)}
-.sort-pill{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:999px;background:var(--side);font:600 13.5px var(--f-display);color:var(--ink)}
+.feed-bar{display:flex;align-items:center;gap:10px;padding:2px 2px 18px}
+.sort-pill{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:999px;background:var(--primary);font:600 13.5px var(--f-display);color:var(--primary-ink)}
 .sort-pill svg.i{width:16px;height:16px}
 .vtoggle{position:relative;display:inline-flex;padding:3px;border-radius:999px;background:var(--side);margin-left:auto}
 .vtoggle button{position:relative;z-index:1;width:38px;height:30px;border:0;border-radius:999px;background:none;color:var(--ink-3);display:grid;place-items:center;transition:color var(--d2)}
@@ -288,12 +323,13 @@ mark{background:var(--c-lime);color:#111;border-radius:4px;padding:0 2px}
 .vtoggle svg.i{width:17px;height:17px}
 
 /* ---------- Feed posts (Reddit-style) ---------- */
-.feed{list-style:none;margin:0;padding:0}
+.feed{list-style:none;margin:0;padding:0;display:grid;gap:18px}
 .feed>li{position:relative}
-.feed>li+li::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:var(--line);transition:opacity var(--d2)}
-.feed>li:hover::before,.feed>li:hover+li::before{opacity:0}
-.post{position:relative;padding:12px 16px;margin:2px -4px;border-radius:20px;transition:background-color var(--d2) var(--ease-out)}
-.post:hover{background:var(--side)}
+.post{position:relative;padding:16px 18px;margin:0;border-radius:28px;background:var(--card);border:1px solid var(--line);box-shadow:var(--soft);transition:transform var(--d3) var(--ease-out),border-color var(--d2),box-shadow var(--d3) var(--ease-out)}
+.post:hover{transform:translateY(-3px);border-color:var(--line-2);box-shadow:var(--elev)}
+.p-badge{position:absolute;z-index:2;top:-11px;right:24px;display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 10px;border-radius:999px;background:var(--primary);color:var(--primary-ink);font:700 11px/1 var(--f-display);letter-spacing:.06em;box-shadow:0 0 0 3px var(--page)}
+.p-badge.hot{background:var(--cta);color:var(--esp)}
+.p-badge svg.i{width:12px;height:12px;stroke-width:2.4}
 .p-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:12.5px;color:var(--ink-3);min-width:0}
 .p-room{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font:600 13.5px var(--f-display)}
 a.p-room:hover{text-decoration:underline;text-underline-offset:3px}
@@ -309,31 +345,36 @@ a.by:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .t-link:focus-visible::after{outline:2px solid var(--ink);outline-offset:-2px}
 .flair{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .flair a,.flair span{position:relative;z-index:1;display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;background:var(--side);font-size:12.5px;color:var(--ink-2);text-decoration:none;transition:background-color var(--d1),color var(--d1)}
-.post:hover .flair a,.post:hover .flair span{background:var(--raise)}
+.post:hover .flair a,.post:hover .flair span{background:var(--card-2)}
 .flair a:hover{color:var(--ink)}
 .flair a.on{background:var(--ink)!important;color:var(--page)}
 .p-ex{margin:6px 0 0;color:var(--ink-2);font-size:14.5px;line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.p-media{position:relative;z-index:1;margin-top:10px;border-radius:18px;overflow:hidden;aspect-ratio:16/10;max-height:440px;background:var(--side);border:1px solid var(--line)}
+.p-media{position:relative;z-index:1;margin-top:12px;border-radius:22px;overflow:hidden;aspect-ratio:16/10;max-height:440px;background:var(--side)}
+.p-media:not([data-n="1"]) .p-track{-webkit-mask:radial-gradient(circle 17px at 0 50%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 17px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 17px at 0 50%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 17px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat}
+.m-chip{position:absolute;z-index:2;left:12px;bottom:12px;display:grid;gap:3px;min-width:86px;padding:10px 12px;border-radius:18px;background:color-mix(in srgb,var(--milk) 88%,transparent);color:var(--esp);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);pointer-events:none;box-shadow:0 10px 24px -14px rgba(0,0,0,.6)}
+.m-chip b{font:700 22px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.m-chip span{font-size:11px;color:var(--brown)}
+.m-chip svg.i{position:absolute;right:9px;top:9px;width:13px;height:13px;color:var(--caramel)}
 .p-track{display:flex;height:100%;transform:translateX(calc(var(--ci,0) * -100%));transition:transform 520ms var(--ease-out)}
 .p-track button{flex:0 0 100%;height:100%;padding:0;border:0;background:none;cursor:zoom-in}
 .p-track img{width:100%;height:100%;object-fit:cover}
-.car-btn{position:absolute;top:50%;margin-top:-18px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.94);color:#111;display:grid;place-items:center;opacity:0;transform:scale(.85);transition:opacity var(--d2),transform var(--d2) var(--ease-spring)}
-.car-btn.prev{left:12px}.car-btn.next{right:12px}
-.p-media:hover .car-btn,.car-btn:focus-visible{opacity:1;transform:none}
-.car-btn:disabled{opacity:0!important;pointer-events:none}
+.car-btn{position:absolute;top:50%;margin-top:-16px;width:22px;height:32px;padding:0;border-radius:10px;border:0;background:none;color:var(--ink-3);display:grid;place-items:center;transition:color var(--d2),opacity var(--d2),transform var(--d2) var(--ease-spring)}
+.car-btn:hover{color:var(--ink)}
+.car-btn.prev{left:-5px}.car-btn.next{right:-5px}
+.car-btn.prev:hover{transform:translateX(-2px)}.car-btn.next:hover{transform:translateX(2px)}
+.car-btn:disabled{opacity:.3;pointer-events:none}
 .car-btn svg.i{width:18px;height:18px}
-@media (hover:none){.car-btn{opacity:1;transform:none}}
-.dots{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:6px;padding:5px 8px;border-radius:999px;background:rgba(17,17,17,.45);pointer-events:none}
+.dots{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:6px;padding:5px 8px;border-radius:999px;background:rgba(30,18,13,.45);pointer-events:none}
 .dots i{width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);transition:width var(--d3) var(--ease-out),background-color var(--d2)}
 .dots i.on{width:16px;background:#fff}
-.car-count{position:absolute;right:12px;top:12px;padding:3px 9px;border-radius:999px;background:rgba(17,17,17,.6);color:#fff;font:500 12px var(--f-mono);pointer-events:none}
+.car-count{position:absolute;right:12px;top:12px;padding:3px 9px;border-radius:999px;background:rgba(30,18,13,.6);color:#fff;font:500 12px var(--f-mono);pointer-events:none}
 .p-actions{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.pill{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:999px;border:0;background:var(--side);color:var(--ink-2);font:600 13px var(--f-display);text-decoration:none;white-space:nowrap;transition:background-color var(--d1),color var(--d1),transform var(--d2) var(--ease-out)}
-.post:hover .pill{background:var(--raise)}
+.pill{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:999px;border:0;background:var(--side);color:var(--ink-2);font:600 13px var(--f-display);text-decoration:none;white-space:nowrap;transition:background-color var(--d1),color var(--d1),transform var(--d2) var(--ease-out)}
+.post:hover .pill{background:var(--card-2)}
 .pill:hover{color:var(--ink)}
 .pill:active{transform:scale(.96)}
 .pill svg.i{width:17px;height:17px}
-.post.compact{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;padding:10px 14px}
+.post.compact{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;padding:10px 12px 10px 10px;border-radius:24px}
 .p-thumb{position:relative;width:52px;height:52px;border-radius:14px;overflow:hidden;display:grid;place-items:center}
 .p-thumb img{width:100%;height:100%;object-fit:cover}
 .post.compact .p-title{font-size:16px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
@@ -343,7 +384,7 @@ a.by:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .c-banner{max-width:1120px;margin:0 auto 20px}
 .c-cover{position:relative;height:128px;border-radius:24px;background:var(--rc);overflow:hidden}
 .c-head{position:relative;display:flex;align-items:flex-end;gap:16px;padding:0 20px;margin-top:-38px}
-.c-icon{width:92px;height:92px;border-radius:50%;background:#111;color:var(--rc);display:grid;place-items:center;border:5px solid var(--page);flex:none;animation:popIn 560ms var(--ease-spring) both}
+.c-icon{width:92px;height:92px;border-radius:30px;background:var(--esp);color:var(--rc);display:grid;place-items:center;border:5px solid var(--page);flex:none;animation:popIn 560ms var(--ease-spring) both}
 .c-icon svg.i{width:38px;height:38px;stroke-width:1.6}
 .c-head>div{min-width:0;margin-bottom:-12px}
 .c-head h1{font:800 clamp(26px,3vw,34px)/1.15 var(--f-display);letter-spacing:-.02em;margin:0}
@@ -357,7 +398,27 @@ a.by:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .about-top{position:relative;height:56px;margin:-20px -20px 16px;border-radius:22px 22px 0 0;background:var(--rc);overflow:hidden}
 .about p{margin:0 0 14px;font-size:14px;color:var(--ink-2);line-height:1.65}
 .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 16px}
-.stats3 b{display:block;font:800 22px/1.15 var(--f-display);font-variant-numeric:tabular-nums}
+.stats3 b{display:block;font:700 24px/1.15 var(--f-display);font-variant-numeric:tabular-nums}
+/* split scoreboard + "match" rows (rail) */
+.board-stats{position:relative;background:var(--card);border:1px solid var(--line);border-radius:30px;padding:22px 20px 18px;box-shadow:var(--soft)}
+.board-stats .bs-h{text-align:center;font:700 22px/1.1 var(--f-display);letter-spacing:.02em;margin:0}
+.board-stats .bs-sub{display:block;text-align:center;font:600 11.5px/1 var(--f-display);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3);margin-top:7px}
+.board-stats>p{margin:14px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink-2);text-align:center}
+.split{display:grid;grid-template-columns:1fr 1px 1fr;align-items:center;margin:18px 0 18px}
+.split>i{height:56px;background:var(--line-2)}
+.split>div{text-align:center}
+.split span{display:block;font-size:12px;color:var(--ink-3);margin-bottom:4px}
+.split b{display:block;font:700 46px/1 var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.match{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:14px}
+.match a{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:13px 12px 10px;border:1px solid var(--line-2);border-radius:20px;text-decoration:none;transition:border-color var(--d2),transform var(--d2) var(--ease-out),background-color var(--d2)}
+.match a:hover{border-color:var(--ink);transform:translateX(2px)}
+.match .tl{position:absolute;top:-9px;left:14px;height:18px;padding:0 8px;border-radius:999px;background:var(--cta);color:var(--esp);font:700 10.5px/18px var(--f-display);letter-spacing:.04em}
+.match .tl.plain{background:var(--primary);color:var(--primary-ink)}
+.match .mid{display:grid;line-height:1.35;min-width:0}
+.match .mid b{font:600 14px var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.match .mid span{font-size:11.5px;color:var(--ink-3)}
+.match .sc{text-align:right;font:700 20px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.match .sc small{display:block;font:500 10.5px/1.4 var(--f-body);color:var(--ink-3)}
 .stats3 span{font-size:12px;color:var(--ink-3)}
 .recent{display:grid;gap:2px}
 .recent a{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;padding:8px;margin:0 -8px;border-radius:14px;text-decoration:none;transition:background-color var(--d1)}
@@ -366,13 +427,13 @@ a.by:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .recent .th img{width:100%;height:100%;object-fit:cover}
 .recent b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:600 13.5px/1.35 var(--f-display)}
 .recent span span{font-size:12px;color:var(--ink-3)}
-.promo{position:relative;display:block;padding:20px 22px;border-radius:22px;background:var(--c-purple);color:#111;text-decoration:none;overflow:hidden;transition:transform var(--d3) var(--ease-out)}
+.promo{position:relative;display:block;padding:20px 22px;border-radius:28px;background:var(--c-latte);color:var(--esp);text-decoration:none;overflow:hidden;transition:transform var(--d3) var(--ease-out)}
 .promo:hover{transform:translateY(-2px)}
-.promo b{display:block;font:800 24px/1.08 var(--f-display);letter-spacing:-.02em;max-width:9ch}
+.promo b{display:block;font:700 24px/1.08 var(--f-display);letter-spacing:-.01em;max-width:9ch}
 .promo span{display:block;font-size:13px;margin-top:8px;max-width:20ch;line-height:1.45}
 .promo .shield{position:absolute;right:16px;bottom:-14px;width:100px;height:100px;transform:rotate(10deg);transition:transform var(--d3) var(--ease-spring)}
 .promo:hover .shield{transform:rotate(2deg) translateY(-6px)}
-.promo.done{background:var(--c-lime)}
+.promo.done{background:var(--c-honey)}
 .people{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .people li a{display:flex;align-items:center;gap:10px;font-size:14px;text-decoration:none;color:var(--ink-2)}
 .people li a:hover{color:var(--ink)}
@@ -382,6 +443,7 @@ a.by:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 /* states */
 .state{position:relative;padding:48px 32px;text-align:center;border-radius:24px;background:var(--side)}
 .state .art{position:relative;width:120px;height:110px;margin:0 auto 14px}
+.state .art svg.mascot{position:absolute;left:4px;top:0;width:104px;height:98px;color:var(--esp);animation:bob 4.5s var(--ease-io) infinite alternate}
 .state h1,.state h2{font:700 26px/1.3 var(--f-display);letter-spacing:-.02em;margin:0 0 6px}
 .state p{margin:0 auto 22px;color:var(--ink-2);max-width:42ch}
 .state .actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
@@ -426,7 +488,7 @@ a.by:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .join.open .join-pill{opacity:0;pointer-events:none}
 .c-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 2px;padding-top:14px;border-top:1px solid var(--line)}
 .c-toolbar h2{font:700 18px/1.3 var(--f-display);margin:0}
-.c-count{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 9px;border-radius:999px;background:var(--c-lime);color:#111;font:700 14px/1 var(--f-display)}
+.c-count{display:inline-grid;place-items:center;min-width:30px;height:28px;padding:0 9px;border-radius:999px;background:var(--c-honey);color:#1e120d;font:700 14px/1 var(--f-display)}
 .c-count.bump{animation:bump 460ms var(--ease-spring)}
 @keyframes bump{40%{transform:scale(1.25) rotate(-6deg)}}
 .c-sort{font-size:12.5px;color:var(--ink-3);margin-left:auto}
@@ -436,7 +498,7 @@ a.by:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .comment{position:relative}
 .c-main{margin:-8px -12px;padding:8px 12px;border-radius:16px}
 .comment.fresh>.c-main{animation:freshBg 2.8s var(--ease-out)}
-@keyframes freshBg{0%,25%{background:color-mix(in srgb,var(--c-lime) 45%,transparent)}100%{background:transparent}}
+@keyframes freshBg{0%,25%{background:color-mix(in srgb,var(--c-honey) 45%,transparent)}100%{background:transparent}}
 .c-top{display:flex;align-items:center;gap:8px;font-size:13.5px;min-width:0}
 .c-name{font:600 15px var(--f-display);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
@@ -449,12 +511,12 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .c-img{margin:10px 0 2px 40px;padding:0;border:0;background:none;cursor:zoom-in;border-radius:16px;overflow:hidden;display:block;width:min(260px,100%)}
 .c-img img{width:100%;aspect-ratio:4/3;object-fit:cover;transition:transform 600ms var(--ease-out)}
 .c-img:hover img{transform:scale(1.04)}
-.reply-to{color:var(--c-purple-ink);font-weight:600;margin-right:2px}
+.reply-to{color:var(--c-latte-ink);font-weight:600;margin-right:2px}
 .c-actions{display:flex;gap:4px;margin:6px 0 0 34px}
 .c-actions .when-closed{display:none}
 .comment.collapsed>.c-main .when-open{display:none}
 .comment.collapsed>.c-main .when-closed{display:inline}
-.comment.collapsed>.c-main .tog{color:var(--c-purple-ink)}
+.comment.collapsed>.c-main .tog{color:var(--c-latte-ink)}
 .thread-line{position:absolute;left:0;top:42px;bottom:2px;width:32px;border:0;padding:0;background:none;cursor:pointer}
 .thread-line::before{content:"";position:absolute;left:15px;top:0;bottom:0;width:2px;border-radius:2px;background:var(--line);transition:background-color var(--d2)}
 .thread-line:hover::before{background:var(--ink)}
@@ -502,11 +564,12 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* profile */
 .u-head{display:flex;align-items:center;gap:18px;padding:4px 4px 18px}
-.u-head .av{--s:96px;font-size:36px;border:4px solid var(--c-lime)}
+.u-head .av{--s:96px;font-size:36px;border:4px solid var(--c-honey)}
 .u-head h1{font:800 clamp(26px,3vw,36px)/1.15 var(--f-display);letter-spacing:-.02em;margin:0}
 .u-head .handle{color:var(--ink-3);font-size:14px}
 .u-card{position:relative;overflow:hidden;padding:20px;border-radius:22px;background:var(--hero);color:var(--hero-ink);display:grid;gap:14px}
-:root[data-theme="dark"] .u-card{border:1px solid var(--line)}
+:root[data-theme="dark"] .u-card,:root[data-theme="dark"] .welcome,:root[data-theme="dark"] .lnav,:root[data-theme="dark"] .auth-art,:root[data-theme="dark"] .login-cta{box-shadow:inset 0 0 0 1px var(--line-2)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .u-card,:root:not([data-theme="light"]) .welcome,:root:not([data-theme="light"]) .lnav,:root:not([data-theme="light"]) .auth-art,:root:not([data-theme="light"]) .login-cta{box-shadow:inset 0 0 0 1px var(--line-2)}}
 .u-card .u-top{display:flex;align-items:center;gap:12px}
 .u-card .u-top b{display:block;font:700 17px/1.3 var(--f-display)}
 .u-card .u-top span{font-size:13px;opacity:.6}
@@ -514,8 +577,8 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .u-joined{display:flex;align-items:center;gap:8px;font-size:13px;opacity:.65}
 .u-joined svg.i{width:16px;height:16px}
 .p-stats{display:flex;gap:10px}
-.p-stat{flex:1;padding:14px 12px;border-radius:18px;background:var(--c-lime);color:#111;text-align:center}
-.p-stat:nth-child(2){background:var(--c-purple)}
+.p-stat{flex:1;padding:14px 12px;border-radius:18px;background:var(--c-honey);color:#1e120d;text-align:center}
+.p-stat:nth-child(2){background:var(--c-latte)}
 .p-stat b{display:block;font:800 28px/1 var(--f-display)}
 .p-stat span{font-size:12px}
 .tabs{position:relative;display:inline-flex;padding:4px;border-radius:999px;background:var(--side);margin-bottom:8px}
@@ -570,10 +633,10 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .alert{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:14px 16px;margin-bottom:18px;border-radius:18px;background:var(--danger-soft);color:var(--ink);outline:none;animation:alertIn 380ms var(--ease-out)}
 .alert>svg.i{color:var(--danger);margin-top:2px}
 .alert b{font-weight:600}
-.alert.info{background:color-mix(in srgb,var(--c-purple) 22%,var(--card))}
-.alert.info>svg.i{color:var(--c-purple-ink)}
-.alert.ok{background:color-mix(in srgb,var(--c-lime) 40%,var(--card))}
-.alert.ok>svg.i{color:#111}
+.alert.info{background:color-mix(in srgb,var(--c-latte) 22%,var(--card))}
+.alert.info>svg.i{color:var(--c-latte-ink)}
+.alert.ok{background:color-mix(in srgb,var(--c-honey) 40%,var(--card))}
+.alert.ok>svg.i{color:#1e120d}
 .alert ul{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:2px}
 .alert ul button{border:0;background:none;padding:0;font-size:14px;color:var(--danger);text-decoration:underline;text-underline-offset:3px;text-align:left}
 .alert details{grid-column:2;margin-top:8px;font-size:12.5px;color:var(--ink-2)}
@@ -608,20 +671,20 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .tchip .x{display:grid;place-items:center;width:26px;height:26px;border:0;border-radius:50%;background:none;color:inherit;opacity:.7;transition:opacity var(--d1),background-color var(--d1)}
 .tchip .x:hover{opacity:1;background:color-mix(in srgb,var(--card) 18%,transparent)}
 .tchip .x svg.i{width:13px;height:13px}
-.tchip .new{font-size:10.5px;font-weight:600;margin-left:6px;padding:2px 6px;border-radius:999px;background:var(--c-lime);color:#111}
+.tchip .new{font-size:10.5px;font-weight:600;margin-left:6px;padding:2px 6px;border-radius:999px;background:var(--c-honey);color:#1e120d}
 @keyframes chipIn{from{opacity:0;transform:scale(.8)}}
 .suggest{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;list-style:none;margin:0;padding:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--elev);opacity:0;transform:translateY(-4px);pointer-events:none;visibility:hidden;transition:opacity var(--d1),transform var(--d2) var(--ease-out),visibility 0s var(--d2)}
 .suggest.open{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition-delay:0s}
 .suggest li{display:flex;justify-content:space-between;align-items:center;height:38px;padding:0 12px;border-radius:12px;font-size:14px;cursor:pointer;transition:background-color 80ms}
 .suggest li.active{background:var(--card-2)}
 .suggest li .n{font-size:12px;color:var(--ink-3)}
-.suggest li.create{color:var(--c-purple-ink);font-weight:600}
+.suggest li.create{color:var(--c-latte-ink);font-weight:600}
 
 .dropzone{position:relative;display:grid;place-items:center;gap:6px;padding:26px 16px;border:1.5px dashed var(--line-2);border-radius:20px;background:var(--card);text-align:center;cursor:pointer;transition:border-color var(--d2),background-color var(--d2),transform var(--d2) var(--ease-out)}
 .dropzone:hover{border-color:var(--ink-3)}
-.dropzone.drag{border-color:var(--ink);background:color-mix(in srgb,var(--c-lime) 25%,var(--card));transform:scale(1.01)}
+.dropzone.drag{border-color:var(--ink);background:color-mix(in srgb,var(--c-honey) 25%,var(--card));transform:scale(1.01)}
 .dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.dropzone .dz-ic{width:52px;height:52px;border-radius:50%;background:var(--c-lime);color:#111;display:grid;place-items:center;transition:transform var(--d3) var(--ease-spring)}
+.dropzone .dz-ic{width:52px;height:52px;border-radius:50%;background:var(--c-honey);color:#1e120d;display:grid;place-items:center;transition:transform var(--d3) var(--ease-spring)}
 .dropzone:hover .dz-ic,.dropzone.drag .dz-ic{transform:translateY(-3px) rotate(-8deg)}
 .dropzone b{font:600 15px var(--f-display)}
 .dropzone span{font-size:12.5px;color:var(--ink-3)}
@@ -632,12 +695,12 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .up img{width:100%;height:100%;object-fit:cover;transition:filter var(--d3),transform var(--d3) var(--ease-out)}
 .up.uploading img{filter:saturate(.4) brightness(.85)}
 .up .bar{position:absolute;left:10px;right:10px;bottom:10px;height:6px;border-radius:999px;background:rgba(255,255,255,.45);overflow:hidden;transition:opacity var(--d2)}
-.up .bar i{display:block;height:100%;width:calc(var(--p,0) * 1%);background:#111;border-radius:999px;transition:width 200ms linear}
+.up .bar i{display:block;height:100%;width:calc(var(--p,0) * 1%);background:#1e120d;border-radius:999px;transition:width 200ms linear}
 .up.done .bar{opacity:0}
-.up .rm{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(17,17,17,.75);color:#fff;display:grid;place-items:center;opacity:0;transform:scale(.8);transition:opacity var(--d2),transform var(--d2) var(--ease-spring)}
+.up .rm{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(30,18,13,.75);color:#fff;display:grid;place-items:center;opacity:0;transform:scale(.8);transition:opacity var(--d2),transform var(--d2) var(--ease-spring)}
 .up:hover .rm,.up:focus-within .rm,.up.error .rm{opacity:1;transform:none}
 .up .rm svg.i{width:14px;height:14px}
-.up .ok{position:absolute;left:8px;bottom:8px;width:24px;height:24px;border-radius:50%;background:var(--c-lime);color:#111;display:grid;place-items:center;opacity:0;transform:scale(.5);transition:opacity var(--d2),transform var(--d3) var(--ease-spring)}
+.up .ok{position:absolute;left:8px;bottom:8px;width:24px;height:24px;border-radius:50%;background:var(--c-honey);color:#1e120d;display:grid;place-items:center;opacity:0;transform:scale(.5);transition:opacity var(--d2),transform var(--d3) var(--ease-spring)}
 .up.done .ok{opacity:1;transform:none}
 .up .ok svg.i{width:13px;height:13px;stroke-width:2.6}
 .up.error{display:grid;place-items:center;padding:10px;text-align:center;background:var(--danger-soft);color:var(--danger);font-size:12px;line-height:1.4}
@@ -665,11 +728,14 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* ---------- Auth ---------- */
 .auth{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;min-height:calc(100vh - var(--top-h) - 40px)}
-.auth-art{position:relative;background:#111;color:#fff;border-radius:36px;padding:44px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:560px}
+.auth-art{position:relative;background:var(--hero);color:var(--hero-ink);border-radius:36px;padding:44px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:560px;
+  -webkit-mask:radial-gradient(circle 24px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat,linear-gradient(#000,#000) left/50% 100% no-repeat;mask:radial-gradient(circle 24px at 100% 50%,#0000 97%,#000) right/51% 100% no-repeat,linear-gradient(#000,#000) left/50% 100% no-repeat}
+.auth-art::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 100% 0%,rgba(222,199,164,.2),transparent 60%);pointer-events:none}
+.auth-art svg.mascot{position:absolute;right:36px;bottom:26px;width:190px;height:178px;color:var(--esp);z-index:1;animation:bob 4.5s var(--ease-io) infinite alternate}
 .auth-art h2{position:relative;z-index:1;font:700 clamp(36px,4vw,58px)/1.14 var(--f-display);letter-spacing:-.03em;margin:0;max-width:11ch}
 .auth-art p{position:relative;z-index:1;color:rgba(255,255,255,.6);max-width:36ch;margin:14px 0 0}
 .collage{position:relative;height:300px;margin-top:20px}
-.float-card{position:absolute;width:250px;padding:14px 16px;border-radius:22px;background:var(--fc,#fff);color:#111;transform:rotate(var(--r,0deg));animation:floaty 7s var(--ease-io) infinite alternate,popIn 640ms var(--ease-spring) both;animation-delay:var(--fd,0s),var(--pd,0s)}
+.float-card{position:absolute;z-index:2;width:250px;padding:14px 16px;border-radius:22px;background:var(--fc,var(--milk));color:var(--esp);transform:rotate(var(--r,0deg));box-shadow:0 14px 30px -16px rgba(0,0,0,.7);animation:floaty 7s var(--ease-io) infinite alternate,popIn 640ms var(--ease-spring) both;animation-delay:var(--fd,0s),var(--pd,0s)}
 .float-card b{display:block;font:600 15px/1.35 var(--f-display)}
 .float-card span{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.7;margin-top:6px}
 @keyframes floaty{from{translate:0 0}to{translate:0 -10px}}
@@ -695,7 +761,7 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .otp{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:4px 0 8px}
 .otp-box{width:100%;height:64px;text-align:center;border:1px solid var(--line-2);border-radius:18px;background:var(--card);font:700 28px/1 var(--f-display);outline:none;caret-color:var(--ink);transition:border-color var(--d1),box-shadow var(--d1),background-color var(--d2),transform var(--d2) var(--ease-spring)}
 .otp-box:focus{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.otp-box.filled{background:color-mix(in srgb,var(--c-lime) 38%,var(--card));animation:otpPop 260ms var(--ease-spring)}
+.otp-box.filled{background:color-mix(in srgb,var(--c-honey) 38%,var(--card));animation:otpPop 260ms var(--ease-spring)}
 @keyframes otpPop{50%{transform:scale(1.08)}}
 .otp.bad .otp-box{border-color:var(--danger);background:var(--danger-soft)}
 .otp.shake{animation:shake 420ms var(--ease-out)}
@@ -709,22 +775,22 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .strength{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:2px}
 .strength i{height:6px;border-radius:999px;background:var(--line);transition:background-color var(--d3) var(--ease-out)}
 .strength[data-s="1"] i:nth-child(-n+1){background:var(--danger)}
-.strength[data-s="2"] i:nth-child(-n+2){background:var(--c-orange)}
-.strength[data-s="3"] i:nth-child(-n+3){background:var(--c-blue)}
+.strength[data-s="2"] i:nth-child(-n+2){background:var(--c-caramel)}
+.strength[data-s="3"] i:nth-child(-n+3){background:var(--c-stone)}
 .strength[data-s="4"] i:nth-child(-n+4){background:var(--ok)}
 .rules{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12.5px;color:var(--ink-3)}
 .rules li{display:flex;align-items:center;gap:6px;transition:color var(--d2)}
 .rules li .c{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line-2);display:grid;place-items:center;transition:background-color var(--d2),border-color var(--d2)}
-.rules li .c svg{width:10px;height:10px;stroke:#111;stroke-width:3;fill:none;stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset var(--d3) var(--ease-out)}
+.rules li .c svg{width:10px;height:10px;stroke:#1e120d;stroke-width:3;fill:none;stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset var(--d3) var(--ease-out)}
 .rules li.ok{color:var(--ink)}
-.rules li.ok .c{background:var(--c-lime);border-color:var(--c-lime)}
+.rules li.ok .c{background:var(--c-honey);border-color:var(--c-honey)}
 .rules li.ok .c svg{stroke-dashoffset:0}
-.success-mark{width:96px;height:96px;margin:0 auto 18px;border-radius:50%;background:var(--c-lime);display:grid;place-items:center;animation:popIn 600ms var(--ease-spring) both}
-.success-mark svg{width:46px;height:46px;stroke:#111;stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:draw 520ms 320ms var(--ease-out) forwards}
+.success-mark{width:96px;height:96px;margin:0 auto 18px;border-radius:50%;background:var(--c-honey);display:grid;place-items:center;animation:popIn 600ms var(--ease-spring) both}
+.success-mark svg{width:46px;height:46px;stroke:#1e120d;stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:draw 520ms 320ms var(--ease-out) forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
 .choice{display:flex;align-items:center;gap:14px;padding:18px;border-radius:22px;border:1px solid var(--line-2);background:var(--card);text-decoration:none;transition:border-color var(--d1),transform var(--d2) var(--ease-out)}
 .choice:hover{border-color:var(--ink);transform:translateY(-2px)}
-.choice .ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--rc,var(--card-2));color:#111;flex:none}
+.choice .ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--rc,var(--card-2));color:#1e120d;flex:none}
 .choice b{display:block;font:600 16px var(--f-display)}
 .choice span{font-size:13px;color:var(--ink-3)}
 .choice>svg.i:last-child{margin-left:auto;color:var(--ink-3)}
@@ -779,7 +845,7 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .session .btn{margin-left:auto}
 
 /* crop dialog */
-.crop-stage{position:relative;width:280px;height:280px;margin:6px auto 18px;border-radius:24px;overflow:hidden;background:#111;touch-action:none;cursor:grab}
+.crop-stage{position:relative;width:280px;height:280px;margin:6px auto 18px;border-radius:24px;overflow:hidden;background:#1e120d;touch-action:none;cursor:grab}
 .crop-stage:active{cursor:grabbing}
 .crop-stage img{position:absolute;left:50%;top:50%;max-width:none;user-select:none;-webkit-user-drag:none;transform-origin:center;will-change:transform}
 .crop-stage .mask{position:absolute;inset:20px;border-radius:50%;box-shadow:0 0 0 400px rgba(0,0,0,.55);border:2px solid #fff;pointer-events:none}
@@ -787,9 +853,9 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .zoom-row input{flex:1;accent-color:var(--ink)}
 
 /* ---------- Lightbox ---------- */
-.lightbox{position:fixed;inset:0;z-index:85;display:grid;place-items:center;padding:48px 72px;background:rgba(8,8,8,0);transition:background-color var(--d3) var(--ease-out);visibility:hidden}
-.lightbox.open{background:rgba(8,8,8,.88);visibility:visible}
-.lightbox.closing{background:rgba(8,8,8,0)}
+.lightbox{position:fixed;inset:0;z-index:85;display:grid;place-items:center;padding:48px 72px;background:rgba(18,7,5,0);transition:background-color var(--d3) var(--ease-out);visibility:hidden}
+.lightbox.open{background:rgba(18,7,5,.88);visibility:visible}
+.lightbox.closing{background:rgba(18,7,5,0)}
 .lightbox img{max-width:100%;max-height:calc(100vh - 140px);border-radius:20px;transform-origin:center;transition:transform 460ms var(--ease-out),opacity 300ms var(--ease-out)}
 .lightbox .lb-btn{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center;opacity:0;transition:opacity var(--d3),background-color var(--d1)}
 .lightbox.open .lb-btn{opacity:1}
@@ -802,10 +868,11 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* ---------- Toast / dialog ---------- */
 .toasts{position:fixed;left:50%;bottom:24px;z-index:95;display:grid;gap:8px;justify-items:center;transform:translateX(-50%);pointer-events:none;width:max-content;max-width:calc(100vw - 32px)}
-.toast{display:flex;align-items:center;gap:10px;padding:12px 18px 12px 12px;border-radius:999px;background:#111;color:#fff;font:500 14px var(--f-body);box-shadow:var(--elev);opacity:0;transform:translateY(14px) scale(.96);transition:opacity var(--d2) var(--ease-out),transform var(--d3) var(--ease-spring)}
-:root[data-theme="dark"] .toast{background:#f2f2ec;color:#111}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 18px 12px 12px;border-radius:999px;background:var(--esp);color:var(--milk);font:500 14px var(--f-body);box-shadow:var(--elev);opacity:0;transform:translateY(14px) scale(.96);transition:opacity var(--d2) var(--ease-out),transform var(--d3) var(--ease-spring)}
+:root[data-theme="dark"] .toast{background:var(--cream);color:var(--esp)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .toast{background:var(--cream);color:var(--esp)}}
 .toast.show{opacity:1;transform:none}
-.toast .ti{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--c-lime);color:#111}
+.toast .ti{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--c-honey);color:#1e120d}
 .toast.err .ti{background:var(--danger);color:#fff}
 .toast .ti svg.i{width:14px;height:14px;stroke-width:2.4}
 .dialog{width:min(420px,calc(100vw - 32px));padding:28px;border:0;border-radius:28px;background:var(--card);color:var(--ink);box-shadow:var(--elev);opacity:0;transform:translateY(14px) scale(.97);transition:opacity var(--d2) var(--ease-out),transform var(--d3) var(--ease-spring)}
@@ -839,7 +906,7 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
 .track{position:relative;width:36px;height:22px;flex:none;border-radius:999px;background:var(--line-2);transition:background-color var(--d2)}
 .track::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform var(--d3) var(--ease-spring)}
 .switch input:checked+.track{background:var(--ink)}
-.switch input:checked+.track::after{transform:translateX(14px);background:var(--c-lime)}
+.switch input:checked+.track::after{transform:translateX(14px);background:var(--c-honey)}
 .switch input:focus-visible+.track{outline:2px solid var(--ink);outline-offset:2px}
 .theme-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:3px;border-radius:999px;background:var(--card-2)}
 .theme-seg button{height:30px;border:0;border-radius:999px;background:none;font-size:12.5px;color:var(--ink-3);transition:background-color var(--d2),color var(--d2)}
@@ -861,7 +928,7 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
   .shell{grid-template-columns:minmax(0,1fr)}
   .topbar-in{grid-template-columns:auto minmax(0,1fr) auto}
   .nav-toggle{display:inline-grid}
-  .lnav{position:fixed;left:0;top:var(--top-h);bottom:0;height:auto;z-index:45;width:min(300px,86vw);visibility:hidden;transform:translateX(-102%);transition:transform 420ms var(--ease-out),box-shadow var(--d3),visibility 0s 420ms}
+  .lnav{position:fixed;left:var(--frame);top:var(--top-h);bottom:var(--frame);height:auto;z-index:45;width:min(300px,86vw);visibility:hidden;transform:translateX(calc(-100% - 2 * var(--frame)));transition:transform 420ms var(--ease-out),box-shadow var(--d3),visibility 0s 420ms}
   body.nav-open .lnav{visibility:visible;transform:none;box-shadow:var(--elev);transition:transform 420ms var(--ease-out),box-shadow var(--d3),visibility 0s}
   .scrim{display:block;position:fixed;inset:var(--top-h) 0 0 0;z-index:44;background:var(--overlay);opacity:0;pointer-events:none;transition:opacity var(--d3) var(--ease-out)}
   body.nav-open .scrim{opacity:1;pointer-events:auto}
@@ -881,8 +948,14 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
   #newBtn .lbl{display:none}
   .me-btn{padding:0 4px;border:0;background:none}
   .me-btn svg.i{display:none}
-  .view{padding:14px 12px 120px}
-  .welcome{padding:22px 20px 20px}
+  :root{--frame:10px}
+  .view{padding:18px 14px 120px;border-radius:26px}
+  .welcome{padding:24px 20px 22px;min-height:0}
+  .welcome svg.mascot{width:88px;height:83px;right:14px;top:16px;bottom:auto}
+  .brand{font-size:18px;gap:8px}
+  .brand-mark{width:34px;height:34px;border-radius:12px}
+  .brand-mark svg{width:19px;height:19px}
+  .welcome p{max-width:24ch}
   .c-cover{height:92px;border-radius:20px}
   .c-head{padding:0 6px;margin-top:-30px;gap:12px}
   .c-icon{width:70px;height:70px;border-width:4px}
@@ -970,6 +1043,19 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
   <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4.5h6V7"/></symbol>
   <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2M8.5 11h5M11 8.5v5"/></symbol>
+  <symbol id="mascot" viewBox="0 0 200 188"><g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 24H120a34 34 0 0 1 34 34v46a34 34 0 0 1-34 34H72l-34 30 8-30h-2a34 34 0 0 1-34-34V58a34 34 0 0 1 34-34z" style="fill:var(--mf,#f6efe3)"/>
+    <path d="M74 24c-3-13 15-17 15-5" fill="none"/>
+    <ellipse cx="58" cy="78" rx="7" ry="10" fill="currentColor" stroke="none"/><ellipse cx="104" cy="78" rx="7" ry="10" fill="currentColor" stroke="none"/>
+    <circle cx="60.5" cy="74" r="2.6" style="fill:var(--mf,#f6efe3)" stroke="none"/><circle cx="106.5" cy="74" r="2.6" style="fill:var(--mf,#f6efe3)" stroke="none"/>
+    <ellipse cx="42" cy="100" rx="8" ry="5" style="fill:var(--mb,#e9bea4)" stroke="none"/><ellipse cx="120" cy="100" rx="8" ry="5" style="fill:var(--mb,#e9bea4)" stroke="none"/>
+    <path d="M70 102q11 12 22 0" fill="none"/>
+    <path d="M150 116l10 6" fill="none"/>
+    <path d="M152 112h38l-5 46a8 8 0 0 1-8 7h-12a8 8 0 0 1-8-7z" style="fill:var(--mc,#ac8d67)"/>
+    <path d="M155 130h32" fill="none"/><path d="M147 112h48" fill="none"/>
+    <path d="M164 98c-6-7 6-10 0-18M178 98c-6-7 6-10 0-18" fill="none" opacity=".75"/>
+  </g></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-4 0-7-2.7-7-6.5 0-3.6 2.8-5.4 3.6-8.5 1.9 1.3 2.8 3.2 2.6 5.2 1.3-.6 2.2-2 2.3-3.7 2.6 1.9 3.5 4.4 3.5 7C17 18.3 15.4 21 12 21z"/></symbol>
   <symbol id="doodle-spark" viewBox="0 0 40 40"><path d="M20 4v9M20 27v9M4 20h9M27 20h9M9 9l5 5M26 26l5 5M31 9l-5 5M14 26l-5 5"/></symbol>
   <symbol id="doodle-squig" viewBox="0 0 120 40"><path d="M4 30c10-20 18-20 24 0s14 20 22 0 16-20 24 0 14 18 22 2c4-7 9-10 18-8"/><path d="M104 14l10 10M114 14l-2 12"/></symbol>
   <symbol id="doodle-crown" viewBox="0 0 48 32"><path d="M4 28h40M6 24 4 6l11 9 9-12 9 12 11-9-2 18z"/></symbol>
@@ -1046,10 +1132,10 @@ a.c-name:hover{text-decoration:underline;text-underline-offset:3px}
    ====================================================================== */
 const NOW = Date.now();
 const ago = min => new Date(NOW - min * 60000).toISOString();
-const COLORS = ['lime', 'purple', 'pink', 'orange', 'blue', 'mint'];
+const COLORS = ['honey', 'latte', 'peach', 'caramel', 'stone', 'matcha'];
 
 function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-const HEX = { lime: '#d4f25a', purple: '#b796ff', pink: '#ff9fd6', orange: '#ffb460', blue: '#92cbff', mint: '#86e6c4' };
+const HEX = { honey: '#e6c995', latte: '#cfae8a', peach: '#e9bea4', caramel: '#d69f68', stone: '#c3bfb6', matcha: '#bfc79c' };
 /** Sample illustration (SVG data URI) standing in for user photos. */
 function art(seed, w = 800, h = 600) {
   const r = rng(seed), pal = Object.values(HEX), bg = pal[seed % pal.length];
@@ -1060,19 +1146,19 @@ function art(seed, w = 800, h = 600) {
       ? `<circle cx="${x | 0}" cy="${y | 0}" r="${s / 2 | 0}" fill="${c}"/>`
       : `<rect x="${x - s / 2 | 0}" y="${y - s / 2 | 0}" width="${s | 0}" height="${s * .8 | 0}" rx="${s / 4 | 0}" fill="${c}" transform="rotate(${(r() * 40 - 20) | 0} ${x | 0} ${y | 0})"/>`;
   }
-  const sq = `<path d="M${w * .1} ${h * .8} c${w * .1} -${h * .25} ${w * .2} -${h * .25} ${w * .3} 0 s${w * .2} ${h * .25} ${w * .3} 0" stroke="#111" stroke-width="10" fill="none" stroke-linecap="round"/>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${bg}"/>${shapes}${sq}<text x="24" y="${h - 24}" font-family="sans-serif" font-size="22" fill="#111" opacity=".55">รูปตัวอย่าง</text></svg>`;
+  const sq = `<path d="M${w * .1} ${h * .8} c${w * .1} -${h * .25} ${w * .2} -${h * .25} ${w * .3} 0 s${w * .2} ${h * .25} ${w * .3} 0" stroke="#1e120d" stroke-width="10" fill="none" stroke-linecap="round"/>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${bg}"/>${shapes}${sq}<text x="24" y="${h - 24}" font-family="sans-serif" font-size="22" fill="#1e120d" opacity=".55">รูปตัวอย่าง</text></svg>`;
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 const img = (seed, alt) => ({ src: art(seed), alt });
 
 const ROOMS = [
-  { id: 1, name: 'ทั่วไป', color: 'orange', icon: 'i-chat', desc: 'คุยเรื่องทั่วไป แนะนำตัว ถามตอบสารพัด', sticker: 'คุยเล่นได้' },
-  { id: 2, name: 'การเรียน', color: 'blue', icon: 'i-book', desc: 'ติวหนังสือ แชร์สรุป ปรึกษาเรื่องเรียนและฝึกงาน', sticker: 'ติวด้วยกัน' },
-  { id: 3, name: 'เทคโนโลยี', color: 'lime', icon: 'i-code', desc: 'โค้ด ฐานข้อมูล เครื่องมือ และปัญหาระหว่างทำโปรเจกต์', sticker: 'ถามได้ทุกบั๊ก' },
-  { id: 4, name: 'อาหาร', color: 'pink', icon: 'i-bowl', desc: 'ร้านอร่อย สูตรอาหาร และรีวิวของกิน', sticker: 'หิวแล้ว' },
-  { id: 5, name: 'ท่องเที่ยว', color: 'purple', icon: 'i-plane', desc: 'แผนเที่ยว รีวิวที่พัก และการเดินทาง', sticker: 'ไปกัน!' },
-  { id: 6, name: 'ดนตรี', color: 'mint', icon: 'i-music', desc: 'แชร์เพลง เครื่องดนตรี และคอนเสิร์ต', sticker: 'เปิดดังๆ' },
+  { id: 1, name: 'ทั่วไป', color: 'caramel', icon: 'i-chat', desc: 'คุยเรื่องทั่วไป แนะนำตัว ถามตอบสารพัด', sticker: 'คุยเล่นได้' },
+  { id: 2, name: 'การเรียน', color: 'stone', icon: 'i-book', desc: 'ติวหนังสือ แชร์สรุป ปรึกษาเรื่องเรียนและฝึกงาน', sticker: 'ติวด้วยกัน' },
+  { id: 3, name: 'เทคโนโลยี', color: 'honey', icon: 'i-code', desc: 'โค้ด ฐานข้อมูล เครื่องมือ และปัญหาระหว่างทำโปรเจกต์', sticker: 'ถามได้ทุกบั๊ก' },
+  { id: 4, name: 'อาหาร', color: 'peach', icon: 'i-bowl', desc: 'ร้านอร่อย สูตรอาหาร และรีวิวของกิน', sticker: 'หิวแล้ว' },
+  { id: 5, name: 'ท่องเที่ยว', color: 'latte', icon: 'i-plane', desc: 'แผนเที่ยว รีวิวที่พัก และการเดินทาง', sticker: 'ไปกัน!' },
+  { id: 6, name: 'ดนตรี', color: 'matcha', icon: 'i-music', desc: 'แชร์เพลง เครื่องดนตรี และคอนเสิร์ต', sticker: 'เปิดดังๆ' },
 ];
 
 const USERS = [
@@ -1323,6 +1409,7 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const paras = s => esc(s).split(/\n{2,}/).filter(Boolean).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 const icon = (id, cls = '') => `<svg class="i ${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
+const mascot = (cls = '') => `<svg class="mascot ${cls}" viewBox="0 0 200 188" aria-hidden="true"><use href="#mascot"/></svg>`;
 const doodle = (id, style, color = 'currentColor') => `<svg class="doodle" style="${style};color:${color}" aria-hidden="true"><use href="#${id}"/></svg>`;
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const smooth = () => reduced() ? 'auto' : 'smooth';
@@ -1566,6 +1653,7 @@ function renderNav() {
     </nav>
     ${sec('rooms', 'ห้อง', rooms.map(r => `<a class="nav-item" data-nav="room-${r.id}" href="#/rooms/${r.id}">${rIc(r)}${esc(r.name)}<span class="n">${r.topicCount}</span></a>`).join(''))}
     ${sec('tags', 'แท็กยอดนิยม', tags.map(t => `<a class="nav-item" data-nav="tag-${esc(t.name)}" href="#/tags/${encodeURIComponent(t.name)}"><span class="hash">#</span>${esc(t.name)}<span class="n">${t.count}</span></a>`).join(''))}
+    <a class="nav-mascot" href="${u ? '#/new' : '#/signup'}">${mascot()}<b>${u ? 'มีเรื่องอยากเล่า?' : 'ชงเรื่องมาคุยกัน'}</b><span>${u ? 'ตั้งกระทู้ใหม่ได้ในไม่กี่คลิก' : 'สมัครฟรี แล้วตั้งกระทู้แรกได้เลย'}</span></a>
     <p class="nav-foot">ไม่ต้องสมัครก็อ่านได้<br>ข้อมูลทั้งหมดเป็นข้อมูลตัวอย่าง</p>`;
 }
 function markNav() {
@@ -1598,9 +1686,10 @@ function listTitle(r, d) {
 }
 const rIc = (room, size = '') => `<span class="r-ic ${size}" style="--rc:var(--c-${room.color})">${icon(room.icon)}</span>`;
 
-function mediaHTML(images, key) {
+function mediaHTML(images, key, comments = null) {
   const n = images.length;
-  return `<div class="p-media" data-n="${n}" data-i="0" style="--ci:0"><div class="p-track">${images.map((im, k) => `<button type="button" data-action="lightbox" data-gallery="${key}" data-index="${k}" aria-label="ดูรูป ${k + 1} จาก ${n}"><img src="${im.src}" alt="${esc(im.alt || '')}" loading="lazy"></button>`).join('')}</div>
+  const chip = comments === null ? '' : `<span class="m-chip">${icon('i-chat')}<b>${comments}</b><span>ความเห็น</span></span>`;
+  return `<div class="p-media" data-n="${n}" data-i="0" style="--ci:0">${chip}<div class="p-track">${images.map((im, k) => `<button type="button" data-action="lightbox" data-gallery="${key}" data-index="${k}" aria-label="ดูรูป ${k + 1} จาก ${n}"><img src="${im.src}" alt="${esc(im.alt || '')}" loading="lazy"></button>`).join('')}</div>
     ${n > 1 ? `<button type="button" class="car-btn prev" data-action="car" data-d="-1" aria-label="รูปก่อนหน้า" disabled>${icon('i-left')}</button><button type="button" class="car-btn next" data-action="car" data-d="1" aria-label="รูปถัดไป">${icon('i-right')}</button><div class="dots">${images.map((_, k) => `<i class="${k ? '' : 'on'}"></i>`).join('')}</div><span class="car-count">1/${n}</span>` : ''}</div>`;
 }
 function setCarousel(m, i) {
@@ -1626,18 +1715,20 @@ function cardHTML(t, i, { q = '', activeTag = '', preview = false, still = false
   const by = author ? (preview ? `<span class="by">โดย ${esc(author.displayName)}</span>` : `<a class="by" href="#/u/${author.username}">โดย ${esc(author.displayName)}</a>`) : '';
   const meta = `<div class="p-meta">${roomEl}<span class="dot">•</span>${t.createdAt ? timeEl(t.createdAt) : '<span>เมื่อสักครู่</span>'}<span class="dot">•</span>${by}</div>`;
   const n = t.commentCount || 0;
+  const fresh = t.createdAt && NOW - Date.parse(t.createdAt) < 6 * 3600e3;
+  const badge = preview ? '' : n >= 5 ? `<span class="p-badge hot">${icon('i-flame')}มาแรง</span>` : fresh ? '<span class="p-badge">ใหม่</span>' : '';
   const li = inner => `<li class="${still || preview ? '' : 'rise'}" style="--i:${Math.min(i, 10)}">${inner}</li>`;
-  if (state.compact && !preview) return li(`<article class="post compact" data-id="${t.id}">
+  if (state.compact && !preview) return li(`<article class="post compact" data-id="${t.id}">${badge}
       <div class="p-thumb">${images[0] ? `<img src="${images[0].src}" alt="" loading="lazy">` : rIc(room, 'lg')}</div>
       <div style="min-width:0">${meta}<h3 class="p-title">${titleEl}</h3></div>
       <a class="pill" href="#/topics/${t.id}" aria-label="${n} ความเห็น">${icon('i-chat')}${n}</a></article>`);
   const flair = t.tags.length ? `<div class="flair">${t.tags.map(x => preview ? `<span>#${esc(x)}</span>` : `<a class="${x === activeTag ? 'on' : ''}" href="#/tags/${encodeURIComponent(x)}">#${esc(x)}</a>`).join('')}</div>` : '';
   const excerpt = (t.body || '').replace(/\s+/g, ' ').trim();
-  const body = images.length ? mediaHTML(images, preview ? 'preview' : 't' + t.id) : excerpt ? `<p class="p-ex">${esc(excerpt)}</p>` : '';
+  const body = images.length ? mediaHTML(images, preview ? 'preview' : 't' + t.id, preview ? null : n) : excerpt ? `<p class="p-ex">${esc(excerpt)}</p>` : '';
   const actions = preview
     ? `<div class="p-actions"><span class="pill">${icon('i-chat')}0 ความเห็น</span><span class="pill">${icon('i-share')}แชร์</span></div>`
     : `<div class="p-actions"><a class="pill" href="#/topics/${t.id}">${icon('i-chat')}${n} ความเห็น</a><button type="button" class="pill" data-action="share" data-href="#/topics/${t.id}">${icon('i-share')}แชร์</button></div>`;
-  return li(`<article class="post" data-id="${t.id || 0}">${meta}<h3 class="p-title">${titleEl}</h3>${flair}${body}${actions}</article>`);
+  return li(`<article class="post" data-id="${t.id || 0}">${badge}${meta}<h3 class="p-title">${titleEl}</h3>${flair}${body}${actions}</article>`);
 }
 
 function feedBar() {
@@ -1656,21 +1747,26 @@ function topicRows(topics, r) {
 }
 
 const rightRail = inner => `<aside class="rail-r" aria-label="ข้อมูลเพิ่มเติม">${inner}<p class="rail-foot">ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง</p></aside>`;
+function scoreCard({ title, sub, about = '', a, b, rows = '', cta }) {
+  return `<section class="board-stats"><h3 class="bs-h">${title}</h3><span class="bs-sub">${sub}</span>${about ? `<p>${about}</p>` : ''}
+    <div class="split"><div><span>${a[1]}</span><b>${a[0]}</b></div><i></i><div><span>${b[1]}</span><b>${b[0]}</b></div></div>
+    ${rows ? `<ul class="match">${rows}</ul>` : ''}${cta}</section>`;
+}
 function aboutBoardCard() {
-  return `<section class="card about"><div class="about-top" style="--rc:var(--c-lime)">${doodle('doodle-squig', 'right:14px;top:10px;width:90px;height:32px;opacity:.55', '#111')}</div>
-    <div class="card-h"><h3>เกี่ยวกับเว็บบอร์ด</h3></div>
-    <p>ตั้งกระทู้ แสดงความเห็น และคุยกันแบบเพื่อน แบ่งเป็นห้องตามหัวข้อ อ่านได้โดยไม่ต้องล็อกอิน</p>
-    <div class="stats3"><div><b>${TOPICS.length}</b><span>กระทู้</span></div><div><b>${COMMENTS.length}</b><span>ความเห็น</span></div><div><b>${USERS.length}</b><span>สมาชิก</span></div></div>
-    <a class="btn btn-primary btn-block" href="#/new">${icon('i-plus')}ตั้งกระทู้</a></section>`;
+  const rooms = api.rooms().slice().sort((x, y) => y.topicCount - x.topicCount).slice(0, 3);
+  const rows = rooms.map((r, i) => {
+    const ids = new Set(TOPICS.filter(t => t.roomId === r.id).map(t => t.id)), nC = COMMENTS.filter(c => ids.has(c.topicId)).length;
+    return `<li><a href="#/rooms/${r.id}"><span class="tl${i ? ' plain' : ''}">${i ? 'อันดับ ' + (i + 1) : 'ห้องยอดนิยม'}</span>${rIc(r, 'lg')}<span class="mid"><b>${esc(r.name)}</b><span>${nC} ความเห็น</span></span><span class="sc">${r.topicCount}<small>กระทู้</small></span></a></li>`;
+  }).join('');
+  return scoreCard({ title: 'เว็บบอร์ด', sub: 'ภาพรวมวันนี้', a: [TOPICS.length, 'กระทู้'], b: [COMMENTS.length, 'ความเห็น'], rows,
+    cta: `<a class="btn btn-cta btn-block" href="#/new">ตั้งกระทู้ใหม่<span class="go">${icon('i-plus')}</span></a>` });
 }
 function roomAbout(room) {
   const topics = TOPICS.filter(t => t.roomId === room.id), ids = new Set(topics.map(t => t.id));
   const cs = COMMENTS.filter(c => ids.has(c.topicId));
   const people = new Set([...topics.map(t => t.authorId), ...cs.map(c => c.authorId)]).size;
-  return `<section class="card about"><div class="about-top" style="--rc:var(--c-${room.color})">${doodle('doodle-spark', 'right:18px;top:10px;width:34px;height:34px', '#111')}</div>
-    <div class="card-h"><h3>เกี่ยวกับห้อง${esc(room.name)}</h3></div><p>${esc(room.desc)}</p>
-    <div class="stats3"><div><b>${topics.length}</b><span>กระทู้</span></div><div><b>${cs.length}</b><span>ความเห็น</span></div><div><b>${people}</b><span>คนร่วมคุย</span></div></div>
-    <a class="btn btn-primary btn-block" href="#/new">${icon('i-plus')}ตั้งกระทู้ในห้องนี้</a></section>`;
+  return scoreCard({ title: esc(room.name), sub: `${people} คนร่วมคุย`, about: esc(room.desc), a: [topics.length, 'กระทู้'], b: [cs.length, 'ความเห็น'],
+    cta: `<a class="btn btn-cta btn-block" href="#/new">ตั้งกระทู้ในห้องนี้<span class="go">${icon('i-plus')}</span></a>` });
 }
 function tagCard(tags, active = '') {
   return `<section class="card"><div class="card-h"><h3>แท็กยอดนิยม</h3></div>
@@ -1679,7 +1775,7 @@ function tagCard(tags, active = '') {
 function promoCard() {
   const u = state.user;
   if (u && u.twoFactor) return '';
-  return `<a class="promo" href="${u ? '#/settings/security/2fa' : '#/signup'}"><b>${u ? 'ล็อกอีกชั้นด้วย 2FA' : 'มีบัญชีแล้ว ปลอดภัยกว่า'}</b><span>${u ? 'ใช้แอป Authenticator ยืนยันตัวตนทุกครั้งที่เข้าสู่ระบบ' : 'สมัครฟรี ตั้งกระทู้ แนบรูป และเปิด 2FA ได้'}</span><svg class="shield" viewBox="0 0 24 24" fill="#111"><path d="M12 2 3.5 5.5v6c0 5 3.6 9.3 8.5 10.5 4.9-1.2 8.5-5.5 8.5-10.5v-6z"/><rect x="9" y="10" width="6" height="5" rx="1" fill="${HEX.purple}"/><path d="M10 10V8.5a2 2 0 0 1 4 0V10" stroke="${HEX.purple}" stroke-width="1.6" fill="none"/></svg></a>`;
+  return `<a class="promo" href="${u ? '#/settings/security/2fa' : '#/signup'}"><b>${u ? 'ล็อกอีกชั้นด้วย 2FA' : 'มีบัญชีแล้ว ปลอดภัยกว่า'}</b><span>${u ? 'ใช้แอป Authenticator ยืนยันตัวตนทุกครั้งที่เข้าสู่ระบบ' : 'สมัครฟรี ตั้งกระทู้ แนบรูป และเปิด 2FA ได้'}</span><svg class="shield" viewBox="0 0 24 24" fill="#1e120d"><path d="M12 2 3.5 5.5v6c0 5 3.6 9.3 8.5 10.5 4.9-1.2 8.5-5.5 8.5-10.5v-6z"/><rect x="9" y="10" width="6" height="5" rx="1" fill="${HEX.latte}"/><path d="M10 10V8.5a2 2 0 0 1 4 0V10" stroke="${HEX.latte}" stroke-width="1.6" fill="none"/></svg></a>`;
 }
 function recentCard() {
   const ids = state.recent.filter(id => TOPICS.some(t => t.id === id));
@@ -1695,11 +1791,12 @@ function homeView({ topics }) {
   const u = state.user;
   const head = u
     ? `<a class="create-bar" href="#/new">${avatar(u, 36)}<span class="fake">ตั้งกระทู้ใหม่…</span><span class="icon-btn" aria-hidden="true">${icon('i-image')}</span></a>`
-    : `<section class="welcome">${doodle('doodle-spark', 'right:30px;top:24px;width:40px;height:40px', 'var(--c-lime)')}${doodle('doodle-squig', 'right:110px;bottom:22px;width:110px;height:36px;opacity:.45', '#fff')}
-        <span class="sticker lime hide-mobile" style="--r:6deg;right:86px;top:26px">คุยกันแบบเพื่อน</span>
-        <h1>วันนี้อยากคุยเรื่อง<span class="hand">อะไร?</span></h1>
+    : `<section class="welcome">${mascot()}
+        <span class="w-chip hide-mobile" style="right:18px;bottom:18px;--pd:.15s">${icon('i-chat')}<b>${TOPICS.length}</b><span>กระทู้ทั้งหมด</span></span>
+        <span class="w-chip hide-mobile" style="right:18px;top:18px;--pd:.3s">${icon('i-user')}<b>${USERS.length}</b><span>สมาชิก</span></span>
+        <h1>วันนี้อยาก<br>คุยเรื่อง<span class="hand">อะไร?</span></h1>
         <p>อ่านได้เลยโดยไม่ต้องล็อกอิน สมัครฟรีเพื่อตั้งกระทู้ แสดงความเห็น และแนบรูป</p>
-        <div class="acts"><a class="btn btn-lime" href="#/signup">สมัครฟรี</a><a class="btn btn-white" href="#/login">เข้าสู่ระบบ</a></div></section>`;
+        <div class="acts"><a class="btn btn-honey" href="#/signup">สมัครฟรี</a><a class="btn btn-white" href="#/login">เข้าสู่ระบบ</a></div></section>`;
   return `<div class="feed-layout"><section class="feed-main" aria-label="กระทู้ล่าสุด">${head}${feedBar()}${topicRows(topics, { name: 'home' })}</section>
     ${rightRail(aboutBoardCard() + promoCard() + recentCard())}</div>`;
 }
@@ -1709,7 +1806,7 @@ function listView(r, { topics, rooms, tags }) {
   if (room) {
     const nC = topics.reduce((n, t) => n + t.commentCount, 0);
     return `<section class="c-banner" style="--rc:var(--c-${room.color})">
-        <div class="c-cover">${doodle('doodle-squig', 'left:40%;top:30px;width:140px;height:46px;opacity:.5', '#111')}${doodle('doodle-spark', 'left:24px;top:20px;width:38px;height:38px', '#111')}
+        <div class="c-cover">${doodle('doodle-squig', 'left:40%;top:30px;width:140px;height:46px;opacity:.5', '#1e120d')}${doodle('doodle-spark', 'left:24px;top:20px;width:38px;height:38px', '#1e120d')}
           <span class="sticker big" style="--r:-6deg;right:28px;top:26px">${esc(room.sticker)}</span></div>
         <div class="c-head"><span class="c-icon">${icon(room.icon)}</span><div><h1>${esc(room.name)}</h1><p>${topics.length} กระทู้ · ${nC} ความเห็น</p></div>
           <a class="btn btn-primary" href="#/new" aria-label="ตั้งกระทู้ในห้องนี้">${icon('i-plus')}<span class="lbl">ตั้งกระทู้</span></a></div>
@@ -1723,7 +1820,7 @@ function listView(r, { topics, rooms, tags }) {
 }
 
 function emptyArt() {
-  return `<div class="art">${doodle('doodle-smile', 'left:30px;top:10px;width:64px;height:64px', 'var(--ink)')}${doodle('doodle-spark', 'right:4px;top:0;width:32px;height:32px', 'var(--c-purple-ink)')}<span class="sticker lime" style="--r:-8deg;left:10px;bottom:6px">ยังว่างอยู่</span></div>`;
+  return `<div class="art">${mascot('empty')}${doodle('doodle-spark', 'right:4px;top:0;width:32px;height:32px', 'var(--c-latte-ink)')}<span class="sticker honey" style="--r:-8deg;left:10px;bottom:6px">ยังว่างอยู่</span></div>`;
 }
 function emptyList(r) {
   let h, p, a;
@@ -1748,7 +1845,7 @@ function errorView(e, r) {
       <h1>เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</h1><p>ตรวจการเชื่อมต่ออินเทอร์เน็ต แล้วลองอีกครั้ง ข้อมูลที่พิมพ์ไว้จะยังอยู่</p>
       <div class="actions"><button class="btn btn-primary" data-action="retry">${icon('i-refresh')}ลองอีกครั้ง</button></div></div></div>` };
   const what = e && e.what === 'room' ? 'ห้องนี้' : e && e.what === 'user' ? 'ผู้ใช้นี้' : r.name === 'topic' ? 'กระทู้นี้' : 'หน้านี้';
-  return { title: 'ไม่พบหน้า', html: `<div class="narrow"><div class="state"><span class="sticker purple big" style="--r:-8deg;left:calc(50% - 150px);top:40px">หลงทางแล้ว</span>
+  return { title: 'ไม่พบหน้า', html: `<div class="narrow"><div class="state"><span class="sticker latte big" style="--r:-8deg;left:calc(50% - 150px);top:40px">หลงทางแล้ว</span>
       <div class="code">404</div><h1>ไม่พบ${what}</h1><p>${r.name === 'topic' ? `ไม่มีกระทู้หมายเลข ${esc(r.id)} ` : ''}ลิงก์อาจพิมพ์ผิดหรือไม่ครบ</p>
       <div class="actions"><a class="btn btn-primary" href="#/">กลับหน้าแรก</a><button class="btn btn-ghost" data-action="history-back">ย้อนกลับ</button></div></div></div>` };
 }
@@ -1777,7 +1874,7 @@ function commentHTML(c, depth, no, kidsHTML, desc, replyTo, topic, anim) {
   const inner = `<article class="comment${collapsed ? ' collapsed' : ''}${fresh ? ' fresh' : ''}" id="c-${c.id}" data-id="${c.id}" data-author="${esc(u.displayName)}">
     ${desc ? `<button class="thread-line" data-action="toggle-thread" aria-label="ย่อหรือขยายความเห็นย่อยของ ${esc(u.displayName)}" aria-expanded="${!collapsed}"></button>` : ''}
     <div class="c-main">
-      <header class="c-top">${avatar(u, 32)}<a class="c-name" href="#/u/${u.username}">${esc(u.displayName)}</a>${u.id === topic.authorId ? '<span class="badge purple op">เจ้าของกระทู้</span>' : ''}<span class="muted">·</span>${timeEl(c.createdAt)}<span class="c-no">${depth === 0 ? 'ความเห็นที่ ' : ''}${no}</span></header>
+      <header class="c-top">${avatar(u, 32)}<a class="c-name" href="#/u/${u.username}">${esc(u.displayName)}</a>${u.id === topic.authorId ? '<span class="badge latte op">เจ้าของกระทู้</span>' : ''}<span class="muted">·</span>${timeEl(c.createdAt)}<span class="c-no">${depth === 0 ? 'ความเห็นที่ ' : ''}${no}</span></header>
       ${bodyHTML ? `<div class="c-body">${bodyHTML}</div>` : ''}
       ${c.image ? `<button class="c-img" type="button" data-action="lightbox" data-gallery="c${c.id}" data-index="0" aria-label="ดูรูปในความเห็น"><img src="${c.image.src}" alt="${esc(c.image.alt || '')}" loading="lazy"></button>` : ''}
       <div class="c-actions"><button class="link-btn" data-action="reply">ตอบกลับ</button>${desc ? `<button class="link-btn tog" data-action="toggle-thread"><span class="when-open">ซ่อนความเห็นย่อย</span><span class="when-closed">แสดง ${desc} ความเห็นย่อย</span></button>` : ''}</div>
@@ -1805,9 +1902,9 @@ function commentsHTML(comments, topic, animate) {
 
 function composerHTML({ parentId = null, compact = false, placeholder = 'แสดงความเห็น…' } = {}) {
   const u = state.user;
-  if (!u) return compact ? '' : `<div class="login-cta">${doodle('doodle-spark', 'right:30%;top:12px;width:30px;height:30px', 'var(--c-lime)')}
+  if (!u) return compact ? '' : `<div class="login-cta">${doodle('doodle-spark', 'right:30%;top:12px;width:30px;height:30px', 'var(--c-honey)')}
       <div><b>อยากร่วมวงคุยด้วยไหม?</b><span>เข้าสู่ระบบเพื่อแสดงความเห็น ตอบกลับ และแนบรูป</span></div>
-      <div class="acts"><a class="btn btn-lime" href="#/login?next=${encodeURIComponent(location.hash)}">เข้าสู่ระบบ</a><a class="btn btn-white" href="#/signup">สมัคร</a></div></div>`;
+      <div class="acts"><a class="btn btn-honey" href="#/login?next=${encodeURIComponent(location.hash)}">เข้าสู่ระบบ</a><a class="btn btn-white" href="#/signup">สมัคร</a></div></div>`;
   const id = parentId || 'root';
   const form = `<form class="composer${compact ? ' compact' : ''}" data-form="comment" data-parent="${parentId || ''}" novalidate>
     <label class="sr-only" for="cb-${id}">ความเห็น</label>
@@ -1868,12 +1965,12 @@ function userView(u, tab) {
   const list = tab === 'comments'
     ? (comments.length ? `<div>${comments.map((c, i) => { const t = TOPICS.find(x => x.id === c.topicId); return `<a class="ccard rise" style="--i:${Math.min(i, 10)}" href="#/topics/${t.id}"><div class="on-topic">ตอบใน <b>${esc(t.title)}</b> · ${timeEl(c.createdAt)}</div><div>${esc(c.body || '(แนบรูป)')}</div></a>`; }).join('')}</div>` : `<div class="state">${emptyArt()}<h2>ยังไม่มีความเห็น</h2></div>`)
     : (topics.length ? `<ul class="feed" id="rows">${topics.map((t, i) => cardHTML(t, i)).join('')}</ul>` : `<div class="state">${emptyArt()}<h2>ยังไม่ได้ตั้งกระทู้</h2>${me ? `<div class="actions"><a class="btn btn-primary" href="#/new">${icon('i-plus')}ตั้งกระทู้แรก</a></div>` : ''}</div>`);
-  const card = `<section class="u-card">${doodle('doodle-spark', 'right:18px;top:16px;width:30px;height:30px', 'var(--c-lime)')}
+  const card = `<section class="u-card">${doodle('doodle-spark', 'right:18px;top:16px;width:30px;height:30px', 'var(--c-honey)')}
       <div class="u-top">${avatar(u, 48)}<div><b>${esc(u.displayName)}</b><span>@${esc(u.username)}</span></div></div>
       ${u.bio ? `<p>${esc(u.bio)}</p>` : ''}
       <div class="p-stats"><div class="p-stat pop"><b>${topics.length}</b><span>กระทู้</span></div><div class="p-stat pop" style="--i:1"><b>${comments.length}</b><span>ความเห็น</span></div></div>
       <div class="u-joined">${icon('i-clock')}เข้าร่วมเมื่อ ${dfMonth.format(new Date(u.joinedAt))}</div>
-      ${me ? `<a class="btn btn-lime btn-block" href="#/settings/profile">${icon('i-settings')}แก้ไขโปรไฟล์</a>` : ''}</section>`;
+      ${me ? `<a class="btn btn-honey btn-block" href="#/settings/profile">${icon('i-settings')}แก้ไขโปรไฟล์</a>` : ''}</section>`;
   return `<div class="feed-layout"><section class="feed-main">
       <div class="u-head">${avatar(u, 96)}<div><h1>${esc(u.displayName)}</h1><div class="handle">@${esc(u.username)} · ${topics.length} กระทู้ · ${comments.length} ความเห็น</div></div></div>
       <nav class="tabs" data-tabs><span class="tab-ind"></span><a href="#/u/${u.username}" class="${tab === 'topics' ? 'on' : ''}">กระทู้</a><a href="#/u/${u.username}/comments" class="${tab === 'comments' ? 'on' : ''}">ความเห็น</a></nav>
@@ -1896,7 +1993,7 @@ function newTopicView() {
   return `<div class="feed-layout" id="newLayout" data-tab="${d.tab}">
     <section class="create feed-main">
       <div class="create-h"><h1>ตั้งกระทู้<span class="hand">ใหม่</span></h1><p>โพสต์ในชื่อ <b style="color:var(--ink)">${esc(u.displayName)}</b></p>
-        <span class="sticker lime hide-mobile" style="--r:6deg;right:0;top:6px">ถามได้ทุกเรื่อง</span></div>
+        <span class="sticker honey hide-mobile" style="--r:6deg;right:0;top:6px">ถามได้ทุกเรื่อง</span></div>
       <div class="seg" role="tablist" data-tab="${d.tab}"><span class="seg-ind"></span>
         <button type="button" role="tab" data-action="tab" data-tab="write" aria-selected="${d.tab === 'write'}">เขียน</button>
         <button type="button" role="tab" data-action="tab" data-tab="preview" aria-selected="${d.tab === 'preview'}">ดูตัวอย่าง</button></div>
@@ -1958,15 +2055,15 @@ function authArt(kind) {
     signup: ['เริ่มคุย<br>ได้ใน<span class="hand">1 นาที</span>', 'สมัครฟรี ตั้งกระทู้ แนบรูป และปกป้องบัญชีด้วย 2FA'],
     secure: ['ล็อก<br>อีก<span class="hand">ชั้น</span>', 'รหัสผ่านอย่างเดียวไม่พอ ใช้รหัสจากแอปยืนยันทุกครั้งที่เข้าสู่ระบบ'],
   }[kind];
-  return `<section class="auth-art" aria-hidden="true">
-    ${doodle('doodle-spark', 'right:44px;top:40px;width:48px;height:48px', 'var(--c-lime)')}
+  return `<section class="auth-art" aria-hidden="true">${mascot()}
+    ${doodle('doodle-spark', 'right:44px;top:40px;width:48px;height:48px', 'var(--c-honey)')}
     ${doodle('doodle-squig', 'left:44px;bottom:36px;width:130px;height:40px;opacity:.5', '#fff')}
     <div><h2>${copy[0]}</h2><p>${copy[1]}</p></div>
     <div class="collage">
-      <div class="float-card" style="--fc:var(--c-lime);--r:-5deg;left:4%;top:10px;--fd:0s;--pd:.1s"><b>EF Core migration ชนกันตอน merge ทำยังไงดี</b><span>${icon('i-chat')} 8 ความเห็น</span></div>
-      <div class="float-card" style="--fc:var(--c-purple);--r:4deg;right:2%;top:96px;--fd:-2s;--pd:.22s"><b>เที่ยวน่าน 3 วัน 2 คืน งบ 4,000</b><span>${icon('i-image')} 4 รูป</span></div>
+      <div class="float-card" style="--fc:var(--c-honey);--r:-5deg;left:4%;top:10px;--fd:0s;--pd:.1s"><b>EF Core migration ชนกันตอน merge ทำยังไงดี</b><span>${icon('i-chat')} 8 ความเห็น</span></div>
+      <div class="float-card" style="--fc:var(--c-latte);--r:4deg;right:2%;top:96px;--fd:-2s;--pd:.22s"><b>เที่ยวน่าน 3 วัน 2 คืน งบ 4,000</b><span>${icon('i-image')} 4 รูป</span></div>
       <div class="float-card" style="--fc:#fff;--r:-2deg;left:14%;top:190px;--fd:-4s;--pd:.34s"><b>สรุป Layered Architecture สำหรับ SASD</b><span>${icon('i-chat')} 4 ความเห็น</span></div>
-      <span class="sticker big ticket lime" style="--r:-10deg;right:12%;top:0;--sd:.5s">${kind === 'secure' ? 'ปลอดภัย<br>สบายใจ' : 'คุยกัน<br>แบบเพื่อน'}</span>
+      <span class="sticker big ticket honey" style="--r:-10deg;right:6%;top:-40px;--sd:.5s">${kind === 'secure' ? 'ปลอดภัย<br>สบายใจ' : 'คุยกัน<br>แบบเพื่อน'}</span>
     </div></section>`;
 }
 const pwField = (id, name, label, ph, auto, extra = '') => `<div class="field" data-field="${name}">
@@ -1999,7 +2096,7 @@ function loginView(r) {
 function twofaView() {
   const u = userById(state.pending2fa.userId);
   return `<div class="auth">${authArt('secure')}<section class="auth-form"><div class="auth-card">
-    <div style="width:64px;height:64px;border-radius:20px;background:var(--c-purple);color:#111;display:grid;place-items:center;margin-bottom:18px;transform:rotate(-6deg)">${icon('i-shield')}</div>
+    <div style="width:64px;height:64px;border-radius:20px;background:var(--c-latte);color:#1e120d;display:grid;place-items:center;margin-bottom:18px;transform:rotate(-6deg)">${icon('i-shield')}</div>
     <h1>ยืนยันตัวตน<br>2 ขั้นตอน</h1>
     <p class="lead">ใส่รหัส 6 หลักจากแอป Authenticator ของ <b>${esc(maskEmail(u.email))}</b></p>
     <div id="formAlert"></div>
@@ -2042,7 +2139,7 @@ function signupView() {
 function verifyView() {
   return `<div class="auth">${authArt('signup')}<section class="auth-form"><div class="auth-card">
     ${signupStepper(1)}
-    <div style="width:64px;height:64px;border-radius:20px;background:var(--c-lime);color:#111;display:grid;place-items:center;margin-bottom:18px;transform:rotate(5deg)">${icon('i-mail')}</div>
+    <div style="width:64px;height:64px;border-radius:20px;background:var(--c-honey);color:#1e120d;display:grid;place-items:center;margin-bottom:18px;transform:rotate(5deg)">${icon('i-mail')}</div>
     <h1>ตรวจอีเมลของคุณ</h1>
     <p class="lead">เราส่งรหัส 6 หลักไปที่ <b>${esc(state.signup.email)}</b> รหัสใช้ได้ 10 นาที</p>
     <div id="formAlert"></div>
@@ -2060,7 +2157,7 @@ function secureView() {
     <h1>ยินดีต้อนรับ ${esc(u.displayName)}!</h1>
     <p class="lead">บัญชีพร้อมใช้แล้ว ขั้นสุดท้าย: เพิ่มความปลอดภัยให้บัญชีไหม?</p>
     <div style="display:grid;gap:10px;text-align:left">
-      <a class="choice" href="#/settings/security/2fa?next=${encodeURIComponent('#/')}" style="--rc:var(--c-purple)"><span class="ic">${icon('i-shield')}</span><span><b>เปิด 2FA ตอนนี้</b><span>ใช้แอป Authenticator · ใช้เวลาราว 1 นาที</span></span>${icon('i-right')}</a>
+      <a class="choice" href="#/settings/security/2fa?next=${encodeURIComponent('#/')}" style="--rc:var(--c-latte)"><span class="ic">${icon('i-shield')}</span><span><b>เปิด 2FA ตอนนี้</b><span>ใช้แอป Authenticator · ใช้เวลาราว 1 นาที</span></span>${icon('i-right')}</a>
       <a class="choice" href="#/" data-action="skip-2fa"><span class="ic">${icon('i-arrow')}</span><span><b>ไว้ทีหลัง</b><span>เปิดได้ทุกเมื่อที่ ความปลอดภัย</span></span>${icon('i-right')}</a>
     </div>
   </div></section></div>`;
@@ -2080,7 +2177,7 @@ function forgotView() {
 function forgotSentView(r) {
   const email = r.qs.get('email') || '';
   return `<div class="auth">${authArt('login')}<section class="auth-form"><div class="auth-card" style="text-align:center">
-    <div class="success-mark" style="background:var(--c-purple)"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div class="success-mark" style="background:var(--c-latte)"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
     <h1>ตรวจกล่องอีเมล</h1>
     <p class="lead">ถ้ามีบัญชีที่ใช้ <b>${esc(email)}</b> เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปแล้ว ลิงก์ใช้ได้ 30 นาที</p>
     <div style="display:grid;gap:10px"><a class="btn btn-primary btn-block" href="#/reset?token=mock">เปิดลิงก์ในอีเมล (จำลอง)</a><a class="btn btn-ghost btn-block" href="#/login">กลับไปเข้าสู่ระบบ</a></div>
@@ -2137,12 +2234,12 @@ function settingsView(tab) {
         <div style="margin:-12px 0 20px">${strengthHTML()}</div>
         <div style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="btn btn-ghost btn-sm" data-action="pw-expand">ยกเลิก</button><button class="btn btn-primary btn-sm" type="submit"><span class="lbl">บันทึกรหัสผ่าน</span></button></div>
       </form></div></div>
-      <div class="sec-row"><span class="ic" style="background:var(--c-purple);color:#111">${icon('i-shield')}</span>
+      <div class="sec-row"><span class="ic" style="background:var(--c-latte);color:#1e120d">${icon('i-shield')}</span>
         <div><b>ยืนยันตัวตน 2 ขั้นตอน ${u.twoFactor ? '<span class="badge ok">เปิดอยู่</span>' : '<span class="badge">ปิดอยู่</span>'}</b><span>${u.twoFactor ? 'ใช้แอป Authenticator ทุกครั้งที่เข้าสู่ระบบจากอุปกรณ์ใหม่' : 'แนะนำให้เปิด เพื่อกันคนที่รู้รหัสผ่านของคุณ'}</span></div>
         <div class="acts">${u.twoFactor ? `<button class="btn btn-ghost btn-sm" data-action="2fa-disable">ปิด 2FA</button>` : `<a class="btn btn-primary btn-sm" href="#/settings/security/2fa">เปิด 2FA</a>`}</div></div>
     </section>
     <section class="card s-card"><div class="card-h"><h2>อุปกรณ์ที่เข้าสู่ระบบ</h2>${SESSIONS.length > 1 ? `<button class="btn btn-ghost btn-sm" data-action="revoke-all">ออกจากระบบอุปกรณ์อื่นทั้งหมด</button>` : ''}</div>
-      <div id="sessions">${SESSIONS.map(s => `<div class="session" data-session="${s.id}"><span class="ic">${icon(s.icon)}</span><div><b>${esc(s.device)}${s.current ? ' <span class="badge lime">อุปกรณ์นี้</span>' : ''}</b><span>${esc(s.client)} · ${esc(s.place)} · ${s.current ? 'ใช้งานอยู่' : esc(rel(ago(s.seen)))}</span></div>${s.current ? '' : `<button class="btn btn-white btn-sm" data-action="revoke">ออกจากระบบ</button>`}</div>`).join('')}</div>
+      <div id="sessions">${SESSIONS.map(s => `<div class="session" data-session="${s.id}"><span class="ic">${icon(s.icon)}</span><div><b>${esc(s.device)}${s.current ? ' <span class="badge honey">อุปกรณ์นี้</span>' : ''}</b><span>${esc(s.client)} · ${esc(s.place)} · ${s.current ? 'ใช้งานอยู่' : esc(rel(ago(s.seen)))}</span></div>${s.current ? '' : `<button class="btn btn-white btn-sm" data-action="revoke">ออกจากระบบ</button>`}</div>`).join('')}</div>
     </section>`;
   return `<div class="settings"><div class="plain-head" style="padding-bottom:0"><h1>ตั้งค่า<span class="hand">${tab === 'profile' ? 'โปรไฟล์' : 'ความปลอดภัย'}</span></h1></div>
     ${nav}<div class="s-stack">${body}</div></div>`;
@@ -2153,7 +2250,7 @@ function qrSVG(seed) {
   const finder = (x, y) => (x < 7 && y < 7) || (x >= n - 7 && y < 7) || (x < 7 && y >= n - 7);
   for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (!finder(x, y) && r() > .52) cells.push(`<rect x="${x}" y="${y}" width="1" height="1"/>`);
   const f = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7" rx="1.6"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" rx="1.1" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" rx=".7"/>`;
-  return `<svg viewBox="0 0 ${n} ${n}" fill="#111" shape-rendering="crispEdges" role="img" aria-label="QR code สำหรับเพิ่มบัญชีในแอป (จำลอง)">${cells.join('')}${f(0, 0)}${f(n - 7, 0)}${f(0, n - 7)}</svg>`;
+  return `<svg viewBox="0 0 ${n} ${n}" fill="#1e120d" shape-rendering="crispEdges" role="img" aria-label="QR code สำหรับเพิ่มบัญชีในแอป (จำลอง)">${cells.join('')}${f(0, 0)}${f(n - 7, 0)}${f(0, n - 7)}</svg>`;
 }
 function setupView() {
   const s = state.setup, u = state.user;
