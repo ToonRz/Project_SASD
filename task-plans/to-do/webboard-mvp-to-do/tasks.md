@@ -23,7 +23,7 @@ Solution .NET ที่ build/test ได้, PostgreSQL ที่สร้า�
 | [MVP-01](TASK-MVP-01-solution-skeleton.md) | Solution, projects, OpenAPI, ProblemDetails, test project | — | narawichswu (Claude) | DONE |
 | [MVP-02](TASK-MVP-02-database-dbcontext.md) | PostgreSQL ผ่าน compose, `WebboardDbContext`, test fixture | MVP-01 | narawichswu (Claude) | DONE |
 | [MVP-03](TASK-MVP-03-topic-comment-entities.md) | Entity `Topic`, `Comment` + migration | MVP-02, AUTH-01 | narawichswu (Claude) | DONE |
-| [MVP-04](TASK-MVP-04-topics-api.md) | `GET/POST /api/topics`, `GET /api/topics/{id}` | MVP-03, AUTH-03 | — | TODO |
+| [MVP-04](TASK-MVP-04-topics-api.md) | `GET/POST /api/topics`, `GET /api/topics/{id}` | MVP-03, AUTH-03 | narawichswu (Claude) | DONE |
 | [MVP-05](TASK-MVP-05-comments-api.md) | `POST /api/topics/{id}/comments` | MVP-04 | — | TODO |
 | [MVP-06](TASK-MVP-06-presentation.md) | หน้าเว็บ: รายการ, กระทู้, login + 2FA, ตั้งกระทู้, ความเห็น | MVP-05, AUTH-03 | — | BLOCKED: รอ TASK-presentation-tech-decision-01 |
 
@@ -118,3 +118,20 @@ $ dotnet format --verify-no-changes
 ```
 
 หมายเหตุ: `dotnet ef` ต้องการ `DataProtection__KeysPath` และ `Jwt__SigningKey` ใน environment (ตั้งชั่วคราวใน shell); `dotnet format` แปลง line ending ของ migration ที่ generate เป็น LF
+
+### MVP-04 — DONE (narawichswu (Claude), 2026-10-31)
+
+Test แดงก่อน: `dotnet test --filter FullyQualifiedName~TopicsApiTests` → `Failed: 8, Passed: 1, Total: 9` (ยังไม่มี endpoint) แล้วเขียวหลัง implement `TopicService` + `TopicsController`
+
+```text
+$ dotnet build -warnaserror
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+$ dotnet test --filter FullyQualifiedName~TopicsApiTests
+Passed!  - Failed:     0, Passed:     9, Skipped:     0, Total:     9 - Webboard.Api.Tests.dll (net10.0)
+$ dotnet test
+Passed!  - Failed:     0, Passed:    56, Skipped:     0, Total:    56 - Webboard.Api.Tests.dll (net10.0)
+$ dotnet format --verify-no-changes
+(exit 0)
+```

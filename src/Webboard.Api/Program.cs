@@ -23,6 +23,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<TokenService>();
 builder.Services.AddSingleton<TotpService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<TopicService>();
 
 var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Webboard");
 var keysPath = builder.Configuration["DataProtection:KeysPath"];

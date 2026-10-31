@@ -1,7 +1,7 @@
 # TASK-MVP-04 — `GET/POST /api/topics`, `GET /api/topics/{id}`
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** MVP-03, AUTH-03 (JWT bearer + access-token policy, `ClaimsPrincipalExtensions.GetUserId()`, `TestAuth.GetAccessTokenAsync`)
 **Spec:** `task-plans/spec/spec-webboard-mvp.md` §2 D14, §3; FR-TOPIC-001…004, FR-AUTH-007
 **Produces:** `TopicService`, `TopicsController`, DTO `TopicSummaryDto`, `TopicDetailDto`, `CommentDto`
