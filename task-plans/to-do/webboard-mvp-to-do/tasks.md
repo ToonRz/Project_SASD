@@ -24,7 +24,7 @@ Solution .NET ที่ build/test ได้, PostgreSQL ที่สร้า�
 | [MVP-02](TASK-MVP-02-database-dbcontext.md) | PostgreSQL ผ่าน compose, `WebboardDbContext`, test fixture | MVP-01 | narawichswu (Claude) | DONE |
 | [MVP-03](TASK-MVP-03-topic-comment-entities.md) | Entity `Topic`, `Comment` + migration | MVP-02, AUTH-01 | narawichswu (Claude) | DONE |
 | [MVP-04](TASK-MVP-04-topics-api.md) | `GET/POST /api/topics`, `GET /api/topics/{id}` | MVP-03, AUTH-03 | narawichswu (Claude) | DONE |
-| [MVP-05](TASK-MVP-05-comments-api.md) | `POST /api/topics/{id}/comments` | MVP-04 | — | TODO |
+| [MVP-05](TASK-MVP-05-comments-api.md) | `POST /api/topics/{id}/comments` | MVP-04 | narawichswu (Claude) | DONE |
 | [MVP-06](TASK-MVP-06-presentation.md) | หน้าเว็บ: รายการ, กระทู้, login + 2FA, ตั้งกระทู้, ความเห็น | MVP-05, AUTH-03 | — | BLOCKED: รอ TASK-presentation-tech-decision-01 |
 
 ## Dependency order
@@ -135,3 +135,22 @@ Passed!  - Failed:     0, Passed:    56, Skipped:     0, Total:    56 - Webboard
 $ dotnet format --verify-no-changes
 (exit 0)
 ```
+
+### MVP-05 — DONE (narawichswu (Claude), 2026-10-31)
+
+Test แดงก่อน: `dotnet test --filter FullyQualifiedName~CommentsApiTests` → `Failed: 4, Passed: 1, Total: 5` (ยังไม่มี route) แล้วเขียวหลัง implement `CommentService` + `CommentsController`
+
+```text
+$ dotnet build -warnaserror
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+$ dotnet test --filter FullyQualifiedName~CommentsApiTests
+Passed!  - Failed:     0, Passed:     5, Skipped:     0, Total:     5 - Webboard.Api.Tests.dll (net10.0)
+$ dotnet test
+Passed!  - Failed:     0, Passed:    61, Skipped:     0, Total:    61 - Webboard.Api.Tests.dll (net10.0)
+$ dotnet format --verify-no-changes
+(exit 0)
+```
+
+หมายเหตุ: `Location` ของ `POST /api/topics/{id}/comments` ชี้ `/api/topics/{id}` เพราะ MVP ไม่มี endpoint อ่าน comment เดี่ยว

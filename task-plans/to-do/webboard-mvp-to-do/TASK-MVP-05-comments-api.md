@@ -1,7 +1,7 @@
 # TASK-MVP-05 — `POST /api/topics/{id}/comments`
 
-**Status:** TODO
-**Owner:** —
+**Status:** DONE
+**Owner:** narawichswu (Claude)
 **Depends on:** MVP-04
 **Spec:** `task-plans/spec/spec-webboard-mvp.md` §3; FR-COMMENT-001…003
 **Produces:** `CommentService`, `CommentsController`; `GET /api/topics/{id}` คืน comments เรียงเก่า → ใหม่

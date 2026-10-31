@@ -24,6 +24,7 @@ builder.Services.AddSingleton<TokenService>();
 builder.Services.AddSingleton<TotpService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TopicService>();
+builder.Services.AddScoped<CommentService>();
 
 var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Webboard");
 var keysPath = builder.Configuration["DataProtection:KeysPath"];
